@@ -116,7 +116,7 @@ static bool load_fonts(const cJSON *const json) {
         const float scale = (float)drawable_height / (float)window_height;
         for (size_t font_index = 0ULL; font_index < FONT_COUNT; ++font_index) {
                 if (!(fonts[font_index] = TTF_OpenFont(font_paths[font_index], (int)(font_sizes[font_index] * scale)))) {
-                        send_message(MESSAGE_ERROR, "Failed to load fonts: Failed to open font %zu: %s", font_index, TTF_GetMESSAGE_ERROR());
+                        send_message(MESSAGE_ERROR, "Failed to load fonts: Failed to open font %zu: %s", font_index, TTF_GetError());
                         return false;
                 }
 

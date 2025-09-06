@@ -47,7 +47,7 @@ void set_persistent_music_enabled(const bool music_enabled) {
 bool load_persistent_data(void) {
         char *const writable_directory_path = SDL_GetPrefPath("PlasmaPuffsProductions", "Sokobee");
         if (!writable_directory_path) {
-                send_message(MESSAGE_ERROR, "Failed to load persistent data: Failed to query writable directory path: %s", SDL_GetMESSAGE_ERROR());
+                send_message(MESSAGE_ERROR, "Failed to load persistent data: Failed to query writable directory path: %s", SDL_GetError());
                 return false;
         }
 
@@ -60,7 +60,7 @@ bool load_persistent_data(void) {
         if (file == NULL) {
                 file = fopen(persistent_data_file_path, "w+");
                 if (file == NULL) {
-                        send_message(MESSAGE_ERROR, "Failed to load persistent data: Failed to create save file at \"%s\": %s", persistent_data_file_path, strMESSAGE_ERROR(errno));
+                        send_message(MESSAGE_ERROR, "Failed to load persistent data: Failed to create save file at \"%s\": %s", persistent_data_file_path, strerror(errno));
                         return false;
                 }
         }
@@ -71,7 +71,7 @@ bool load_persistent_data(void) {
 
         char *const data = (char *)xmalloc(size + 1ULL);
         if (fread(data, 1ULL, size, file) != size) {
-                send_message(MESSAGE_ERROR, "Failed to load persistent data; Failed to read save file at \"%s\": %s", persistent_data_file_path, strMESSAGE_ERROR(errno));
+                send_message(MESSAGE_ERROR, "Failed to load persistent data; Failed to read save file at \"%s\": %s", persistent_data_file_path, strerror(errno));
                 xfree(data);
                 fclose(file);
                 return false;
@@ -106,7 +106,7 @@ bool save_persistent_data(void) {
 
         FILE *const file = fopen(persistent_data_file_path, "w");
         if (file == NULL) {
-                send_message(MESSAGE_ERROR, "Failed to save persistent data: Failed to open save file in write mode: %s", strMESSAGE_ERROR(errno));
+                send_message(MESSAGE_ERROR, "Failed to save persistent data: Failed to open save file in write mode: %s", strerror(errno));
                 free(json_string);
                 return false;
         }

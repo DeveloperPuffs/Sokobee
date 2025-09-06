@@ -79,7 +79,7 @@ static void remove_allocation(void *const pointer, const char *const file, const
         fflush(stderr);
 }
 
-void *_malloc(const size_t size, const char *const file, const size_t line) {
+void *track_malloc(const size_t size, const char *const file, const size_t line) {
         void *const allocated = malloc(size);
         if (allocated == NULL) {
                 fprintf(stderr, "xmalloc(%zu): Out of memory at %s:%zu\n", size, file, line);
@@ -92,7 +92,7 @@ void *_malloc(const size_t size, const char *const file, const size_t line) {
         return allocated;
 }
 
-void *_calloc(const size_t count, const size_t size, const char *const file, const size_t line) {
+void *track_calloc(const size_t count, const size_t size, const char *const file, const size_t line) {
         void *const allocated = calloc(count, size);
         if (allocated == NULL) {
                 fprintf(stderr, "xcalloc(%zu, %zu): Out of memory at %s:%zu\n", count, size, file, line);
@@ -105,7 +105,7 @@ void *_calloc(const size_t count, const size_t size, const char *const file, con
         return allocated;
 }
 
-void *_realloc(void *const pointer, const size_t size, const char *const file, const size_t line) {
+void *track_realloc(void *const pointer, const size_t size, const char *const file, const size_t line) {
         if (pointer != NULL) {
                 remove_allocation(pointer, file, line);
         }
@@ -122,7 +122,7 @@ void *_realloc(void *const pointer, const size_t size, const char *const file, c
         return reallocated;
 }
 
-char *_strdup(const char *const string, const char *const file, const size_t line) {
+char *track_strdup(const char *const string, const char *const file, const size_t line) {
         char *const duplicated = strdup(string);
         if (duplicated == NULL) {
                 fprintf(stderr, "xstrdup(%s): Out of memory at %s:%zu\n", string, file, line);
@@ -136,7 +136,7 @@ char *_strdup(const char *const string, const char *const file, const size_t lin
         return duplicated;
 }
 
-void _free(void *const pointer, const char *const file, const size_t line) {
+void track_free(void *const pointer, const char *const file, const size_t line) {
         if (pointer == NULL) {
                 return;
         }

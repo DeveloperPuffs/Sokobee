@@ -158,7 +158,8 @@ typedef struct internal_hooks
     void *(CJSON_CDECL *reallocate)(void *pointer, size_t size);
 } internal_hooks;
 
-#if defined(_MSC_VER)
+// MODIFIED: Use the standard 'malloc()', 'free()', and 'realloc()' functions when using Clang
+#if defined(_MSC_VER) && !defined(__clang__)
 /* work around MSVC MESSAGE_ERROR C2322: '...' address of dllimport '...' is not static */
 static void * CJSON_CDECL internal_malloc(size_t size)
 {

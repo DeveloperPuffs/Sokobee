@@ -45,26 +45,43 @@ static const char *const message_severity_strings[COUNT] = {
         [MESSAGE_VERBOSE]     = "    \033[34mMESSAGE_VERBOSE\033[m"
 };
 
-static inline void send_message(const enum MessageSeverity message_severity, const char *message, ...) {
+static inline void send_message(const enum MessageSeverity message_severity, const char *const message, ...) {
         struct timespec time_specification;
         struct tm local_time;
         char time_string[TIME_STRING_SIZE];
 
+#ifdef _WIN32
+        timespec_get(&time_specification, TIME_UTC);
+        localtime_s(&local_time, &time_specification.tv_sec);
+#else
         timespec_get(&time_specification, TIME_UTC);
         localtime_r(&time_specification.tv_sec, &local_time);
+#endif
+
         strftime(time_string, sizeof(time_string), "%Y-%m-%d - %I:%M:%S", &local_time);
 
         va_list arguments;
         va_start(arguments, message);
 
-        const size_t size = (size_t)vsnprintf(NULL, 0ULL, message, arguments) + 1ULL;
+#ifdef _WIN32
+        const size_t size = (size_t)_vscprintf(message, arguments) + 1;
+#else
+        const size_t size = (size_t)vsnprintf(NULL, 0, message, arguments) + 1;
+#endif
+
         char *const formatted = (char *)xmalloc(size);
         vsnprintf(formatted, size, message, arguments);
 
         FILE *const stream = message_severity <= MESSAGE_ERROR ? stderr : stdout;
-        fprintf(stream, "%s(%s.%09ld %s): %s\n", message_severity_strings[message_severity], time_string, time_specification.tv_nsec, local_time.tm_hour >= 12 ? "PM" : "AM", formatted);
-        fflush(stream);
+        fprintf(stream, "%s(%s.%09ld %s): %s\n",
+                message_severity_strings[message_severity],
+                time_string,
+                time_specification.tv_nsec,
+                local_time.tm_hour >= 12 ? "PM" : "AM",
+                formatted
+        );
 
+        fflush(stream);
         xfree(formatted);
         va_end(arguments);
 }

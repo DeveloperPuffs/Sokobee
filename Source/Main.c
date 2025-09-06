@@ -1,8 +1,8 @@
 #include <time.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "SDL.h"
+#include "SDL_ttf.h"
 
 #include "Audio.h"
 #include "Debug.h"
@@ -20,7 +20,7 @@ static void initialize(void);
 static void update(const double delta_time);
 static void terminate(const int exit_code);
 
-int main(const int argument_count, char *const argument_values[]) {
+int main(int argument_count, char *argument_values[]) {
         srand((unsigned int)time(NULL));
         initialize();
 
@@ -41,7 +41,7 @@ static void initialize(void) {
         send_message(MESSAGE_INFORMATION, "Initializing program...");
 
         if (SDL_Init(SDL_INIT_EVERYTHING) < 0 || TTF_Init() < 0) {
-                send_message(MESSAGE_FATAL, "Failed to initialize program: Failed to initialize SDL: %s", SDL_GetMESSAGE_ERROR());
+                send_message(MESSAGE_FATAL, "Failed to initialize program: Failed to initialize SDL: %s", SDL_GetError());
                 terminate(EXIT_FAILURE);
         }
 

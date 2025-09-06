@@ -30,8 +30,6 @@ def main():
         if system == "Windows":
                 executable_path = executable_path.with_suffix(".exe")
                 cmake_command += ["-G", "Ninja", "-DCMAKE_C_COMPILER=clang", "-DCMAKE_CXX_COMPILER=clang++"]
-                if build_type == "Debug":
-                        cmake_command.append("-DCMAKE_C_FLAGS_DEBUG=-fsanitize=address -fno-omit-frame-pointer")
         elif system == "Darwin":
                 if build_type == "Debug":
                         cmake_command.append("-DCMAKE_C_FLAGS_DEBUG=-fsanitize=address -fno-omit-frame-pointer")
@@ -52,8 +50,11 @@ def main():
         subprocess.check_call(cmake_command)
         subprocess.check_call(["cmake", "--build", "."])
 
-        if executable_path.is_file() and os.access(executable_path, os.X_OK):
-                subprocess.run([str(executable_path)], cwd=root_directory)
+        if executable_path.is_file():
+                print(f"Running: {executable_path}")
+                subprocess.run([str(executable_path)], cwd=root_directory, check=True)
+        else:
+                print(f"Executable not found: {executable_path}")
 
 if __name__ == "__main__":
         sys.exit(main())

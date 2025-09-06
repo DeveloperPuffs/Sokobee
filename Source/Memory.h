@@ -7,19 +7,25 @@
 
 void flush_memory_leaks(void);
 
-void *_malloc(const size_t size, const char *const file, const size_t line);
-void *_calloc(const size_t count, const size_t size, const char *const file, const size_t line);
-void *_realloc(void *const pointer, const size_t size, const char *const file, const size_t line);
-char *_strdup(const char *const string, const char *const file, const size_t line);
-void  _free(void *const pointer, const char *const file, const size_t line);
+void *track_malloc(const size_t size, const char *const file, const size_t line);
+void *track_calloc(const size_t count, const size_t size, const char *const file, const size_t line);
+void *track_realloc(void *const pointer, const size_t size, const char *const file, const size_t line);
+char *track_strdup(const char *const string, const char *const file, const size_t line);
+void  track_free(void *const pointer, const char *const file, const size_t line);
 
-#define xmalloc(size)           _malloc((size),              __FILE__, (size_t)__LINE__)
-#define xcalloc(count, size)    _calloc((count), (size),     __FILE__, (size_t)__LINE__)
-#define xrealloc(pointer, size) _realloc((pointer), (size),  __FILE__, (size_t)__LINE__)
-#define xstrdup(string)         _strdup((string),            __FILE__, (size_t)__LINE__)
-#define xfree(pointer)          _free((pointer),             __FILE__, (size_t)__LINE__)
+#define xmalloc(size)           track_malloc((size),              __FILE__, (size_t)__LINE__)
+#define xcalloc(count, size)    track_calloc((count), (size),     __FILE__, (size_t)__LINE__)
+#define xrealloc(pointer, size) track_realloc((pointer), (size),  __FILE__, (size_t)__LINE__)
+#define xstrdup(string)         track_strdup((string),            __FILE__, (size_t)__LINE__)
+#define xfree(pointer)          track_free((pointer),             __FILE__, (size_t)__LINE__)
 
 #else
+
+#ifdef _WIN32
+#define STRDUP _strdup
+#else
+#define STRDUP strdup
+#endif
 
 static inline void flush_memory_leaks(void) {
         return;
@@ -53,7 +59,7 @@ static inline void *xrealloc(void *const pointer, const size_t size) {
 }
 
 static inline char *xstrdup(const char *const string) {
-        void *const duplicated = strdup(string);
+        void *const duplicated = STRDUP(string);
         if (duplicated == NULL) {
                 exit(EXIT_FAILURE);
         }
