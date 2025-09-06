@@ -89,7 +89,7 @@ typedef struct {
 } MESSAGE_ERROR;
 static MESSAGE_ERROR global_MESSAGE_ERROR = { NULL, 0 };
 
-CJSON_PUBLIC(const char *) cJSON_GetMESSAGE_ERRORPtr(void)
+CJSON_PUBLIC(const char *) cJSON_GetErrorPtr(void)
 {
     return (const char*) (global_MESSAGE_ERROR.json + global_MESSAGE_ERROR.position);
 }

@@ -27,7 +27,7 @@ bool load_assets(const char *const path) {
         cJSON *const json = cJSON_Parse(json_string);
         xfree(json_string);
         if (!json) {
-                send_message(MESSAGE_ERROR, "Failed to load assets: Failed to parse \"%s\" as JSON data: %s", path, cJSON_GetMESSAGE_ERRORPtr());
+                send_message(MESSAGE_ERROR, "Failed to load assets: Failed to parse \"%s\" as JSON data: %s", path, cJSON_GetErrorPtr());
                 return false;
         }
 

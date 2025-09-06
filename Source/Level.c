@@ -354,7 +354,7 @@ bool initialize_level(struct Level *const level, const struct LevelMetadata *con
         xfree(json_string);
 
         if (!json) {
-                send_message(MESSAGE_ERROR, "Failed to initialize level \"%s\": Failed to parse level data file \"%s\": %s", metadata->title, metadata->path, cJSON_GetMESSAGE_ERRORPtr());
+                send_message(MESSAGE_ERROR, "Failed to initialize level \"%s\": Failed to parse level data file \"%s\": %s", metadata->title, metadata->path, cJSON_GetErrorPtr());
                 deinitialize_level(level);
                 return false;
         }

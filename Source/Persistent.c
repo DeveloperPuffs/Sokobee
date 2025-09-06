@@ -58,20 +58,31 @@ bool load_persistent_data(void) {
 
         FILE *file = fopen(persistent_data_file_path, "rb");
         if (file == NULL) {
-                file = fopen(persistent_data_file_path, "w+");
-                if (file == NULL) {
-                        send_message(MESSAGE_ERROR, "Failed to load persistent data: Failed to create save file at \"%s\": %s", persistent_data_file_path, strerror(errno));
+                if (!save_persistent_data()) {
+                        send_message(MESSAGE_ERROR, "Failed to load persistent data: could not create save file");
                         return false;
                 }
+
+                return true;
         }
 
         fseek(file, 0L, SEEK_END);
         const size_t size = (size_t)ftell(file);
         rewind(file);
 
+        if (size == 0) {
+                fclose(file);
+                if (!save_persistent_data()) {
+                        send_message(MESSAGE_ERROR, "Failed to load persistent data: could not save defaults");
+                        return false;
+                }
+
+                return true;
+        }
+
         char *const data = (char *)xmalloc(size + 1ULL);
         if (fread(data, 1ULL, size, file) != size) {
-                send_message(MESSAGE_ERROR, "Failed to load persistent data; Failed to read save file at \"%s\": %s", persistent_data_file_path, strerror(errno));
+                send_message(MESSAGE_ERROR, "Failed to load persistent data: Failed to read save file at \"%s\": %s", persistent_data_file_path, strerror(errno));
                 xfree(data);
                 fclose(file);
                 return false;
@@ -84,7 +95,7 @@ bool load_persistent_data(void) {
         xfree(data);
 
         if (json == NULL) {
-                send_message(MESSAGE_ERROR, "Failed to load persistent data: Failed to parse save file into JSON: %s", cJSON_GetMESSAGE_ERRORPtr());
+                send_message(MESSAGE_ERROR, "Failed to load persistent data: Failed to parse save file into JSON: %s", cJSON_GetErrorPtr());
                 return false;
         }
 
