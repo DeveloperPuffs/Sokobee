@@ -37,7 +37,7 @@ void destroy_animation(struct Animation *const animation) {
 void initialize_animation(struct Animation *const animation, const size_t action_count) {
         animation->actions = (struct Action *)xcalloc(action_count, sizeof(struct Action));
         animation->action_count = action_count;
-        animation->action_index = SIZE_MAX;
+        animation->action_index = (const size_t) - 1;
         animation->active = false;
 }
 
@@ -56,7 +56,7 @@ static void start_action(struct Action *const action);
 void start_animation(struct Animation *const animation, const size_t action_index) {
         animation->active = true;
 
-        if (animation->action_index == SIZE_MAX) {
+        if (animation->action_index == (const size_t) - 1) {
                 animation->action_index = action_index;
                 start_action(&animation->actions[action_index]);
         }
@@ -69,7 +69,7 @@ void stop_animation(struct Animation *const animation) {
 void reset_animation(struct Animation *const animation) {
         stop_animation(animation);
 
-        if (animation->action_index == SIZE_MAX) {
+        if (animation->action_index == (const size_t) - 1) {
                 return;
         }
 
@@ -77,7 +77,7 @@ void reset_animation(struct Animation *const animation) {
                 animation->actions[action_index].elapsed = 0.0f;
         }
 
-        animation->action_index = SIZE_MAX;
+        animation->action_index = (const size_t) - 1;
 }
 
 void restart_animation(struct Animation *const animation, const size_t action_index) {
