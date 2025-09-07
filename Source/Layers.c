@@ -3,11 +3,11 @@
 #include <math.h>
 #include <stdbool.h>
 
-#include "SDL.h"
-
 #include "Context.h"
 #include "Geometry.h"
 #include "Hexagons.h"
+#include "Utilities.h"
+#include "Debug.h"
 
 #define LAYER_GRID_COLUMNS 10ULL
 #define LAYER_GRID_ROWS 10ULL

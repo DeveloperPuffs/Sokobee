@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "SDL_events.h"
+
 #include "Hexagons.h"
 
 enum TileType {
@@ -33,7 +35,6 @@ void destroy_level(struct Level *const level);
 bool initialize_level(struct Level *const level, const struct LevelMetadata *const metadata);
 void deinitialize_level(struct Level *const level);
 
-typedef union SDL_Event SDL_Event;
 bool level_receive_event(struct Level *const level, const SDL_Event *const event);
 void update_level(struct Level *const level, const double delta_time);
 

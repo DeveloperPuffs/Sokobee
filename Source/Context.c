@@ -2,9 +2,9 @@
 
 #include <stdbool.h>
 
-#include "SDL.h"
+#include "SDL_error.h"
 
-#include "Utilities.h"
+#include "Debug.h"
 
 #define INITIAL_WINDOW_WIDTH  1280
 #define INITIAL_WINDOW_HEIGHT  720
@@ -88,7 +88,7 @@ bool apply_missing_texture(SDL_Texture *const texture) {
         void *pixels;
         int pitch;
         if (SDL_LockTexture(texture, NULL, &pixels, &pitch) != 0) {
-                SDL_Log("Failed to apply missing texture: Failed to lock texture: %s", SDL_GetError());
+                send_message(MESSAGE_ERROR, "Failed to apply missing texture: Failed to lock texture: %s", SDL_GetError());
                 return false;
         }
 

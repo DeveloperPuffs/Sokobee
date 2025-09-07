@@ -3,14 +3,16 @@
 #include <assert.h>
 #include <stdint.h>
 
-#include "SDL.h"
+#include "SDL_render.h"
 
 #include "Audio.h"
+#include "Debug.h"
 #include "Cursor.h"
 #include "Assets.h"
 #include "Context.h"
 #include "Geometry.h"
 #include "Animation.h"
+#include "Utilities.h"
 #include "Hexagons.h"
 #include "Icons.h"
 #include "Text.h"

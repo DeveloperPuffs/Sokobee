@@ -3,13 +3,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-typedef union SDL_Event SDL_Event;
+#include "SDL_events.h"
 
-#define SCENE_COUNT 3ULL
 enum Scene {
         SCENE_MAIN_MENU,
         SCENE_PLAYING,
-        SCENE_NONE
+        SCENE_NONE,
+        SCENE_COUNT
 };
 
 struct SceneAPI {

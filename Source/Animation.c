@@ -4,17 +4,15 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "SDL.h"
-
-#include "Utilities.h"
-
-// https://easings.net/
+#include "Debug.h"
 
 #define C1 1.70158f
 #define C2 C1 * 1.525f
 #define C3 C1 + 1.0f
 #define C4 2.0f * (float)M_PI / 3.0f
 #define C5 2.0f * (float)M_PI / 4.5f
+
+#define DEFAULT_INDEX ((const size_t) - 1ULL)
 
 float ease(const float time, const enum Easing easing);
 
@@ -37,7 +35,7 @@ void destroy_animation(struct Animation *const animation) {
 void initialize_animation(struct Animation *const animation, const size_t action_count) {
         animation->actions = (struct Action *)xcalloc(action_count, sizeof(struct Action));
         animation->action_count = action_count;
-        animation->action_index = (const size_t) - 1;
+        animation->action_index = DEFAULT_INDEX;
         animation->active = false;
 }
 
@@ -56,7 +54,7 @@ static void start_action(struct Action *const action);
 void start_animation(struct Animation *const animation, const size_t action_index) {
         animation->active = true;
 
-        if (animation->action_index == (const size_t) - 1) {
+        if (animation->action_index == DEFAULT_INDEX) {
                 animation->action_index = action_index;
                 start_action(&animation->actions[action_index]);
         }
@@ -69,7 +67,7 @@ void stop_animation(struct Animation *const animation) {
 void reset_animation(struct Animation *const animation) {
         stop_animation(animation);
 
-        if (animation->action_index == (const size_t) - 1) {
+        if (animation->action_index == DEFAULT_INDEX) {
                 return;
         }
 
@@ -77,7 +75,7 @@ void reset_animation(struct Animation *const animation) {
                 animation->actions[action_index].elapsed = 0.0f;
         }
 
-        animation->action_index = (const size_t) - 1;
+        animation->action_index = DEFAULT_INDEX;
 }
 
 void restart_animation(struct Animation *const animation, const size_t action_index) {

@@ -32,7 +32,8 @@ void update_cursor(const double delta_time) {
 
 #else
 
-#include "SDL.h"
+#include "SDL_mouse.h"
+#include "SDL_render.h"
 
 #include "Text.h"
 #include "Geometry.h"

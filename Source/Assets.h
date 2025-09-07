@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "SDL_ttf.h"
+
 bool load_assets(const char *const path);
 void unload_assets(void);
 
@@ -21,7 +23,6 @@ enum Font {
         FONT_DEBUG,
 };
 
-typedef struct TTF_Font TTF_Font;
 TTF_Font *get_font(const enum Font font);
 
 // ================================================================================================

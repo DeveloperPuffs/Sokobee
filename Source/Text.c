@@ -3,12 +3,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "SDL.h"
 #include "SDL_ttf.h"
 
 #include "Assets.h"
 #include "Context.h"
-#include "Utilities.h"
+#include "Memory.h"
+#include "Debug.h"
 
 struct TextImplementation {
         char *string;

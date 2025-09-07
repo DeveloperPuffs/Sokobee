@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "SDL.h"
+#include "SDL_render.h"
 
 #include "Assets.h"
 #include "Button.h"
@@ -62,11 +62,11 @@ static void simulate_key_press(void *const key) {
         playing_scene_receive_event(&event);
 }
 
-static void back_to_main_menu(void *const data) {
+static void back_to_main_menu(void *) {
         scene_manager_present_scene(SCENE_MAIN_MENU);
 }
 
-static void quit_callback(void *const data) {
+static void quit_callback(void *) {
         trigger_transition_layer(back_to_main_menu, NULL);
 }
 
@@ -196,7 +196,7 @@ static void present_level(void *const data) {
         set_text_string(&level_number_label, level_count_string);
 }
 
-static void transition_to_next_level(void *const data) {
+static void transition_to_next_level(void *) {
         trigger_transition_layer(present_level, (void *)(uintptr_t)(current_level_number + 1ULL));
 }
 

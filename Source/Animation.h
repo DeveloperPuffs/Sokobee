@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "SDL.h"
+#include "SDL_rect.h"
+#include "SDL_pixels.h"
 
 enum Easing {
         LINEAR,

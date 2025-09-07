@@ -10,7 +10,6 @@
 #include "Assets.h"
 #include "Layers.h"
 #include "Context.h"
-#include "Geometry.h"
 #include "Persistent.h"
 #include "Scenes.h"
 
@@ -20,7 +19,7 @@ static void initialize(void);
 static void update(const double delta_time);
 static void terminate(const int exit_code);
 
-int main(int argument_count, char *argument_values[]) {
+int main(int, char *[]) {
         srand((unsigned int)time(NULL));
         initialize();
 

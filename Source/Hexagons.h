@@ -4,10 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "Utilities.h"
 #include "Geometry.h"
-
-#include "SDL.h"
 
 // ================================================================================================
 // Hexagon Orientation

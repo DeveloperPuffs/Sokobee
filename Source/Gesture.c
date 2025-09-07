@@ -4,9 +4,10 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "SDL.h"
+#include "SDL_events.h"
+#include "SDL_timer.h"
+#include "SDL_video.h"
 
-#include "Debug.h"
 #include "Context.h"
 #include "Level.h"
 
@@ -19,10 +20,10 @@ struct GestureState {
 
 static struct GestureState gesture = {0};
 
-#define TAP_DISTANCE_THRESHOLD     0.05f // 5% of screen
-#define TAP_TIME_THRESHOLD         300   // max time for tap
-#define SWIPE_DISTANCE_THRESHOLD   0.15f // 15% of screen
-#define SWIPE_TIME_THRESHOLD       500   // max time for swipe
+#define TAP_DISTANCE_THRESHOLD   0.05f
+#define TAP_TIME_THRESHOLD       300
+#define SWIPE_DISTANCE_THRESHOLD 0.15f
+#define SWIPE_TIME_THRESHOLD     500
 
 static inline void get_event_position(const SDL_Event *const event, const int screen_width, const int screen_height, float *const x, float *const y) {
 #ifndef NDEBUG

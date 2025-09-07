@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <errno.h>
 
-#include "SDL.h"
+#include "SDL_render.h"
 
 #include "Utilities.h"
 #include "Context.h"
@@ -474,12 +474,6 @@ void write_elliptical_arc_outline_geometry(
         static const float angle_offset = M_PI_4 / 4.0f;
 
         if ((rounded_caps & LINE_CAP_START) == LINE_CAP_START || (rounded_caps & LINE_CAP_BOTH) == LINE_CAP_BOTH) {
-                const float x = outer_radius_x * cosf(start_angle);
-                const float y = outer_radius_y * sinf(start_angle);
-
-                const float rx = x * cos - y * sin;
-                const float ry = x * sin + y * cos;
-
                 const float dx0 = -outer_radius_x * sinf(start_angle);
                 const float dy0 =  outer_radius_y * cosf(start_angle);
 
@@ -500,17 +494,11 @@ void write_elliptical_arc_outline_geometry(
         }
 
         if ((rounded_caps & LINE_CAP_END) == LINE_CAP_END || (rounded_caps & LINE_CAP_BOTH) == LINE_CAP_BOTH) {
-                const float x = outer_radius_x * cosf(end_angle);
-                const float y = outer_radius_y * sinf(end_angle);
+                const float dx0 = -outer_radius_x * sinf(end_angle);
+                const float dy0 =  outer_radius_y * cosf(end_angle);
 
-                const float rx = x * cos - y * sin;
-                const float ry = x * sin + y * cos;
-
-                float dx0 = -outer_radius_x * sinf(end_angle);
-                float dy0 =  outer_radius_y * cosf(end_angle);
-
-                float dx = dx0 * cos - dy0 * sin;
-                float dy = dx0 * sin + dy0 * cos;
+                const float dx = dx0 * cos - dy0 * sin;
+                const float dy = dx0 * sin + dy0 * cos;
 
                 const float tangent_angle = atan2f(dy, dx);
 

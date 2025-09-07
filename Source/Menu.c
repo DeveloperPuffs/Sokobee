@@ -3,16 +3,14 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "SDL.h"
+#include "SDL_render.h"
 
-#include "Text.h"
 #include "Layers.h"
 #include "Button.h"
 #include "Context.h"
-#include "Geometry.h"
-#include "Utilities.h"
 #include "Hexagons.h"
-#include "Icons.h"
+#include "Debug.h"
+#include "Assets.h"
 
 static bool initialize_main_menu_scene(void);
 static bool main_menu_scene_receive_event(const SDL_Event *const event);
@@ -37,7 +35,7 @@ const struct SceneAPI *get_main_menu_scene_API(void) {
 static struct GridMetrics levels_grid_metrics = {};
 static struct Button *buttons = NULL;
 
-static void start_level(void *const data) {
+static void start_level(void *) {
         scene_manager_present_scene(SCENE_PLAYING);
 }
 

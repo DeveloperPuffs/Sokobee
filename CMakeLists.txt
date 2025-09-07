@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(Sokobee VERSION 0.0.0)
 
-set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(SDL2_DIR       "" CACHE PATH "Path to SDL2 CMake folder")
 set(SDL2_ttf_DIR   "" CACHE PATH "Path to SDL2_ttf CMake folder")

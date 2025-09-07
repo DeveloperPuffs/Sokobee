@@ -5,11 +5,12 @@
 #include <errno.h>
 #include <stdbool.h>
 
-#include "Assets.h"
 #include "Level.h"
 #include "Hexagons.h"
 #include "Animation.h"
-#include "Audio.h"
+#include "Utilities.h"
+#include "Debug.h"
+#include "Memory.h"
 
 struct Entity {
         struct Level *level;

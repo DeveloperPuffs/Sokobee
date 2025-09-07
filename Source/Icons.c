@@ -1,7 +1,5 @@
 #include "Icons.h"
 
-#include "SDL.h"
-
 #include "Geometry.h"
 #include "Utilities.h"
 

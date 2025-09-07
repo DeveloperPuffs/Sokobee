@@ -5,7 +5,8 @@
 #include <errno.h>
 #include <stdbool.h>
 
-#include "SDL.h"
+#include "SDL_error.h"
+#include "SDL_filesystem.h"
 
 #include "cJSON.h"
 #include "Debug.h"

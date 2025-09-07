@@ -2,9 +2,7 @@
 
 #include <stdbool.h>
 
-#include "SDL.h"
-
-#include "Utilities.h"
+#include "Debug.h"
 
 size_t current_level_number = 0ULL;
 

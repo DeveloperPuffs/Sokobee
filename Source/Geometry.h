@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "SDL.h"
-
 void track_geometry_data(void);
 
 void get_tracked_geometry_data(size_t *const out_vertex_count, size_t *const out_index_count);

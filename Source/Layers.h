@@ -2,10 +2,11 @@
 
 #include <stdbool.h>
 
+#include "SDL_events.h"
+
 void initialize_layers(void);
 void terminate_layers(void);
 
-typedef union SDL_Event SDL_Event;
 bool layers_receive_event(const SDL_Event *const event);
 void update_layers(const double delta_time);
 

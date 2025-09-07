@@ -2,12 +2,10 @@
 
 #include <stdbool.h>
 
+#include "SDL_render.h"
+
 #define MISSING_TEXTURE_WIDTH  64
 #define MISSING_TEXTURE_HEIGHT 64
-
-typedef struct SDL_Window SDL_Window;
-typedef struct SDL_Renderer SDL_Renderer;
-typedef struct SDL_Texture SDL_Texture;
 
 SDL_Window *get_context_window(void);
 

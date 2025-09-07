@@ -3,9 +3,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "SDL.h"
-
-#include "Animation.h"
 #include "Hexagons.h"
 
 enum EntityType {

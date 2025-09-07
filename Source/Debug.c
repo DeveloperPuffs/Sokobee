@@ -1,6 +1,5 @@
 #include "Debug.h"
-
-#include "SDL.h"
+#include <stdint.h>
 
 #ifdef NDEBUG
 
@@ -24,6 +23,8 @@ void update_debug_panel(const double delta_time) {
 
 #include <stdlib.h>
 #include <stdbool.h>
+
+#include "SDL_timer.h"
 
 #include "Context.h"
 #include "Geometry.h"
@@ -110,7 +111,7 @@ bool get_process_memory_usage_bytes(size_t *const out_memory_usage_bytes) {
 static double actual_time_elapsed = 0.0;
 static double actual_time_accumulator = 0.0;
 
-static Uint64 frame_start = 0;
+static uint64_t frame_start = 0UL;
 static double time_accumulator = 0.0;
 static double previous_frame_duration = 0.0;
 static size_t frame_accumulator = 0ULL;
@@ -151,7 +152,7 @@ void start_debug_frame_profiling(void) {
 }
 
 void finish_debug_frame_profiling(void) {
-        const Uint64 frame_finish = SDL_GetPerformanceCounter();
+        const uint64_t frame_finish = (uint64_t)SDL_GetPerformanceCounter();
         previous_frame_duration = (double)(frame_finish - frame_start) / (double)SDL_GetPerformanceFrequency();
 
         ++frame_accumulator;
@@ -279,8 +280,7 @@ static void refresh_debug_panel(void) {
                 set_text_string(&debug_memory_usage_text, "Memory:   Unknown");
         }
 
-        size_t vertex_count;
-        size_t index_count;
+        size_t vertex_count, index_count;
         get_tracked_geometry_data(&vertex_count, &index_count);
 
         snprintf(debug_text_buffer, debug_text_buffer_size, "Vertices: %zu", vertex_count);

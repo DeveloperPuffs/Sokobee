@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SDL.h"
-
 enum IconType {
         ICON_PLAY,
         ICON_UNDO,

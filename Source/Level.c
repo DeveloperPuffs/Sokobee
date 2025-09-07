@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "SDL.h"
+#include "SDL_render.h"
 
 #include "Audio.h"
 #include "cJSON.h"
@@ -14,6 +14,8 @@
 #include "Entity.h"
 #include "Geometry.h"
 #include "Gesture.h"
+#include "Utilities.h"
+#include "Debug.h"
 
 #define LEVEL_DIMENSION_LIMIT 20
 
@@ -693,8 +695,6 @@ static void resize_level(struct Level *const level) {
         const float line_width = tile_radius / 5.0f;
         grid_metrics->bounding_y -= thickness / 2.0f;
         grid_metrics->grid_y -= thickness / 2.0f;
-
-        const size_t tile_count = (size_t)level->columns * (size_t)level->rows;
 
         set_geometry_color(implementation->grid_geometry, COLOR_GOLD, COLOR_OPAQUE);
         for (uint8_t row = 0; row < level->rows; ++row) {

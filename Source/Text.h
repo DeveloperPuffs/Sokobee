@@ -1,7 +1,5 @@
 #pragma once
 
-#include "SDL.h"
-
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -27,8 +25,6 @@ struct Text {
         float rotation;
         bool visible;
 };
-
-typedef struct SDL_Color SDL_Color;
 
 struct Text *create_text(const char *const string, const enum Font font);
 void destroy_text(struct Text *const text);

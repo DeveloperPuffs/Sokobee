@@ -45,8 +45,6 @@
 #include <ctype.h>
 #include <float.h>
 
-#include "Memory.h"
-
 #ifdef ENABLE_LOCALES
 #include <locale.h>
 #endif

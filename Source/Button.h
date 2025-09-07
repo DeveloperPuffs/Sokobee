@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "SDL_events.h"
+
 #include "Hexagons.h"
 
 enum IconType;
@@ -30,8 +32,6 @@ void destroy_button(struct Button *const button);
 
 void initialize_button(struct Button *const button, const bool grid_slot_positioning);
 void deinitialize_button(struct Button *const button);
-
-typedef union SDL_Event SDL_Event;
 
 void get_button_metrics(const struct Button *const button, float *const out_x, float *const out_y, float *const out_radius);
 void set_button_surface_icon(struct Button *const button, const enum IconType icon_type);
