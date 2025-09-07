@@ -6,7 +6,6 @@
 #include <stdbool.h>
 
 #include "Level.h"
-#include "Hexagons.h"
 #include "Animation.h"
 #include "Utilities.h"
 #include "Debug.h"

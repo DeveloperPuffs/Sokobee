@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "Hexagons.h"
+#include "Utilities.h"
 
 enum EntityType {
         ENTITY_PLAYER,

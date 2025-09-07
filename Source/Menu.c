@@ -8,7 +8,7 @@
 #include "Layers.h"
 #include "Button.h"
 #include "Context.h"
-#include "Hexagons.h"
+#include "Utilities.h"
 #include "Debug.h"
 #include "Assets.h"
 
@@ -31,6 +31,7 @@ const struct SceneAPI *get_main_menu_scene_API(void) {
 }
 
 #define LEVEL_BUTTON_SCALE 1.5f
+#define LEVEL_COUNT 7ULL
 
 static struct GridMetrics levels_grid_metrics = {};
 static struct Button *buttons = NULL;
@@ -47,11 +48,10 @@ static void level_button_callback(void *const data) {
 static void resize_main_menu_scene(void);
 
 static bool initialize_main_menu_scene(void) {
-        const size_t level_count = 7ULL; // TODO: Don't hardcode this
-        buttons = (struct Button *)xmalloc(level_count * sizeof(struct Button));
+        buttons = (struct Button *)xmalloc(LEVEL_COUNT * sizeof(struct Button));
 
         char string[16];
-        for (size_t level_index = 0ULL; level_index < level_count; ++level_index) {
+        for (size_t level_index = 0ULL; level_index < LEVEL_COUNT; ++level_index) {
                 struct Button *const button = &buttons[level_index];
                 initialize_button(button, false);
 
@@ -87,8 +87,7 @@ static bool main_menu_scene_receive_event(const SDL_Event *const event) {
                 return false;
         }
 
-        const size_t level_count = get_level_count();
-        for (size_t level_index = 0ULL; level_index < level_count; ++level_index) {
+        for (size_t level_index = 0ULL; level_index < LEVEL_COUNT; ++level_index) {
                 if (button_receive_event(&buttons[level_index], event)) {
                         return true;
                 }
@@ -98,17 +97,14 @@ static bool main_menu_scene_receive_event(const SDL_Event *const event) {
 }
 
 static void update_main_menu_scene(const double delta_time) {
-        const size_t level_count = get_level_count();
-        for (size_t level_index = 0ULL; level_index < level_count; ++level_index) {
+        for (size_t level_index = 0ULL; level_index < LEVEL_COUNT; ++level_index) {
                 update_button(&buttons[level_index], delta_time);
         }
 }
 
 static void terminate_main_menu_scene(void) {
-        const size_t level_count = get_level_count();
-
         if (buttons) {
-                for (size_t level_index = 0ULL; level_index < level_count; ++level_index) {
+                for (size_t level_index = 0ULL; level_index < LEVEL_COUNT; ++level_index) {
                         deinitialize_button(&buttons[level_index]);
                 }
 
@@ -118,8 +114,7 @@ static void terminate_main_menu_scene(void) {
 }
 
 static void resize_main_menu_scene(void) {
-        int drawable_width;
-        int drawable_height;
+        int drawable_width, drawable_height;
         SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
 
         const float grid_padding = fminf((float)drawable_width, (float)drawable_height) / 10.0f;
@@ -128,15 +123,14 @@ static void resize_main_menu_scene(void) {
         levels_grid_metrics.bounding_y = grid_padding;
         levels_grid_metrics.bounding_width = (float)drawable_width - grid_padding * 2.0f;
 
-        levels_grid_metrics.tile_count = get_level_count();
+        levels_grid_metrics.tile_count = LEVEL_COUNT;
         get_button_metrics(&buttons[0], NULL, NULL, &levels_grid_metrics.tile_radius);
         populate_scrolling_grid_metrics(&levels_grid_metrics, GRID_AXIS_VERTICAL);
 
-        const size_t level_count = get_level_count();
         for (size_t row = 0ULL; row < levels_grid_metrics.rows; ++row) {
                 for (size_t column = 0ULL; column < levels_grid_metrics.columns; ++column) {
                         const size_t index = row * levels_grid_metrics.columns + column;
-                        if (index >= level_count) {
+                        if (index >= LEVEL_COUNT) {
                                 continue;
                         }
 
@@ -144,23 +138,22 @@ static void resize_main_menu_scene(void) {
                         get_grid_tile_position(&levels_grid_metrics, column, row, &button->absolute_offset_x, &button->absolute_offset_y);
 
                         button->thickness_mask = HEXAGON_THICKNESS_MASK_ALL;
-                        size_t neighbor_column;
-                        size_t neighbor_row;
+                        size_t neighbor_column, neighbor_row;
 
                         if (get_hexagon_neighbor(&levels_grid_metrics, column, row, HEXAGON_NEIGHBOR_BOTTOM, &neighbor_column, &neighbor_row)) {
-                                if (neighbor_row * levels_grid_metrics.columns + neighbor_column < level_count) {
+                                if (neighbor_row * levels_grid_metrics.columns + neighbor_column < LEVEL_COUNT) {
                                         button->thickness_mask &= ~HEXAGON_THICKNESS_MASK_BOTTOM;
                                 }
                         }
 
                         if (get_hexagon_neighbor(&levels_grid_metrics, column, row, HEXAGON_NEIGHBOR_BOTTOM_LEFT, &neighbor_column, &neighbor_row)) {
-                                if (neighbor_row * levels_grid_metrics.columns + neighbor_column < level_count) {
+                                if (neighbor_row * levels_grid_metrics.columns + neighbor_column < LEVEL_COUNT) {
                                         button->thickness_mask &= ~HEXAGON_THICKNESS_MASK_LEFT;
                                 }
                         }
 
                         if (get_hexagon_neighbor(&levels_grid_metrics, column, row, HEXAGON_NEIGHBOR_BOTTOM_RIGHT, &neighbor_column, &neighbor_row)) {
-                                if (neighbor_row * levels_grid_metrics.columns + neighbor_column < level_count) {
+                                if (neighbor_row * levels_grid_metrics.columns + neighbor_column < LEVEL_COUNT) {
                                         button->thickness_mask &= ~HEXAGON_THICKNESS_MASK_RIGHT;
                                 }
                         }

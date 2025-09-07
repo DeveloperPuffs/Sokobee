@@ -5,7 +5,6 @@
 
 #include "Context.h"
 #include "Geometry.h"
-#include "Hexagons.h"
 #include "Utilities.h"
 #include "Debug.h"
 

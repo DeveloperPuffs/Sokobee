@@ -6,7 +6,7 @@
 
 #include "SDL_events.h"
 
-#include "Hexagons.h"
+#include "Utilities.h"
 
 enum TileType {
         TILE_EMPTY,

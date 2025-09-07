@@ -10,11 +10,10 @@
 #include "Audio.h"
 #include "cJSON.h"
 #include "Context.h"
-#include "Hexagons.h"
+#include "Utilities.h"
 #include "Entity.h"
 #include "Geometry.h"
 #include "Gesture.h"
-#include "Utilities.h"
 #include "Debug.h"
 
 #define LEVEL_DIMENSION_LIMIT 20
@@ -346,7 +345,7 @@ bool initialize_level(struct Level *const level, const size_t number) {
         initialize_step_history(&level->implementation->undo_history);
 
         char level_path_buffer[32ULL];
-        snprintf(level_path_buffer, sizeof(level_path_buffer), "Assets/Levels/Level%zu", number);
+        snprintf(level_path_buffer, sizeof(level_path_buffer), "Assets/Levels/Level%zu.json", number);
 
         char *const json_string = load_text_file(level_path_buffer);
         if (!json_string) {

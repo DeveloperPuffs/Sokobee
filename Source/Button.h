@@ -5,7 +5,7 @@
 
 #include "SDL_events.h"
 
-#include "Hexagons.h"
+#include "Utilities.h"
 
 enum IconType;
 struct ButtonImplementation;
