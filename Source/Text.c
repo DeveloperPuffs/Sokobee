@@ -1,14 +1,84 @@
 #include "Text.h"
 
+#include <math.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "SDL_ttf.h"
-
-#include "Assets.h"
 #include "Context.h"
 #include "Memory.h"
 #include "Debug.h"
+
+enum FontFamily {
+        FONT_FAMILY_DISPLAY,
+        FONT_FAMILY_BODY,
+#ifndef NDEBUG
+        FONT_FAMILY_DEBUG,
+#endif
+        FONT_FAMILY_COUNT
+};
+
+struct FontConfiguration {
+        size_t size;
+        bool kerning;
+        enum FontFamily family;
+};
+
+static TTF_Font *fonts[FONT_COUNT];
+
+TTF_Font *get_font(const enum Font font) {
+        return fonts[font];
+}
+
+static const char *font_family_paths[FONT_FAMILY_COUNT] = {
+        [FONT_FAMILY_DISPLAY] = "Assets/Fonts/Dangrek/Dangrek-Regular.ttf",
+        [FONT_FAMILY_BODY]    = "Assets/Fonts/Nunito/Nunito-Medium.ttf"
+#ifndef NDEBUG
+        ,
+        [FONT_FAMILY_DEBUG]   = "Assets/Fonts/Fira Mono/FiraMono-Regular.ttf"
+#endif
+};
+
+static const struct FontConfiguration font_configurations[FONT_COUNT] = {
+        [FONT_TITLE]    = {48ULL, true, FONT_FAMILY_DISPLAY},
+        [FONT_HEADER_1] = {36ULL, true, FONT_FAMILY_DISPLAY},
+        [FONT_HEADER_2] = {24ULL, true, FONT_FAMILY_DISPLAY},
+        [FONT_HEADER_3] = {16ULL, true, FONT_FAMILY_DISPLAY},
+        [FONT_BODY]     = {16ULL, true, FONT_FAMILY_BODY},
+        [FONT_CAPTION]  = {12ULL, true, FONT_FAMILY_BODY}
+#ifndef NDEBUG
+        ,
+        [FONT_DEBUG]    = {16ULL, false, FONT_FAMILY_DEBUG}
+#endif
+};
+
+bool load_fonts(void) {
+        int window_height, drawable_height;
+        SDL_GetWindowSize(get_context_window(), NULL, &window_height);
+        SDL_GetRendererOutputSize(get_context_renderer(), NULL, &drawable_height);
+        const float scale = (float)drawable_height / (float)window_height;
+
+        for (size_t index = 0ULL; index < (size_t)FONT_COUNT; ++index) {
+                const struct FontConfiguration *const font_configuration = &font_configurations[index];
+
+                const int final_font_size = (int)lroundf((float)font_configuration->size * scale);
+
+                if (!(fonts[index] = TTF_OpenFont(font_family_paths[font_configuration->family], final_font_size))) {
+                        send_message(MESSAGE_ERROR, "Failed to load fonts: Failed to open font %zu: %s", index, TTF_GetError());
+                        return false;
+                }
+
+                TTF_SetFontKerning(fonts[index], (int)font_configuration->kerning);
+        }
+
+        return true;
+}
+
+void unload_fonts(void) {
+        for (size_t font_index = 0ULL; font_index < (size_t)FONT_COUNT; ++font_index) {
+                TTF_CloseFont(fonts[font_index]);
+                fonts[font_index] = NULL;
+        }
+}
 
 struct TextImplementation {
         char *string;

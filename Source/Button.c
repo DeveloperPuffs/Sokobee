@@ -8,7 +8,6 @@
 #include "Audio.h"
 #include "Debug.h"
 #include "Cursor.h"
-#include "Assets.h"
 #include "Context.h"
 #include "Geometry.h"
 #include "Animation.h"
@@ -21,11 +20,11 @@
 #define MINIMUM_PADDING 20.0f
 #define MAXIMUM_PADDING 100.0f
 
-#define BUTTON_STATE_COUNT 3ULL
 enum ButtonState {
-        BUTTON_IDLE,
-        BUTTON_HOVER,
-        BUTTON_PRESSED
+        BUTTON_STATE_IDLE,
+        BUTTON_STATE_HOVER,
+        BUTTON_STATE_PRESSED,
+        BUTTON_STATE_COUNT
 };
 
 struct ButtonImplementation {
@@ -77,7 +76,7 @@ void initialize_button(struct Button *const button, const bool grid_slot_positio
 
         button->implementation = (struct ButtonImplementation *)xmalloc(sizeof(struct ButtonImplementation));
         button->implementation->geometry = create_geometry();
-        button->implementation->state = BUTTON_IDLE;
+        button->implementation->state = BUTTON_STATE_IDLE;
         button->implementation->hovering = false;
         button->implementation->tooltip_text = NULL;
         button->implementation->animation_offset = 0.0f;
@@ -86,7 +85,7 @@ void initialize_button(struct Button *const button, const bool grid_slot_positio
         button->implementation->surface_text = NULL;
         initialize_animation(&button->implementation->animations, BUTTON_STATE_COUNT);
 
-        struct Action *const idle = &button->implementation->animations.actions[BUTTON_IDLE];
+        struct Action *const idle = &button->implementation->animations.actions[BUTTON_STATE_IDLE];
         idle->target.float_pointer = &button->implementation->animation_offset;
         idle->keyframes.floats[1] = 0.0f;
         idle->type = ACTION_FLOAT;
@@ -95,7 +94,7 @@ void initialize_button(struct Button *const button, const bool grid_slot_positio
         idle->lazy_start = true;
         idle->pause = true;
 
-        struct Action *const hover = &button->implementation->animations.actions[BUTTON_HOVER];
+        struct Action *const hover = &button->implementation->animations.actions[BUTTON_STATE_HOVER];
         hover->target.float_pointer = &button->implementation->animation_offset;
         hover->keyframes.floats[1] = 0.1f;
         hover->type = ACTION_FLOAT;
@@ -104,7 +103,7 @@ void initialize_button(struct Button *const button, const bool grid_slot_positio
         hover->lazy_start = true;
         hover->pause = true;
 
-        struct Action *const pressed = &button->implementation->animations.actions[BUTTON_PRESSED];
+        struct Action *const pressed = &button->implementation->animations.actions[BUTTON_STATE_PRESSED];
         pressed->target.float_pointer = &button->implementation->animation_offset;
         pressed->keyframes.floats[1] = -0.25f;
         pressed->type = ACTION_FLOAT;
@@ -266,8 +265,8 @@ bool button_receive_event(struct Button *const button, const SDL_Event *const ev
                 const enum ButtonState current_button_state = next_button_state;
                 switch (event->type) {
                         case SDL_MOUSEBUTTONDOWN: case SDL_FINGERDOWN: {
-                                if (button->implementation->hovering && current_button_state != BUTTON_PRESSED) {
-                                        next_button_state = BUTTON_PRESSED;
+                                if (button->implementation->hovering && current_button_state != BUTTON_STATE_PRESSED) {
+                                        next_button_state = BUTTON_STATE_PRESSED;
                                         event_consumed = true;
                                 }
 
@@ -275,11 +274,11 @@ bool button_receive_event(struct Button *const button, const SDL_Event *const ev
                         }
 
                         case SDL_MOUSEMOTION: case SDL_FINGERMOTION: {
-                                if (button->implementation->hovering && current_button_state == BUTTON_IDLE) {
-                                        next_button_state = BUTTON_HOVER;
+                                if (button->implementation->hovering && current_button_state == BUTTON_STATE_IDLE) {
+                                        next_button_state = BUTTON_STATE_HOVER;
                                         event_consumed = true;
-                                } else if (!button->implementation->hovering && current_button_state == BUTTON_HOVER) {
-                                        next_button_state = BUTTON_IDLE;
+                                } else if (!button->implementation->hovering && current_button_state == BUTTON_STATE_HOVER) {
+                                        next_button_state = BUTTON_STATE_IDLE;
                                         event_consumed = true;
                                 }
 
@@ -287,10 +286,10 @@ bool button_receive_event(struct Button *const button, const SDL_Event *const ev
                         }
 
                         case SDL_MOUSEBUTTONUP: case SDL_FINGERUP: {
-                                if (!button->implementation->hovering && current_button_state == BUTTON_PRESSED) {
+                                if (!button->implementation->hovering && current_button_state == BUTTON_STATE_PRESSED) {
                                         event_consumed = true;
-                                } else if (button->implementation->hovering && current_button_state == BUTTON_PRESSED) {
-                                        next_button_state = BUTTON_HOVER;
+                                } else if (button->implementation->hovering && current_button_state == BUTTON_STATE_PRESSED) {
+                                        next_button_state = BUTTON_STATE_HOVER;
                                         event_consumed = true;
                                         if (button->callback) {
                                                 button->callback(button->callback_data);

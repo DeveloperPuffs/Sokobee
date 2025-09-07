@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "SDL_render.h"
-
-#include "Assets.h"
 #include "Button.h"
 #include "Audio.h"
 #include "Persistent.h"
@@ -17,6 +14,9 @@
 #include "Level.h"
 #include "Icons.h"
 #include "Text.h"
+
+// NOTE: This is hardcoded for now, it might/should probably not be later
+#define LEVEL_COUNT 7ULL
 
 #define MOVE_COUNT_LABEL_BUFFER_SIZE 16ULL
 #define LEVEL_TITLE_LABEL_BUFFER_SIZE 64ULL
@@ -175,15 +175,13 @@ static void present_level(void *const data) {
         deinitialize_level(&level);
 
         current_level_number = (size_t)(uintptr_t)data;
-
-        const struct LevelMetadata *const next_level_metadata = get_level_metadata(current_level_number);
-        if (!next_level_metadata) {
+        if (current_level_number > LEVEL_COUNT) {
                 send_message(MESSAGE_INFORMATION, "All levels complete: Returning to main menu");
                 scene_manager_present_scene(SCENE_MAIN_MENU);
                 return;
         }
 
-        if (!initialize_level(&level, next_level_metadata)) {
+        if (!initialize_level(&level, current_level_number)) {
                 send_message(MESSAGE_ERROR, "Failed to load next level: Returning to main menu");
                 scene_manager_present_scene(SCENE_MAIN_MENU);
                 return;
@@ -192,7 +190,7 @@ static void present_level(void *const data) {
         level.completion_callback = transition_to_next_level;
 
         char level_count_string[LEVEL_TITLE_LABEL_BUFFER_SIZE];
-        snprintf(level_count_string, sizeof(level_count_string), "Level %zu: %s", current_level_number, level.title);
+        snprintf(level_count_string, sizeof(level_count_string), "Level %zu: %s", current_level_number, get_level_title(&level));
         set_text_string(&level_number_label, level_count_string);
 }
 

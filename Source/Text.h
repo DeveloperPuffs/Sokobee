@@ -3,7 +3,25 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "Assets.h"
+#include "SDL_ttf.h"
+
+bool load_fonts(void);
+void unload_fonts(void);
+
+enum Font {
+        FONT_TITLE,
+        FONT_HEADER_1,
+        FONT_HEADER_2,
+        FONT_HEADER_3,
+        FONT_BODY,
+        FONT_CAPTION,
+#ifndef NDEBUG
+        FONT_DEBUG,
+#endif
+        FONT_COUNT
+};
+
+TTF_Font *get_font(const enum Font font);
 
 enum TextAlignment {
         TEXT_ALIGNMENT_LEFT,

@@ -45,7 +45,7 @@ bool initialize_audio(void) {
                 toggle_music(false);
         }
 
-        for (size_t index = 0ULL; index < MUSIC_COUNT; index++) {
+        for (size_t index = 0ULL; index < (size_t)MUSIC_COUNT; index++) {
                 if (!(music_tracks[index] = Mix_LoadMUS(music_paths[index]))) {
                         send_message(MESSAGE_ERROR, "Failed to initialize audio: Failed to load music %zu from path \"%s\": %s", index, music_paths[index], Mix_GetError());
                         terminate_audio();
@@ -53,7 +53,7 @@ bool initialize_audio(void) {
                 }
         }
 
-        for (size_t index = 0ULL; index < SOUND_COUNT; index++) {
+        for (size_t index = 0ULL; index < (size_t)SOUND_COUNT; index++) {
                 if (!(sound_chunks[index] = Mix_LoadWAV(sound_paths[index]))) {
                         send_message(MESSAGE_ERROR, "Failed to initialize audio: Failed to load sound %zu from path \"%s\": %s", index, sound_paths[index], Mix_GetError());
                         terminate_audio();

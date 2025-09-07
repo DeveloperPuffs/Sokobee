@@ -1,14 +1,11 @@
+/*
 #include "Assets.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "Context.h"
 #include "Utilities.h"
 #include "cJSON.h"
-
-static bool load_fonts(const cJSON *const json);
-static void unload_fonts(void);
 
 static bool load_levels(const cJSON *const json);
 static void unload_levels(void);
@@ -28,13 +25,6 @@ bool load_assets(const char *const path) {
                 return false;
         }
 
-        if (!load_fonts((const void *)cJSON_GetObjectItemCaseSensitive(json, "fonts"))) {
-                send_message(MESSAGE_ERROR, "Failed to load assets: Failed to load fonts");
-                cJSON_Delete(json);
-                unload_assets();
-                return false;
-        }
-
         if (!load_levels((const void *)cJSON_GetObjectItemCaseSensitive(json, "levels"))) {
                 send_message(MESSAGE_ERROR, "Failed to load assets: Failed to load levels");
                 cJSON_Delete(json);
@@ -47,92 +37,8 @@ bool load_assets(const char *const path) {
 }
 
 void unload_assets(void) {
-        unload_fonts();
         unload_levels();
 }
-
-// ================================================================================================
-// Fonts
-// ================================================================================================
-
-static TTF_Font *fonts[FONT_COUNT];
-static size_t font_sizes[FONT_COUNT] = {
-        [FONT_TITLE]    = 48ULL,
-        [FONT_HEADER_1] = 36ULL,
-        [FONT_HEADER_2] = 24ULL,
-        [FONT_HEADER_3] = 16ULL,
-        [FONT_BODY]     = 16ULL,
-        [FONT_CAPTION]  = 12ULL,
-        [FONT_DEBUG]    = 16ULL,
-};
-
-static bool font_kerning_allowed[FONT_COUNT] = {
-        [FONT_TITLE]    = true,
-        [FONT_HEADER_1] = true,
-        [FONT_HEADER_2] = true,
-        [FONT_HEADER_3] = true,
-        [FONT_BODY]     = true,
-        [FONT_CAPTION]  = true,
-        [FONT_DEBUG]    = true,
-};
-
-TTF_Font *get_font(const enum Font font) {
-        return fonts[font];
-}
-
-static bool load_fonts(const cJSON *const json) {
-        if (!cJSON_IsObject(json)) {
-                send_message(MESSAGE_ERROR, "Failed to load fonts: JSON data is invalid");
-                return false;
-        }
-
-        const cJSON *const display_font_json = cJSON_GetObjectItemCaseSensitive(json, "display");
-        const cJSON *const debug_font_json = cJSON_GetObjectItemCaseSensitive(json, "debug");
-        const cJSON *const body_font_json = cJSON_GetObjectItemCaseSensitive(json, "body");
-
-        if (!cJSON_IsString(display_font_json) || !cJSON_IsString(debug_font_json) || !cJSON_IsString(body_font_json)) {
-                send_message(MESSAGE_ERROR, "Failed to load fonts: JSON data is invalid");
-                return false;
-        }
-
-        const char *font_paths[FONT_COUNT] = {
-                [FONT_TITLE]    = display_font_json->valuestring,
-                [FONT_HEADER_1] = display_font_json->valuestring,
-                [FONT_HEADER_2] = display_font_json->valuestring,
-                [FONT_HEADER_3] = display_font_json->valuestring,
-                [FONT_BODY]     = body_font_json->valuestring,
-                [FONT_CAPTION]  = body_font_json->valuestring,
-                [FONT_DEBUG]    = debug_font_json->valuestring,
-        };
-
-        int window_height;
-        int drawable_height;
-        SDL_GetWindowSize(get_context_window(), NULL, &window_height);
-        SDL_GetRendererOutputSize(get_context_renderer(), NULL, &drawable_height);
-
-        const float scale = (float)drawable_height / (float)window_height;
-        for (size_t font_index = 0ULL; font_index < FONT_COUNT; ++font_index) {
-                if (!(fonts[font_index] = TTF_OpenFont(font_paths[font_index], (int)(font_sizes[font_index] * scale)))) {
-                        send_message(MESSAGE_ERROR, "Failed to load fonts: Failed to open font %zu: %s", font_index, TTF_GetError());
-                        return false;
-                }
-
-                TTF_SetFontKerning(fonts[font_index], (int)font_kerning_allowed[font_index]);
-        }
-
-        return true;
-}
-
-static void unload_fonts(void) {
-        for (size_t font_index = 0ULL; font_index < FONT_COUNT; ++font_index) {
-                TTF_CloseFont(fonts[font_index]);
-                fonts[font_index] = NULL;
-        }
-}
-
-// ================================================================================================
-// Levels
-// ================================================================================================
 
 static struct LevelMetadata *level_metadatas = NULL;
 static size_t level_metadata_count = 0ULL;
@@ -194,3 +100,4 @@ static void unload_levels(void) {
 
         xfree(level_metadatas);
 }
+*/

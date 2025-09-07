@@ -4,11 +4,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "Memory.h"
 #include "SDL_render.h"
 
 #include "Audio.h"
 #include "cJSON.h"
-#include "Assets.h"
 #include "Context.h"
 #include "Hexagons.h"
 #include "Entity.h"
@@ -174,6 +174,7 @@ static inline void discard_pending_step(struct StepHistory *const step_history, 
         step_history->change_count -= step_changes;
 }
 struct LevelImplementation {
+        char *title;
         enum TileType *tiles;
         uint16_t tile_count;
         struct Entity **entities;
@@ -308,9 +309,9 @@ static bool parse_level(const cJSON *const json, struct Level *const level);
 
 static void resize_level(struct Level *const level);
 
-struct Level *load_level(const struct LevelMetadata *const metadata) {
+struct Level *load_level(const size_t number) {
         struct Level *const level = (struct Level *)xcalloc(1, sizeof(struct Level));
-        if (!initialize_level(level, metadata)) {
+        if (!initialize_level(level, number)) {
                 send_message(MESSAGE_ERROR, "Failed to load level: Failed to initialize level");
                 destroy_level(level);
                 return NULL;
@@ -329,13 +330,12 @@ void destroy_level(struct Level *const level) {
         xfree(level);
 }
 
-bool initialize_level(struct Level *const level, const struct LevelMetadata *const metadata) {
+bool initialize_level(struct Level *const level, const size_t number) {
         level->columns = 0;
         level->rows = 0;
         level->move_count = 0ULL;
         level->completion_callback = NULL;
         level->completion_callback_data = NULL;
-        level->title = xstrdup(metadata->title);
 
         level->implementation = (struct LevelImplementation *)xmalloc(sizeof(struct LevelImplementation));
         level->implementation->grid_geometry = create_geometry();
@@ -345,9 +345,12 @@ bool initialize_level(struct Level *const level, const struct LevelMetadata *con
         initialize_step_history(&level->implementation->step_history);
         initialize_step_history(&level->implementation->undo_history);
 
-        char *const json_string = load_text_file(metadata->path);
+        char level_path_buffer[32ULL];
+        snprintf(level_path_buffer, sizeof(level_path_buffer), "Assets/Levels/Level%zu", number);
+
+        char *const json_string = load_text_file(level_path_buffer);
         if (!json_string) {
-                send_message(MESSAGE_ERROR, "Failed to initialize level \"%s\": Failed to load level data file \"%s\"", metadata->title, metadata->path);
+                send_message(MESSAGE_ERROR, "Failed to initialize level %zu: Failed to load level data file", level_path_buffer);
                 deinitialize_level(level);
                 return false;
         }
@@ -356,13 +359,13 @@ bool initialize_level(struct Level *const level, const struct LevelMetadata *con
         xfree(json_string);
 
         if (!json) {
-                send_message(MESSAGE_ERROR, "Failed to initialize level \"%s\": Failed to parse level data file \"%s\": %s", metadata->title, metadata->path, cJSON_GetErrorPtr());
+                send_message(MESSAGE_ERROR, "Failed to initialize level %zu: Failed to parse level data file: %s", level_path_buffer, cJSON_GetErrorPtr());
                 deinitialize_level(level);
                 return false;
         }
 
         if (!parse_level(json, level)) {
-                send_message(MESSAGE_ERROR, "Failed to initialize level \"%s\": Failed to parse level", metadata->title);
+                send_message(MESSAGE_ERROR, "Failed to initialize level %zu: Failed to parse level from level data file", level_path_buffer);
                 deinitialize_level(level);
                 cJSON_Delete(json);
                 return NULL;
@@ -384,33 +387,37 @@ void deinitialize_level(struct Level *const level) {
                 return;
         }
 
-        xfree(level->title);
-        level->title = NULL;
-
-        struct LevelImplementation *const implementation = level->implementation;
-        if (!implementation) {
+        if (level->implementation == NULL) {
                 return;
         }
 
         destroy_step_history(&level->implementation->step_history);
         destroy_step_history(&level->implementation->undo_history);
 
-        destroy_geometry(implementation->grid_geometry);
+        destroy_geometry(level->implementation->grid_geometry);
 
-        if (implementation->entities) {
-                for (size_t entity_index = 0ULL; entity_index < implementation->entity_count; ++entity_index) {
-                        destroy_entity(implementation->entities[entity_index]);
+        if (level->implementation->entities) {
+                for (size_t entity_index = 0ULL; entity_index < level->implementation->entity_count; ++entity_index) {
+                        destroy_entity(level->implementation->entities[entity_index]);
                 }
 
-                xfree(implementation->entities);
+                xfree(level->implementation->entities);
         }
 
-        if (implementation->tiles) {
-                xfree(implementation->tiles);
+        if (level->implementation->tiles) {
+                xfree(level->implementation->tiles);
         }
 
+        if (level->implementation->title) {
+                xfree(level->implementation->title);
+        }
+
+        xfree(level->implementation);
         level->implementation = NULL;
-        xfree(implementation);
+}
+
+char *get_level_title(struct Level *const level) {
+        return level->implementation->title;
 }
 
 bool query_level_tile(
@@ -589,15 +596,24 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
                 return false;
         }
 
+        const cJSON *const title_json    = cJSON_GetObjectItemCaseSensitive(json, "title");
         const cJSON *const columns_json  = cJSON_GetObjectItemCaseSensitive(json, "columns");
         const cJSON *const rows_json     = cJSON_GetObjectItemCaseSensitive(json, "rows");
         const cJSON *const tiles_json    = cJSON_GetObjectItemCaseSensitive(json, "tiles");
         const cJSON *const entities_json = cJSON_GetObjectItemCaseSensitive(json, "entities");
 
-        if (!cJSON_IsNumber(columns_json) || !cJSON_IsNumber(rows_json) || !cJSON_IsArray(tiles_json) || !cJSON_IsArray(entities_json)) {
+        if (
+                !cJSON_IsString(title_json) ||
+                !cJSON_IsNumber(columns_json) ||
+                !cJSON_IsNumber(rows_json) ||
+                !cJSON_IsArray(tiles_json) ||
+                !cJSON_IsArray(entities_json)
+        ) {
                 send_message(MESSAGE_ERROR, "Failed to parse level: JSON data is invalid");
                 return false;
         }
+
+        level->implementation->title = xstrdup(title_json->valuestring);
 
         const double columns = columns_json->valuedouble;
         if (floor(columns) != columns || columns <= 0.0 || columns > (double)LEVEL_DIMENSION_LIMIT) {

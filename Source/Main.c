@@ -7,11 +7,11 @@
 #include "Audio.h"
 #include "Debug.h"
 #include "Cursor.h"
-#include "Assets.h"
 #include "Layers.h"
 #include "Context.h"
 #include "Persistent.h"
 #include "Scenes.h"
+#include "Text.h"
 
 #define WINDOW_MINIMIZED_THROTTLE 100ULL
 
@@ -59,8 +59,8 @@ static void initialize(void) {
                 terminate(EXIT_FAILURE);
         }
 
-        if (!load_assets("Assets/Assets.json")) {
-                send_message(MESSAGE_FATAL, "Failed to initialize program: Failed to load assets");
+        if (!load_fonts()) {
+                send_message(MESSAGE_FATAL, "Failed to initialize program: Failed to load fonts");
                 terminate(EXIT_FAILURE);
         }
 
@@ -134,9 +134,9 @@ static void terminate(const int exit_code) {
         terminate_layers();
         terminate_cursor();
 
-        unload_assets();
         terminate_context();
         terminate_audio();
+        unload_fonts();
 
         TTF_Quit();
         SDL_Quit();

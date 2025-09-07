@@ -47,7 +47,7 @@ static void level_button_callback(void *const data) {
 static void resize_main_menu_scene(void);
 
 static bool initialize_main_menu_scene(void) {
-        const size_t level_count = get_level_count();
+        const size_t level_count = 7ULL; // TODO: Don't hardcode this
         buttons = (struct Button *)xmalloc(level_count * sizeof(struct Button));
 
         char string[16];
