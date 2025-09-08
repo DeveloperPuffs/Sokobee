@@ -10,7 +10,6 @@
 #include "Context.h"
 #include "Utilities.h"
 #include "Debug.h"
-#include "Assets.h"
 
 static bool initialize_main_menu_scene(void);
 static bool main_menu_scene_receive_event(const SDL_Event *const event);

@@ -1,25 +1,8 @@
+#ifndef NDEBUG
+
 #include "Debug.h"
+
 #include <stdint.h>
-
-#ifdef NDEBUG
-
-void initialize_debug_panel(void) {
-        return;
-}
-
-void terminate_debug_panel(void) {
-        return;
-}
-
-void debug_panel_receive_event(const SDL_Event *const event) {
-        return;
-}
-
-void update_debug_panel(const double delta_time) {
-        return;
-}
-
-#else
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -31,7 +14,7 @@ void update_debug_panel(const double delta_time) {
 #include "Utilities.h"
 #include "Text.h"
 
-#if defined(PLATFORM_WINDOWS)
+#if defined(__WIN32__)
 
 #include <windows.h>
 #include <psapi.h>
@@ -50,7 +33,7 @@ bool get_process_memory_usage_bytes(size_t *const out_memory_usage_bytes) {
         return false;
 }
 
-#elif defined(PLATFORM_APPLE)
+#elif defined(__APPLE__)
 
 #include <mach/mach.h>
 
@@ -70,7 +53,7 @@ bool get_process_memory_usage_bytes(size_t *const out_memory_usage_bytes) {
         return false;
 }
 
-#elif defined(PLATFORM_LINUX)
+#elif defined(__LINUX__)
 
 #include <stdio.h>
 #include <unistd.h>
@@ -85,7 +68,7 @@ bool get_process_memory_usage_bytes(size_t *const out_memory_usage_bytes) {
                 return false;
         }
 
-        long pages = 0;
+        long pages = 0L;
         if (fscanf(file, "%ld", &pages) != 1L) {
                 fclose(file);
                 return false;
@@ -99,9 +82,9 @@ bool get_process_memory_usage_bytes(size_t *const out_memory_usage_bytes) {
 
 #else
 
-#MESSAGE_WARNING "Unsupported platform for getting process memory usage"
+#warning "Unsupported platform for getting process memory usage"
 
-bool get_process_memory_usage_bytes(size_t *const out_memory_usage_bytes) {
+bool get_process_memory_usage_bytes(size_t *) {
         return false;
 }
 

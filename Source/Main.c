@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "SDL.h"
-#include "SDL_ttf.h"
 
 #include "Audio.h"
 #include "Debug.h"
@@ -39,7 +38,7 @@ int main(int, char *[]) {
 static void initialize(void) {
         send_message(MESSAGE_INFORMATION, "Initializing program...");
 
-        if (SDL_Init(SDL_INIT_EVERYTHING) < 0 || TTF_Init() < 0) {
+        if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
                 send_message(MESSAGE_FATAL, "Failed to initialize program: Failed to initialize SDL: %s", SDL_GetError());
                 terminate(EXIT_FAILURE);
         }
@@ -83,7 +82,7 @@ static void initialize(void) {
 }
 
 static void update(const double delta_time) {
-        // I need to start profiling when the frame starts because the true FPS gets capped on some environments (like mine)
+        // I need to start profiling when the frame starts because the true FPS gets capped on some environments
         start_debug_frame_profiling();
 
         SDL_Event event;
@@ -97,11 +96,15 @@ static void update(const double delta_time) {
                         return;
                 }
 
-                if (
-                        scene_manager_receive_event(&event) ||
-                        layers_receive_event(&event)        ||
-                        debug_panel_receive_event(&event)
-                ) {
+                if (scene_manager_receive_event(&event)) {
+                        continue;
+                }
+
+                if (layers_receive_event(&event)) {
+                        continue;
+                }
+
+                if (debug_panel_receive_event(&event)) {
                         continue;
                 }
         }
@@ -138,7 +141,6 @@ static void terminate(const int exit_code) {
         terminate_audio();
         unload_fonts();
 
-        TTF_Quit();
         SDL_Quit();
 
         send_message(MESSAGE_INFORMATION, "Exiting program with code \"EXIT_%s\"...", exit_code == EXIT_SUCCESS ? "SUCCESS" : "FAILURE");

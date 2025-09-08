@@ -8,15 +8,6 @@
 
 #include "SDL_events.h"
 
-void start_debug_frame_profiling(void);
-void finish_debug_frame_profiling(void);
-
-void initialize_debug_panel(void);
-void terminate_debug_panel(void);
-
-bool debug_panel_receive_event(const SDL_Event *const event);
-void update_debug_panel(const double delta_time);
-
 enum MessageSeverity {
         MESSAGE_FATAL,
         MESSAGE_ERROR,
@@ -24,20 +15,18 @@ enum MessageSeverity {
         MESSAGE_INFORMATION,
         MESSAGE_DEBUG,
         MESSAGE_VERBOSE,
-        COUNT
+        MESSAGE_COUNT
 };
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 
-#define send_message(...) ((void)0)
-
-#else
+#include "SDL_platform.h"
 
 #include "Memory.h"
 
 #define TIME_STRING_SIZE 64
 
-static const char *const message_severity_strings[COUNT] = {
+static const char *const message_severity_strings[MESSAGE_COUNT] = {
         [MESSAGE_FATAL]       = "      \033[37;41mMESSAGE_FATAL\033[m",
         [MESSAGE_ERROR]       = "      \033[31mMESSAGE_ERROR\033[m",
         [MESSAGE_WARNING]     = "    \033[33mMESSAGE_WARNING\033[m",
@@ -51,7 +40,7 @@ static inline void send_message(const enum MessageSeverity message_severity, con
         struct tm local_time;
         char time_string[TIME_STRING_SIZE];
 
-#ifdef _WIN32
+#if defined(__WIN32__)
         timespec_get(&time_specification, TIME_UTC);
         localtime_s(&local_time, &time_specification.tv_sec);
 #else
@@ -64,10 +53,10 @@ static inline void send_message(const enum MessageSeverity message_severity, con
         va_list arguments;
         va_start(arguments, message);
 
-#ifdef _WIN32
-        const size_t size = (size_t)_vscprintf(message, arguments) + 1;
+#if defined(__WIN32__)
+        const size_t size = (size_t)_vscprintf(message, arguments) + 1ULL;
 #else
-        const size_t size = (size_t)vsnprintf(NULL, 0, message, arguments) + 1;
+        const size_t size = (size_t)vsnprintf(NULL, 0ULL, message, arguments) + 1ULL;
 #endif
 
         char *const formatted = (char *)xmalloc(size);
@@ -85,6 +74,43 @@ static inline void send_message(const enum MessageSeverity message_severity, con
         fflush(stream);
         xfree(formatted);
         va_end(arguments);
+}
+
+void start_debug_frame_profiling(void);
+void finish_debug_frame_profiling(void);
+
+void initialize_debug_panel(void);
+void terminate_debug_panel(void);
+
+bool debug_panel_receive_event(const SDL_Event *const event);
+void update_debug_panel(const double delta_time);
+
+#else
+
+#define send_message(...) ((void)0)
+
+void start_debug_frame_profiling(void) {
+        return;
+}
+
+void finish_debug_frame_profiling(void) {
+        return;
+}
+
+void initialize_debug_panel(void) {
+        return;
+}
+
+void terminate_debug_panel(void) {
+        return;
+}
+
+bool debug_panel_receive_event(const SDL_Event *) {
+        return false;
+}
+
+void update_debug_panel(double) {
+        return;
 }
 
 #endif

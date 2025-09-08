@@ -13,60 +13,6 @@
 #include "Debug.h"
 
 // ================================================================================================
-// Platform Detection
-// ================================================================================================
-
-#undef PLATFORM_APPLE
-#undef PLATFORM_APPLE_MACOS
-#undef PLATFORM_APPLE_IOS
-#undef PLATFORM_WINDOWS
-#undef PLATFORM_WINDOWS_32
-#undef PLATFORM_WINDOWS_64
-#undef PLATFORM_LINUX
-#undef PLATFORM_ANDROID
-#undef PLATFORM_EMSCRIPTEN
-#undef PLATFORM_SWITCH
-#undef PLATFORM_UNKNOWN
-
-#if defined(__APPLE__)
-#define PLATFORM_APPLE
-#include <TargetConditionals.h>
-
-#if TARGET_OS_MAC && !TARGET_OS_IPHONE
-#define PLATFORM_APPLE_MACOS
-#elif TARGET_OS_IOS
-#define PLATFORM_APPLE_IOS
-#endif
-
-#elif defined(_WIN32)
-#define PLATFORM_WINDOWS
-
-#if defined(_WIN64)
-#define PLATFORM_WINDOWS_64
-#else
-#define PLATFORM_WINDOWS_32
-#endif
-
-#elif defined(__linux__) || defined(__unix__)
-#define PLATFORM_LINUX
-
-#elif defined(__ANDROID__)
-#define PLATFORM_ANDROID
-
-#elif defined(__EMSCRIPTEN__)
-#define PLATFORM_EMSCRIPTEN
-
-#else
-#define PLATFORM_UNKNOWN
-#endif
-
-#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_LINUX) || defined(PLATFORM_APPLE_MACOS) || defined(PLATFORM_EMSCRIPTEN)
-#define PLATFORM_HAS_MOUSE 1
-#else
-#define PLATFORM_HAS_MOUSE 0
-#endif
-
-// ================================================================================================
 // Color Palette
 // ================================================================================================
 

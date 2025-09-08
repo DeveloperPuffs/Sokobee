@@ -1,5 +1,6 @@
 #include "Text.h"
 
+#include <SDL_ttf.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -52,6 +53,11 @@ static const struct FontConfiguration font_configurations[FONT_COUNT] = {
 };
 
 bool load_fonts(void) {
+        if (TTF_Init() < 0) {
+                send_message(MESSAGE_ERROR, "Faied to load fonts: Failed to intialize SDL_ttf: %s", TTF_GetError());
+                return false;
+        }
+
         int window_height, drawable_height;
         SDL_GetWindowSize(get_context_window(), NULL, &window_height);
         SDL_GetRendererOutputSize(get_context_renderer(), NULL, &drawable_height);
@@ -78,6 +84,8 @@ void unload_fonts(void) {
                 TTF_CloseFont(fonts[font_index]);
                 fonts[font_index] = NULL;
         }
+
+        TTF_Quit();
 }
 
 struct TextImplementation {

@@ -5,10 +5,10 @@
 bool initialize_cursor(void);
 void terminate_cursor(void);
 
-#define CURSOR_COUNT 2ULL
 enum CursorType {
         CURSOR_ARROW,
-        CURSOR_POINTER
+        CURSOR_POINTER,
+        CURSOR_COUNT
 };
 
 void request_cursor(const enum CursorType type);

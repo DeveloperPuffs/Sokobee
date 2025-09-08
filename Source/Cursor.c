@@ -2,43 +2,13 @@
 
 #include <stdbool.h>
 
-#include "Utilities.h"
-
-#if !PLATFORM_HAS_MOUSE
-
-bool initialize_cursor(void) {
-        return true;
-}
-
-void terminate_cursor(void) {
-        return;
-}
-
-void request_cursor(const enum CursorType type) {
-        return;
-}
-
-void request_tooltip(const bool active) {
-        return;
-}
-
-void set_tooltip_text(char *const text) {
-        return;
-}
-
-void update_cursor(const double delta_time) {
-        return;
-}
-
-#else
-
 #include "SDL_mouse.h"
-#include "SDL_render.h"
 
 #include "Text.h"
 #include "Geometry.h"
 #include "Animation.h"
 #include "Context.h"
+#include "Utilities.h"
 
 #define TOOLTIP_PADDING 5.0f
 #define TOOLTIP_CURSOR_OFFSET 10.0f
@@ -48,7 +18,7 @@ static enum CursorType requested_cursor;
 
 static SDL_Cursor *cursors[CURSOR_COUNT];
 static const SDL_SystemCursor cursor_flags[CURSOR_COUNT] = {
-        [CURSOR_ARROW] = SDL_SYSTEM_CURSOR_ARROW,
+        [CURSOR_ARROW]   = SDL_SYSTEM_CURSOR_ARROW,
         [CURSOR_POINTER] = SDL_SYSTEM_CURSOR_HAND
 };
 
@@ -62,7 +32,13 @@ static float current_tooltip_alpha = 0.0f;
 static float animated_tooltip_alpha = 0.0f;
 static struct Animation tooltip_fade;
 
+#define CURSOR_AVAILABLE() (SDL_GetCursor() != NULL || SDL_GetNumTouchDevices() == 0)
+
 bool initialize_cursor(void) {
+        if (!CURSOR_AVAILABLE()) {
+                return true;
+        }
+
         current_cursor = CURSOR_ARROW;
         requested_cursor = CURSOR_ARROW;
         for (size_t cursor_index = 0ULL; cursor_index < CURSOR_COUNT; ++cursor_index) {
@@ -99,6 +75,10 @@ bool initialize_cursor(void) {
 }
 
 void terminate_cursor(void) {
+        if (!CURSOR_AVAILABLE()) {
+                return;
+        }
+
         deinitialize_animation(&tooltip_fade);
         deinitialize_text(&tooltip_text);
         destroy_geometry(tooltip_geometry);
@@ -115,14 +95,26 @@ void terminate_cursor(void) {
 }
 
 void request_cursor(const enum CursorType type) {
+        if (!CURSOR_AVAILABLE()) {
+                return;
+        }
+
         requested_cursor = type;
 }
 
 void request_tooltip(const bool active) {
+        if (!CURSOR_AVAILABLE()) {
+                return;
+        }
+
         tooltip_requested_active = active;
 }
 
 void set_tooltip_text(char *const text) {
+        if (!CURSOR_AVAILABLE()) {
+                return;
+        }
+
         if (tooltip_string && !strcmp(text, tooltip_string)) {
                 return;
         }
@@ -136,6 +128,10 @@ void set_tooltip_text(char *const text) {
 }
 
 void update_cursor(const double delta_time) {
+        if (!CURSOR_AVAILABLE()) {
+                return;
+        }
+
         update_animation(&tooltip_fade, delta_time);
 
         if (current_cursor != requested_cursor) {
@@ -217,5 +213,3 @@ void update_cursor(const double delta_time) {
         tooltip_text.absolute_offset_y = tooltip_center_y - tooltip_height / 2.0f + padding;
         update_text(&tooltip_text);
 }
-
-#endif
