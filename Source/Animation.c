@@ -6,11 +6,11 @@
 
 #include "Debug.h"
 
-#define C1 1.70158f
-#define C2 C1 * 1.525f
-#define C3 C1 + 1.0f
-#define C4 2.0f * (float)M_PI / 3.0f
-#define C5 2.0f * (float)M_PI / 4.5f
+#define C1 (1.70158f)
+#define C2 (C1 * 1.525f)
+#define C3 (C1 + 1.0f)
+#define C4 (2.0f * (float)M_PI / 3.0f)
+#define C5 (2.0f * (float)M_PI / 4.5f)
 
 #define DEFAULT_INDEX ((const size_t) - 1ULL)
 
@@ -192,56 +192,55 @@ static void apply_action(struct Action *const action, const float value) {
 }
 
 float ease(const float time, const enum Easing easing) {
-        const float t = time;
         switch (easing) {
                 case LINEAR: {
-                        return t;
+                        return time;
                 }
 
                 case QUAD_IN: {
-                        return t * t;
+                        return time * time;
                 }
 
                 case QUAD_OUT: {
-                        return t * (2.0f - t);
+                        return time * (2.0f - time);
                 }
 
                 case QUAD_IN_OUT: {
-                        if (t < 0.5f) {
-                                return 2.0f * t * t;
+                        if (time < 0.5f) {
+                                return 2.0f * time * time;
                         }
 
-                        return -1.0f + (4.0f - t * 2.0f) * t;
+                        return -1.0f + (4.0f - time * 2.0f) * time;
                 }
 
                 case CUBE_IN: {
-                        return t * t * t;
+                        return time * time * time;
                 }
 
                 case CUBE_OUT: {
-                        const float f = t - 1.0f;
+                        const float f = time - 1.0f;
                         return f * f * f + 1.0f;
                 }
 
                 case CUBE_IN_OUT: {
-                        if (t < 0.5f) {
-                                return t * t * t * 4.0f;
+                        if (time < 0.5f) {
+                                return time * time * time * 4.0f;
                         }
 
-                        const float f = t * 2.0f - 2.0f;
+                        const float f = time * 2.0f - 2.0f;
                         return f * f * f / 2.0f + 1.0f;
                 }
 
                 case SINE_IN: {
-                        return 1.0f - cosf(t * (float)M_PI / 2.0f);
+                        return 1.0f - cosf(time * (float)M_PI / 2.0f);
                 }
 
                 case SINE_OUT: {
-                        return sinf(t * (float)M_PI / 2.0f);
+                        return sinf(time * (float)M_PI / 2.0f);
                 }
 
                 case SINE_IN_OUT: {
-                        return -(cosf(t * (float)M_PI) - 1.0f) / 2.0f;
+                        return -(cosf(time * (float)M_PI) - 1.0f) / 2.0f;
                 }
 
                 // For the formulas that were commented out:
@@ -250,8 +249,8 @@ float ease(const float time, const enum Easing easing) {
                 case BACK_IN: {
                         const float c1 = 1.70158f;
                         const float c3 = c1 + 1.0f;
-                        const float t2 = t * t;
-                        const float t3 = t2 * t;
+                        const float t2 = time * time;
+                        const float t3 = t2 * time;
                         return c3 * t3 - c1 * t2;
 
                         // return C3 * powf(t, 3.0f) - C1 * powf(t, 2.0f);
@@ -260,18 +259,18 @@ float ease(const float time, const enum Easing easing) {
                 case BACK_OUT: {
                         const float c1 = 1.70158f;
                         const float c3 = c1 + 1.0f;
-                        const float y = t - 1.0f;
+                        const float y = time - 1.0f;
                         return 1.0f + c3 * powf(y, 3.0f) + c1 * powf(y, 2.0f);
 
                         // return 1.0f + C3 * powf(t - 1.0f, 3.0f) + C1 * powf(t - 1.0f, 2.0f);
                 }
 
                 case BACK_IN_OUT: {
-                        if (t < 0.5f) {
-                                return powf(t * 2.0f, 2.0f) * ((C2 + 1.0f) * 2.0f * t - C2) / 2.0f;
+                        if (time < 0.5f) {
+                                return powf(time * 2.0f, 2.0f) * ((C2 + 1.0f) * 2.0f * time - C2) / 2.0f;
                         }
 
-                        const float f = t * 2.0f - 2.0f;
+                        const float f = time * 2.0f - 2.0f;
                         return (powf(f, 2.0f) * ((C2 + 1.0f) * f + C2) + 2.0f) / 2.0f;
                 }
         }

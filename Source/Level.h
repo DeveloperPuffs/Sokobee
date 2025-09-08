@@ -27,12 +27,15 @@ struct Level {
 };
 
 struct Level *load_level(const size_t number);
+
 void destroy_level(struct Level *const level);
 
 bool initialize_level(struct Level *const level, const size_t number);
+
 void deinitialize_level(struct Level *const level);
 
 bool level_receive_event(struct Level *const level, const SDL_Event *const event);
+
 void update_level(struct Level *const level, const double delta_time);
 
 char *get_level_title(struct Level *const level);

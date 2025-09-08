@@ -10,8 +10,8 @@
 #include "Context.h"
 #include "Utilities.h"
 
-#define TOOLTIP_PADDING 5.0f
-#define TOOLTIP_CURSOR_OFFSET 10.0f
+#define TOOLTIP_PADDING (5.0f)
+#define TOOLTIP_CURSOR_OFFSET (10.0f)
 
 static enum CursorType current_cursor;
 static enum CursorType requested_cursor;
@@ -154,16 +154,13 @@ void update_cursor(const double delta_time) {
                 set_text_color(&tooltip_text, COLOR_YELLOW, (uint8_t)lroundf(current_tooltip_alpha * 255.0f));
         }
 
-        int mouse_x;
-        int mouse_y;
+        int mouse_x, mouse_y;
         SDL_GetMouseState(&mouse_x, &mouse_y);
 
-        int window_width;
-        int window_height;
+        int window_width, window_height;
         SDL_GetWindowSize(get_context_window(), &window_width, &window_height);
 
-        int drawable_width;
-        int drawable_height;
+        int drawable_width, drawable_height;
         SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
 
         const float cursor_x = (float)mouse_x * (float)drawable_width / (float)window_width;

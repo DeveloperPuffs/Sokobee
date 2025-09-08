@@ -42,8 +42,8 @@ struct Entity {
         } as;
 };
 
-#define PLAYER_CLOSED_WINGS_ANGLE (-(float)M_PI * 5.0f / 6.0f);
-#define PLAYER_OPEN_WINGS_ANGLE   (-(float)M_PI * 4.0f / 6.0f);
+#define PLAYER_CLOSED_WINGS_ANGLE (-(float)M_PI * 5.0f / 6.0f)
+#define PLAYER_OPEN_WINGS_ANGLE   (-(float)M_PI * 4.0f / 6.0f)
 
 #define PULSE_ENTITY_SCALE(entity, scale)                                   \
         do {                                                                \

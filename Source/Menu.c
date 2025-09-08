@@ -12,8 +12,11 @@
 #include "Debug.h"
 
 static bool initialize_main_menu_scene(void);
+
 static bool main_menu_scene_receive_event(const SDL_Event *const event);
+
 static void update_main_menu_scene(const double delta_time);
+
 static void terminate_main_menu_scene(void);
 
 static const struct SceneAPI main_menu_scene_API = (struct SceneAPI){
@@ -29,8 +32,8 @@ const struct SceneAPI *get_main_menu_scene_API(void) {
         return &main_menu_scene_API;
 }
 
-#define LEVEL_BUTTON_SCALE 1.5f
-#define LEVEL_COUNT 7ULL
+#define LEVEL_BUTTON_SCALE (1.5f)
+#define LEVEL_COUNT (7ULL)
 
 static struct GridMetrics levels_grid_metrics = {};
 static struct Button *buttons = NULL;

@@ -20,10 +20,10 @@ struct GestureState {
 
 static struct GestureState gesture = {0};
 
-#define TAP_DISTANCE_THRESHOLD   0.05f
-#define TAP_TIME_THRESHOLD       300
-#define SWIPE_DISTANCE_THRESHOLD 0.15f
-#define SWIPE_TIME_THRESHOLD     500
+#define TAP_DISTANCE_THRESHOLD   (0.05f)
+#define TAP_TIME_THRESHOLD       (300)
+#define SWIPE_DISTANCE_THRESHOLD (0.15f)
+#define SWIPE_TIME_THRESHOLD     (500)
 
 static inline void get_event_position(const SDL_Event *const event, const int screen_width, const int screen_height, float *const x, float *const y) {
 #ifndef NDEBUG

@@ -8,11 +8,11 @@
 #include "Utilities.h"
 #include "Debug.h"
 
-#define LAYER_GRID_COLUMNS 10ULL
-#define LAYER_GRID_ROWS 10ULL
+#define LAYER_GRID_COLUMNS (10ULL)
+#define LAYER_GRID_ROWS    (10ULL)
 
-#define ROTATION_SPEED 0.01f
-#define ROTATION_CYCLE (float)M_PI * 2.0f
+#define ROTATION_SPEED (0.01f)
+#define ROTATION_CYCLE ((float)M_PI * 2.0f)
 
 static float grid_rotation = 0.0f;
 static struct GridMetrics grid_metrics = {};
@@ -63,11 +63,6 @@ bool layers_receive_event(const SDL_Event *const event) {
         return false;
 }
 
-static inline float transition_easing(const float t) {
-        const float u = 1.0f - t; // Cubic Bezier: [0, 0.5, 1, 0.5]
-        return (3.0f * u * u * t * 0.5f) + (3.0f * u * t * t * 0.5f) + (t * t * t);
-}
-
 void update_layers(const double delta_time) {
         grid_rotation += ROTATION_SPEED * (float)delta_time / 1000.0f;
         while (grid_rotation >= ROTATION_CYCLE) {
@@ -103,7 +98,12 @@ void update_layers(const double delta_time) {
         const float rotation_pivot_y = grid_metrics.grid_y + grid_metrics.grid_height / 2.0f;
 
         set_geometry_color(background_geometry, COLOR_BROWN, COLOR_OPAQUE);
-        const float time = transition_easing(1.0f - fabsf(2.0f * transition_time - 1.0f)) * 2.0f;
+
+        const float u = fabsf(2.0f * transition_time - 1.0f);
+        const float t = 1.0f - u;
+
+        // Cubic Bezier: [0, 0.5, 1, 0.5]
+        const float time = ((3.0f * u * u * t / 2.0f) + (3.0f * u * t * t / 2.0f) + (t * t * t)) * 2.0f;
         for (size_t row = 0ULL; row < LAYER_GRID_ROWS; ++row) {
                 const size_t row_number = transition_direction ? row + 1ULL : (LAYER_GRID_ROWS - (row + 1ULL));
                 const float row_time = fminf(fmaxf(time - (float)row_number / (float)LAYER_GRID_ROWS, 0.0f), 1.0f);
@@ -148,8 +148,7 @@ bool trigger_transition_layer(void (*const callback)(void *), void *const callba
 }
 
 static void resize_layers(void) {
-        int drawable_width;
-        int drawable_height;
+        int drawable_width, drawable_height;
         SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
 
         layers_width = (float)drawable_width;

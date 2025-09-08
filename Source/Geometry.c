@@ -11,14 +11,14 @@
 #include "Utilities.h"
 #include "Context.h"
 
-#define INITIAL_VERTEX_CAPACITY 64ULL
-#define INITIAL_INDEX_CAPACITY  64ULL
+#define INITIAL_VERTEX_CAPACITY (64ULL)
+#define INITIAL_INDEX_CAPACITY  (64ULL)
 
 #define INDEX_STRIDE           (sizeof(uint16_t))
 #define VERTEX_POSITION_STRIDE (sizeof(float) * 2ULL)
 #define VERTEX_COLOR_STRIDE    (sizeof(uint8_t) * 4ULL)
 
-#define SEGMENT_LENGTH 4.0f
+#define SEGMENT_LENGTH (4.0f)
 
 static size_t tracked_vertex_count = 0ULL;
 static size_t tracked_index_count = 0ULL;
@@ -96,18 +96,18 @@ void render_geometry(const struct Geometry *const geometry) {
         tracked_vertex_count += geometry->vertex_count;
         tracked_index_count += geometry->index_count;
         SDL_RenderGeometryRaw(
-                get_context_renderer(),        // Renderer
-                NULL,                          // Texture
-                geometry->positions,           // Positions
-                (int)VERTEX_POSITION_STRIDE,   // Position Stride
-                (SDL_Color *)geometry->colors, // Colors
-                (int)VERTEX_COLOR_STRIDE,      // Color Stride
-                NULL,                          // Texcoords
-                0,                             // Texcoord Stride
-                (int)geometry->vertex_count,   // Vertex Count
-                geometry->indices,             // Indices
-                (int)geometry->index_count,    // Index Count
-                (int)INDEX_STRIDE              // Index Size (Stride)
+                get_context_renderer(),
+                NULL,
+                geometry->positions,
+                (int)VERTEX_POSITION_STRIDE,
+                (SDL_Color *)geometry->colors,
+                (int)VERTEX_COLOR_STRIDE,
+                NULL,
+                0,
+                (int)geometry->vertex_count,
+                geometry->indices,
+                (int)geometry->index_count,
+                (int)INDEX_STRIDE
         );
 }
 

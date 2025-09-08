@@ -8,9 +8,13 @@
 void flush_memory_leaks(void);
 
 void *track_malloc(const size_t size, const char *const file, const size_t line);
+
 void *track_calloc(const size_t count, const size_t size, const char *const file, const size_t line);
+
 void *track_realloc(void *const pointer, const size_t size, const char *const file, const size_t line);
+
 char *track_strdup(const char *const string, const char *const file, const size_t line);
+
 void  track_free(void *const pointer, const char *const file, const size_t line);
 
 #define xmalloc(size)           track_malloc((size),              __FILE__, (size_t)__LINE__)

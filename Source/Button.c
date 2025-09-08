@@ -15,9 +15,9 @@
 #include "Icons.h"
 #include "Text.h"
 
-#define PADDING_FACTOR 0.02f
-#define MINIMUM_PADDING 20.0f
-#define MAXIMUM_PADDING 100.0f
+#define PADDING_FACTOR  (0.02f)
+#define MINIMUM_PADDING (20.0f)
+#define MAXIMUM_PADDING (100.0f)
 
 enum ButtonState {
         BUTTON_STATE_IDLE,
@@ -164,8 +164,7 @@ void get_button_metrics(const struct Button *const button, float *const out_x, f
                 return;
         }
 
-        int drawable_width;
-        int drawable_height;
+        int drawable_width, drawable_height;
         SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
 
         if (out_x != NULL) {
@@ -236,15 +235,12 @@ bool button_receive_event(struct Button *const button, const SDL_Event *const ev
                 event->type == SDL_FINGERMOTION ||
                 event->type == SDL_FINGERUP
         ) {
-                int drawable_width;
-                int drawable_height;
+                int drawable_width, drawable_height;
                 SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
 
-                float target_x;
-                float target_y;
+                float target_x, target_y;
                 if (event->type == SDL_MOUSEBUTTONDOWN || event->type == SDL_MOUSEMOTION || event->type == SDL_MOUSEBUTTONUP) {
-                        int window_width;
-                        int window_height;
+                        int window_width, window_height;
                         SDL_GetWindowSize(get_context_window(), &window_width, &window_height);
                         target_x = event->button.x * (float)drawable_width / (float)window_width;
                         target_y = event->button.y * (float)drawable_height / (float)window_height;
@@ -253,9 +249,7 @@ bool button_receive_event(struct Button *const button, const SDL_Event *const ev
                         target_y = event->tfinger.y * (float)drawable_height;
                 }
 
-                float x;
-                float y;
-                float radius;
+                float x, y, radius;
                 get_button_metrics(button, &x, &y, &radius);
                 button->implementation->hovering = powf(x - target_x, 2.0f) + powf(y - target_y, 2.0f) <= powf(radius * 0.8f, 2.0f);
 
@@ -317,9 +311,7 @@ bool update_button(struct Button *const button, const double delta_time) {
 
         clear_geometry(button->implementation->geometry);
 
-        float x;
-        float y;
-        float radius;
+        float x, y, radius;
         get_button_metrics(button, &x, &y, &radius);
 
         const float thickness = radius / 2.0f;
@@ -367,8 +359,7 @@ bool update_button(struct Button *const button, const double delta_time) {
 }
 
 static void resize_button(struct Button *const button) {
-        int drawable_width;
-        int drawable_height;
+        int drawable_width, drawable_height;
         SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
 
         const float padding = CLAMP_VALUE(fmaxf((float)drawable_width, (float)drawable_height) * PADDING_FACTOR, MINIMUM_PADDING, MAXIMUM_PADDING);

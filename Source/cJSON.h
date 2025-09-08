@@ -81,7 +81,7 @@ then using the CJSON_API_VISIBILITY flag to "export" the same symbols the way CJ
 /* project version */
 #define CJSON_VERSION_MAJOR 1
 #define CJSON_VERSION_MINOR 7
-#define CJSON_VERSION_PATCH 14
+#define CJSON_VERSION_PATCH 18
 
 #include <stddef.h>
 
@@ -102,31 +102,31 @@ then using the CJSON_API_VISIBILITY flag to "export" the same symbols the way CJ
 /* The cJSON structure: */
 typedef struct cJSON
 {
-    /* next/prev allow you to walk array/object chains. Alternatively, use GetArraySize/GetArrayItem/GetObjectItem */
-    struct cJSON *next;
-    struct cJSON *prev;
-    /* An array or object item will have a child pointer pointing to a chain of the items in the array/object. */
-    struct cJSON *child;
+        /* next/prev allow you to walk array/object chains. Alternatively, use GetArraySize/GetArrayItem/GetObjectItem */
+        struct cJSON *next;
+        struct cJSON *prev;
+        /* An array or object item will have a child pointer pointing to a chain of the items in the array/object. */
+        struct cJSON *child;
 
-    /* The type of the item, as above. */
-    int type;
+        /* The type of the item, as above. */
+        int type;
 
-    /* The item's string, if type==cJSON_String  and type == cJSON_Raw */
-    char *valuestring;
-    /* writing to valueint is DEPRECATED, use cJSON_SetNumberValue instead */
-    int valueint;
-    /* The item's number, if type==cJSON_Number */
-    double valuedouble;
+        /* The item's string, if type==cJSON_String  and type == cJSON_Raw */
+        char *valuestring;
+        /* writing to valueint is DEPRECATED, use cJSON_SetNumberValue instead */
+        int valueint;
+        /* The item's number, if type==cJSON_Number */
+        double valuedouble;
 
-    /* The item's name string, if this item is the child of, or is in the list of subitems of an object. */
-    char *string;
+        /* The item's name string, if this item is the child of, or is in the list of subitems of an object. */
+        char *string;
 } cJSON;
 
 typedef struct cJSON_Hooks
 {
-      /* malloc/free are CDECL on Windows regardless of the default calling convention of the compiler, so ensure the hooks allow passing those functions directly. */
-      void *(CJSON_CDECL *malloc_fn)(size_t sz);
-      void (CJSON_CDECL *free_fn)(void *ptr);
+        /* malloc/free are CDECL on Windows regardless of the default calling convention of the compiler, so ensure the hooks allow passing those functions directly. */
+        void *(CJSON_CDECL *malloc_fn)(size_t sz);
+        void (CJSON_CDECL *free_fn)(void *ptr);
 } cJSON_Hooks;
 
 typedef int cJSON_bool;
@@ -135,6 +135,12 @@ typedef int cJSON_bool;
  * This is to prevent stack overflows. */
 #ifndef CJSON_NESTING_LIMIT
 #define CJSON_NESTING_LIMIT 1000
+#endif
+
+/* Limits the length of circular references can be before cJSON rejects to parse them.
+ * This is to prevent stack overflows. */
+#ifndef CJSON_CIRCULAR_LIMIT
+#define CJSON_CIRCULAR_LIMIT 10000
 #endif
 
 /* returns the version of cJSON as a string */
@@ -148,7 +154,7 @@ CJSON_PUBLIC(void) cJSON_InitHooks(cJSON_Hooks* hooks);
 CJSON_PUBLIC(cJSON *) cJSON_Parse(const char *value);
 CJSON_PUBLIC(cJSON *) cJSON_ParseWithLength(const char *value, size_t buffer_length);
 /* ParseWithOpts allows you to require (and check) that the JSON is null terminated, and to retrieve the pointer to the final byte parsed. */
-/* If you supply a ptr in return_parse_end and parsing fails, then return_parse_end will contain a pointer to the MESSAGE_ERROR so will match cJSON_GetErrorPtr(). */
+/* If you supply a ptr in return_parse_end and parsing fails, then return_parse_end will contain a pointer to the error so will match cJSON_GetErrorPtr(). */
 CJSON_PUBLIC(cJSON *) cJSON_ParseWithOpts(const char *value, const char **return_parse_end, cJSON_bool require_null_terminated);
 CJSON_PUBLIC(cJSON *) cJSON_ParseWithLengthOpts(const char *value, size_t buffer_length, const char **return_parse_end, cJSON_bool require_null_terminated);
 
@@ -172,7 +178,7 @@ CJSON_PUBLIC(cJSON *) cJSON_GetArrayItem(const cJSON *array, int index);
 CJSON_PUBLIC(cJSON *) cJSON_GetObjectItem(const cJSON * const object, const char * const string);
 CJSON_PUBLIC(cJSON *) cJSON_GetObjectItemCaseSensitive(const cJSON * const object, const char * const string);
 CJSON_PUBLIC(cJSON_bool) cJSON_HasObjectItem(const cJSON *object, const char *string);
-/* For analysing failed parses. This returns a pointer to the parse MESSAGE_ERROR. You'll probably need to look a few chars back to make sense of it. Defined when cJSON_Parse() returns 0. 0 when cJSON_Parse() succeeds. */
+/* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when cJSON_Parse() returns 0. 0 when cJSON_Parse() succeeds. */
 CJSON_PUBLIC(const char *) cJSON_GetErrorPtr(void);
 
 /* Check item type and return its value */
@@ -222,20 +228,9 @@ CJSON_PUBLIC(cJSON *) cJSON_CreateStringArray(const char *const *strings, int co
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToArray(cJSON *array, cJSON *item);
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToObject(cJSON *object, const char *string, cJSON *item);
 /* Use this when string is definitely const (i.e. a literal, or as good as), and will definitely survive the cJSON object.
- * MESSAGE_WARNING: When this function was used, make sure to always check that (item->type & cJSON_StringIsConst) is zero before
+ * WARNING: When this function was used, make sure to always check that (item->type & cJSON_StringIsConst) is zero before
  * writing to `item->string` */
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemToObjectCS(cJSON *object, const char *string, cJSON *item);
-CJSON_PUBLIC(void) cJSON_AddItemReferenceToObjectCS(cJSON *object, const char *string, cJSON *item);
-CJSON_PUBLIC(cJSON*) cJSON_AddNullToObjectCS(cJSON * const object, const char * const name);
-CJSON_PUBLIC(cJSON*) cJSON_AddTrueToObjectCS(cJSON * const object, const char * const name);
-CJSON_PUBLIC(cJSON*) cJSON_AddFalseToObjectCS(cJSON * const object, const char * const name);
-CJSON_PUBLIC(cJSON*) cJSON_AddBoolToObjectCS(cJSON * const object, const char * const name, const cJSON_bool boolean);
-CJSON_PUBLIC(cJSON*) cJSON_AddNumberToObjectCS(cJSON * const object, const char * const name, const double number);
-CJSON_PUBLIC(cJSON*) cJSON_AddStringToObjectCS(cJSON * const object, const char * const name, const char * const string);
-CJSON_PUBLIC(cJSON*) cJSON_AddRawToObjectCS(cJSON * const object, const char * const name, const char * const raw);
-CJSON_PUBLIC(cJSON*) cJSON_AddObjectToObjectCS(cJSON * const object, const char * const name);
-CJSON_PUBLIC(cJSON*) cJSON_AddArrayToObjectCS(cJSON * const object, const char * const name);
-
 /* Append reference to item to the specified array/object. Use this when you want to add an existing cJSON to a new cJSON, but don't want to corrupt your existing cJSON. */
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemReferenceToArray(cJSON *array, cJSON *item);
 CJSON_PUBLIC(cJSON_bool) cJSON_AddItemReferenceToObject(cJSON *object, const char *string, cJSON *item);
@@ -267,7 +262,7 @@ CJSON_PUBLIC(cJSON_bool) cJSON_Compare(const cJSON * const a, const cJSON * cons
 
 /* Minify a strings, remove blank characters(such as ' ', '\t', '\r', '\n') from strings.
  * The input pointer json cannot point to a read-only address area, such as a string constant, 
- * but should point to a readable and writable adress area. */
+ * but should point to a readable and writable address area. */
 CJSON_PUBLIC(void) cJSON_Minify(char *json);
 
 /* Helper functions for creating and adding items to an object at the same time.
@@ -289,6 +284,13 @@ CJSON_PUBLIC(double) cJSON_SetNumberHelper(cJSON *object, double number);
 #define cJSON_SetNumberValue(object, number) ((object != NULL) ? cJSON_SetNumberHelper(object, (double)number) : (number))
 /* Change the valuestring of a cJSON_String object, only takes effect when type of object is cJSON_String */
 CJSON_PUBLIC(char*) cJSON_SetValuestring(cJSON *object, const char *valuestring);
+
+/* If the object is not a boolean type this does nothing and returns cJSON_Invalid else it returns the new type*/
+#define cJSON_SetBoolValue(object, boolValue) ( \
+        (object != NULL && ((object)->type & (cJSON_False|cJSON_True))) ? \
+        (object)->type=((object)->type &(~(cJSON_False|cJSON_True)))|((boolValue)?cJSON_True:cJSON_False) : \
+        cJSON_Invalid\
+)
 
 /* Macro for iterating over an array or object */
 #define cJSON_ArrayForEach(element, array) for(element = (array != NULL) ? (array)->child : NULL; element != NULL; element = element->next)

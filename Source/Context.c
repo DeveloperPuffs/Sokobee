@@ -11,7 +11,7 @@
 #define MINIMUM_WINDOW_WIDTH   800
 #define MINIMUM_WINDOW_HEIGHT  600
 
-#define MISSING_TEXTURE_TILE_SIZE 16ULL
+#define MISSING_TEXTURE_TILE_SIZE (16ULL)
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;

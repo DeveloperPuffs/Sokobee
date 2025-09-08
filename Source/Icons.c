@@ -14,13 +14,21 @@ struct Icon {
 };
 
 static void write_play_icon_geometry(struct Icon *);
+
 static void write_undo_icon_geometry(struct Icon *);
+
 static void write_redo_icon_geometry(struct Icon *);
+
 static void write_restart_icon_geometry(struct Icon *);
+
 static void write_sounds_on_icon_geometry(struct Icon *);
+
 static void write_sounds_off_icon_geometry(struct Icon *);
+
 static void write_music_on_icon_geometry(struct Icon *);
+
 static void write_music_off_icon_geometry(struct Icon *);
+
 static void write_exit_icon_geometry(struct Icon *);
 
 static void(*icon_geometry_writers[ICON_COUNT])(struct Icon *) = {

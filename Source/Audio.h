@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 bool initialize_audio(void);
+
 void terminate_audio(void);
 
 enum Sound {

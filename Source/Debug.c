@@ -42,11 +42,11 @@ bool get_process_memory_usage_bytes(size_t *const out_memory_usage_bytes) {
                 return false;
         }
 
-        struct task_basic_info task_MESSAGE_INFORMATION;
+        struct task_basic_info task_information;
         mach_msg_type_number_t count = TASK_BASIC_INFO_COUNT;
 
-        if (task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&task_MESSAGE_INFORMATION, &count) == KERN_SUCCESS) {
-                *out_memory_usage_bytes = (size_t)task_MESSAGE_INFORMATION.resident_size;
+        if (task_info(mach_task_self(), TASK_BASIC_INFO, (task_info_t)&task_information, &count) == KERN_SUCCESS) {
+                *out_memory_usage_bytes = (size_t)task_information.resident_size;
                 return true;
         }
 
@@ -76,7 +76,7 @@ bool get_process_memory_usage_bytes(size_t *const out_memory_usage_bytes) {
 
         fclose(file);
 
-        *out_memory_usage_bytes (size_t)pages * (size_t)sysconf(_SC_PAGESIZE);
+        *out_memory_usage_bytes = (size_t)pages * (size_t)sysconf(_SC_PAGESIZE);
         return true;
 }
 
@@ -215,8 +215,7 @@ static void resize_debug_panel(void) {
                 }
         }
 
-        int drawable_width;
-        int drawable_height;
+        int drawable_width, drawable_height;
         SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
         const float padding = CLAMP_VALUE(MAXIMUM_VALUE((float)drawable_width, (float)drawable_height) / 100.0f, 10.0f, 20.0f);
 
@@ -272,8 +271,7 @@ static void refresh_debug_panel(void) {
         snprintf(debug_text_buffer, debug_text_buffer_size, "Indices:  %zu", index_count);
         set_text_string(&debug_index_count_text, debug_text_buffer);
 
-        int window_width;
-        int window_height;
+        int window_width, window_height;
         SDL_GetWindowSizeInPixels(get_context_window(), &window_width, &window_height);
 
         if (displayed_viewport_width != (size_t)window_width || displayed_viewport_height != (size_t)window_height) {

@@ -18,7 +18,7 @@
 
 #define LEVEL_DIMENSION_LIMIT 20
 
-#define STEP_HISTORY_INITIAL_CAPACITY 64ULL
+#define STEP_HISTORY_INITIAL_CAPACITY (64ULL)
 
 struct StepHistory {
         struct Change *changes;
@@ -309,7 +309,7 @@ static bool parse_level(const cJSON *const json, struct Level *const level);
 static void resize_level(struct Level *const level);
 
 struct Level *load_level(const size_t number) {
-        struct Level *const level = (struct Level *)xcalloc(1, sizeof(struct Level));
+        struct Level *const level = (struct Level *)xcalloc(1ULL, sizeof(struct Level));
         if (!initialize_level(level, number)) {
                 send_message(MESSAGE_ERROR, "Failed to load level: Failed to initialize level");
                 destroy_level(level);
@@ -692,8 +692,7 @@ static void resize_level(struct Level *const level) {
         struct LevelImplementation *const implementation = level->implementation;
         clear_geometry(implementation->grid_geometry);
 
-        int drawable_width;
-        int drawable_height;
+        int drawable_width, drawable_height;
         SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
 
         const float grid_padding = fminf((float)drawable_width, (float)drawable_height) / 10.0f;

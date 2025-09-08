@@ -61,13 +61,19 @@ struct Animation {
 };
 
 struct Animation *create_animation(const size_t action_count);
+
 void destroy_animation(struct Animation *const animation);
 
 void initialize_animation(struct Animation *const animation, const size_t action_count);
+
 void deinitialize_animation(struct Animation *const animation);
 
 void start_animation(struct Animation *const animation, const size_t action_index);
+
 void stop_animation(struct Animation *const animation);
+
 void reset_animation(struct Animation *const animation);
+
 void update_animation(struct Animation *const animation, const double delta_time);
+
 void restart_animation(struct Animation *const animation, const size_t action_index);

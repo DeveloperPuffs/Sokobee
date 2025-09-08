@@ -12,10 +12,12 @@
 #include "Scenes.h"
 #include "Text.h"
 
-#define WINDOW_MINIMIZED_THROTTLE 100ULL
+#define WINDOW_MINIMIZED_THROTTLE (100ULL)
 
 static void initialize(void);
+
 static void update(const double delta_time);
+
 static void terminate(const int exit_code);
 
 int main(int, char *[]) {

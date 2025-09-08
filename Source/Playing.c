@@ -16,10 +16,10 @@
 #include "Text.h"
 
 // NOTE: This is hardcoded for now, it might/should probably not be later
-#define LEVEL_COUNT 7ULL
+#define LEVEL_COUNT (7ULL)
 
-#define MOVE_COUNT_LABEL_BUFFER_SIZE 16ULL
-#define LEVEL_TITLE_LABEL_BUFFER_SIZE 64ULL
+#define MOVE_COUNT_LABEL_BUFFER_SIZE (16ULL)
+#define LEVEL_TITLE_LABEL_BUFFER_SIZE (64ULL)
 
 static struct Level level;
 static size_t displayed_move_count = 0ULL;
@@ -36,10 +36,15 @@ static struct Button sounds_button;
 static struct Button music_button;
 
 static bool initialize_playing_scene(void);
+
 static void present_playing_scene(void);
+
 static bool playing_scene_receive_event(const SDL_Event *const event);
+
 static void update_playing_scene(const double delta_time);
+
 static void dismiss_playing_scene(void);
+
 static void terminate_playing_scene(void);
 
 static const struct SceneAPI playing_scene_API = (struct SceneAPI){
@@ -243,8 +248,7 @@ static void update_playing_scene(const double delta_time) {
                 start_animation(&move_count_pulse, 0ULL);
         }
 
-        int drawable_width;
-        int drawable_height;
+        int drawable_width, drawable_height;
         SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
 
         const float padding = CLAMP_VALUE(fmaxf((float)drawable_width, (float)drawable_height) * 0.02f, 20.0f, 50.0f);

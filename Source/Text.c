@@ -180,8 +180,7 @@ void update_text(struct Text *const text) {
                 return;
         }
 
-        int drawable_width;
-        int drawable_height;
+        int drawable_width, drawable_height;
         SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
 
         SDL_Rect destination = (SDL_Rect){
@@ -262,9 +261,9 @@ void set_text_color(struct Text *const text, const uint8_t r, const uint8_t g, c
         text->implementation->outdated_texture = true;
 }
 
-#define MAXIMUM_WORD_SIZE 512ULL
-#define MAXIMUM_LINE_SIZE 1024ULL
-#define MAXIMUM_LINE_COUNT 128ULL
+#define MAXIMUM_WORD_SIZE  (512ULL)
+#define MAXIMUM_LINE_SIZE  (1024ULL)
+#define MAXIMUM_LINE_COUNT (128ULL)
 
 static void invalidate_text(struct Text *const text) {
         if (!text->implementation->texture) {
@@ -303,7 +302,7 @@ static void refresh_text(struct Text *const text) {
         const char *position = text->implementation->string;
         while (*position && line_count < MAXIMUM_LINE_COUNT) {
                 if (*position == ' ' || *position == '\t') {
-                        size_t space_count = 0;
+                        size_t space_count = 0ULL;
                         while (*position == ' ' || *position == '\t') {
                                 ++space_count;
                                 ++position;
