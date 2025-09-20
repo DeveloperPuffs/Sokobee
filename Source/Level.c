@@ -1,19 +1,20 @@
 #include "Level.h"
 
+#include <SDL_mixer.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "Memory.h"
 #include "SDL_render.h"
+#include "SDL_timer.h"
 
 #include "Audio.h"
 #include "cJSON.h"
 #include "Context.h"
 #include "Utilities.h"
+#include "Memory.h"
 #include "Entity.h"
 #include "Geometry.h"
-#include "Gesture.h"
 #include "Debug.h"
 
 #define LEVEL_DIMENSION_LIMIT 20
@@ -172,6 +173,22 @@ static inline void discard_pending_step(struct StepHistory *const step_history, 
 
         step_history->change_count -= step_changes;
 }
+
+#define TAP_TIME_THRESHOLD       (300)
+#define SWIPE_DISTANCE_THRESHOLD (0.15f)
+#define SWIPE_TIME_THRESHOLD     (500)
+#define TAP_DISTANCE_THRESHOLD   (0.05f)
+
+#ifndef NDEBUG
+#define EVENT_IS_GESTURE_DOWN(event)   ((event)->type == SDL_FINGERDOWN   || (event)->type == SDL_MOUSEBUTTONDOWN)
+#define EVENT_IS_GESTURE_UP(event)     ((event)->type == SDL_FINGERUP     || (event)->type == SDL_MOUSEBUTTONUP)
+#define EVENT_IS_GESTURE_MOTION(event) ((event)->type == SDL_FINGERMOTION || (event)->type == SDL_MOUSEMOTION)
+#else
+#define EVENT_IS_GESTURE_DOWN(event)   ((event)->type == SDL_FINGERDOWN)
+#define EVENT_IS_GESTURE_UP(event)     ((event)->type == SDL_FINGERUP)
+#define EVENT_IS_GESTURE_MOTION(event) ((event)->type == SDL_FINGERMOTION)
+#endif
+
 struct LevelImplementation {
         char *title;
         enum TileType *tiles;
@@ -185,6 +202,9 @@ struct LevelImplementation {
         struct StepHistory undo_history;
         enum Input buffered_input;
         bool has_buffered_input;
+        uint32_t gesture_start_time;
+        float gesture_swipe_x;
+        float gesture_swipe_y;
 };
 
 static inline void level_move_step(struct Level *const level, struct Entity *const entity, const enum Input input) {
@@ -339,7 +359,7 @@ bool initialize_level(struct Level *const level, const size_t number) {
         level->implementation = (struct LevelImplementation *)xmalloc(sizeof(struct LevelImplementation));
         level->implementation->grid_geometry = create_geometry();
         level->implementation->current_player = NULL;
-        level->implementation->has_buffered_input = false;
+        level->implementation->gesture_start_time = 0;
 
         initialize_step_history(&level->implementation->step_history);
         initialize_step_history(&level->implementation->undo_history);
@@ -465,6 +485,21 @@ bool query_level_tile(
         return true;
 }
 
+static inline void get_event_position(const SDL_Event *const event, const int screen_width, const int screen_height, float *const x, float *const y) {
+#ifndef NDEBUG
+        if (event->type == SDL_MOUSEBUTTONDOWN || event->type == SDL_MOUSEBUTTONUP || event->type == SDL_MOUSEMOTION) {
+                *x = (float)event->button.x / (float)screen_width;
+                *y = (float)event->button.y / (float)screen_height;
+                return;
+        }
+#endif
+
+        if (event->type == SDL_FINGERDOWN || event->type == SDL_FINGERUP || event->type == SDL_FINGERMOTION) {
+                *x = event->tfinger.x;
+                *y = event->tfinger.y;
+        }
+}
+
 bool level_receive_event(struct Level *const level, const SDL_Event *const event) {
         if (event->type == SDL_WINDOWEVENT) {
                 const Uint8 window_event = event->window.event;
@@ -527,11 +562,38 @@ bool level_receive_event(struct Level *const level, const SDL_Event *const event
                 }
         }
 
-        const enum Input gesture_input = handle_gesture_event(event);
-        if (gesture_input != INPUT_NONE) {
+        int screen_width, screen_height;
+        SDL_GetWindowSize(get_context_window(), &screen_width, &screen_height);
+
+        if (EVENT_IS_GESTURE_DOWN(event)) {
+                get_event_position(event, screen_width, screen_height, &level->implementation->gesture_swipe_x, &level->implementation->gesture_swipe_y);
+                level->implementation->gesture_start_time = (uint32_t)SDL_GetTicks();
+                return true;
+        }
+
+        if (EVENT_IS_GESTURE_UP(event) && level->implementation->gesture_start_time != 0) {
+                const uint32_t delta_time = (uint32_t)SDL_GetTicks() - level->implementation->gesture_start_time;
+                level->implementation->gesture_start_time = 0;
+
                 if (!level->implementation->has_buffered_input) {
-                        level->implementation->has_buffered_input = true;
-                        level->implementation->buffered_input = gesture_input;
+                        float swiped_x, swiped_y;
+                        get_event_position(event, screen_width, screen_height, &swiped_x, &swiped_y);
+
+                        const float dx = swiped_x - level->implementation->gesture_swipe_x;
+                        const float dy = swiped_y - level->implementation->gesture_swipe_y;
+                        const float distance = sqrtf(dx * dx + dy * dy);
+
+                        if (distance < TAP_DISTANCE_THRESHOLD && delta_time < TAP_TIME_THRESHOLD) {
+                                // TODO: For this case, check to see where the tap (or click) has landed
+                        }
+
+                        if (distance > SWIPE_DISTANCE_THRESHOLD && delta_time < SWIPE_TIME_THRESHOLD) {
+                                level->implementation->has_buffered_input = true;
+                                level->implementation->buffered_input = fabsf(dx) > fabsf(dy)
+                                        ? dx > 0.0f ? INPUT_RIGHT : INPUT_LEFT
+                                        : dy > 0.0f ? INPUT_BACKWARD : INPUT_FORWARD;
+                        }
+
                 }
 
                 return true;
