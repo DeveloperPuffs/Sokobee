@@ -242,16 +242,6 @@ enum GridAxis {
         GRID_AXIS_VERTICAL
 };
 
-static inline void get_grid_tile_position(const struct GridMetrics *const grid_metrics, const size_t column, const size_t row, float *const x, float *const y) {
-        if (x != NULL) {
-                *x = grid_metrics->grid_x + grid_metrics->tile_radius + column * grid_metrics->tile_distance_x;
-        }
-
-        if (y != NULL) {
-                *y = grid_metrics->grid_y + grid_metrics->tile_distance_y / 2.0f + row * grid_metrics->tile_distance_y + ((column & 1ULL) ? grid_metrics->tile_distance_y / 2.0f : 0.0f);
-        }
-}
-
 enum HexagonNeighbor {
         HEXAGON_NEIGHBOR_TOP = 0,
         HEXAGON_NEIGHBOR_BOTTOM,
@@ -300,6 +290,64 @@ static inline bool get_hexagon_neighbor(const struct GridMetrics *const grid_met
 
         if (out_column != NULL) {
                 *out_column = neighbor_column;
+        }
+
+        return true;
+}
+
+static inline bool get_grid_tile_position(const struct GridMetrics *const grid_metrics, const size_t column, const size_t row, float *const x, float *const y) {
+        if (column >= grid_metrics->columns || row >= grid_metrics->rows) {
+                return false;
+        }
+
+        if (x != NULL) {
+                *x = grid_metrics->grid_x + grid_metrics->tile_radius + column * grid_metrics->tile_distance_x;
+        }
+
+        if (y != NULL) {
+                *y = grid_metrics->grid_y + grid_metrics->tile_distance_y / 2.0f + row * grid_metrics->tile_distance_y + ((column & 1ULL) ? grid_metrics->tile_distance_y / 2.0f : 0.0f);
+        }
+
+        return true;
+}
+
+static inline bool get_grid_tile_at_position(const struct GridMetrics *grid_metrics, const float x, const float y, size_t *const column, size_t *const row) {
+        const int approximate_column = (int)((x - grid_metrics->grid_x) / grid_metrics->tile_distance_x);
+        if (approximate_column < 0 || approximate_column >= (int)grid_metrics->columns) {
+                return false;
+        }
+
+        const int approximate_row = (int)((y - grid_metrics->grid_y - ((approximate_column & 1) ? grid_metrics->tile_distance_y / 2.0f : 0.0f)) / grid_metrics->tile_distance_y);
+        if (approximate_row < 0 || approximate_row >= (int)grid_metrics->rows) {
+                return false;
+        }
+
+        for (int neighbor = 0; neighbor < HEXAGON_NEIGHBOR_COUNT; ++neighbor) {
+                size_t neighbor_column, neighbor_row;
+                if (get_hexagon_neighbor(grid_metrics, approximate_column, approximate_row, (enum HexagonNeighbor)neighbor, &neighbor_column, &neighbor_row)) {
+                        float neighbor_x, neighbor_y;
+                        if (get_grid_tile_position(grid_metrics, neighbor_column, neighbor_row, &neighbor_x, &neighbor_y)) {
+                                if ((fabsf(x - neighbor_x) * 2.0f / sqrtf(3.0f) + fabsf(y - neighbor_y)) / grid_metrics->tile_radius <= 1.0f) {
+                                        if (column != NULL) {
+                                                *column = neighbor_column;
+                                        }
+
+                                        if (row != NULL) {
+                                                *row = neighbor_row;
+                                        }
+
+                                        return true;
+                                }
+                        }
+                }
+        }
+
+        if (column != NULL) {
+                *column = (size_t)approximate_column;
+        }
+
+        if (row != NULL) {
+                *row = (size_t)approximate_row;
         }
 
         return true;

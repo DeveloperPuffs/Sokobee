@@ -31,7 +31,7 @@ static const char *const message_severity_strings[MESSAGE_COUNT] = {
         [MESSAGE_ERROR]       = "      \033[31mMESSAGE_ERROR\033[m",
         [MESSAGE_WARNING]     = "    \033[33mMESSAGE_WARNING\033[m",
         [MESSAGE_INFORMATION] = "\033[32mMESSAGE_INFORMATION\033[m",
-        [MESSAGE_DEBUG]       = "      \033[36mDEBUG\033[m",
+        [MESSAGE_DEBUG]       = "      \033[36mMESSAGE_DEBUG\033[m",
         [MESSAGE_VERBOSE]     = "    \033[34mMESSAGE_VERBOSE\033[m"
 };
 

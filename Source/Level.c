@@ -572,10 +572,9 @@ bool level_receive_event(struct Level *const level, const SDL_Event *const event
         }
 
         if (EVENT_IS_GESTURE_UP(event) && level->implementation->gesture_start_time != 0) {
-                const uint32_t delta_time = (uint32_t)SDL_GetTicks() - level->implementation->gesture_start_time;
-                level->implementation->gesture_start_time = 0;
-
                 if (!level->implementation->has_buffered_input) {
+                        const uint32_t delta_time = (uint32_t)SDL_GetTicks() - level->implementation->gesture_start_time;
+
                         float swiped_x, swiped_y;
                         get_event_position(event, screen_width, screen_height, &swiped_x, &swiped_y);
 
@@ -584,7 +583,22 @@ bool level_receive_event(struct Level *const level, const SDL_Event *const event
                         const float distance = sqrtf(dx * dx + dy * dy);
 
                         if (distance < TAP_DISTANCE_THRESHOLD && delta_time < TAP_TIME_THRESHOLD) {
-                                // TODO: For this case, check to see where the tap (or click) has landed
+                                int drawable_width, drawable_height;
+                                SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
+
+                                const float denormalized_x = swiped_x * (float)drawable_width;
+                                const float denormalized_y = swiped_y * (float)drawable_height;
+
+                                size_t tapped_column, tapped_row;
+                                if (get_grid_tile_at_position(&level->implementation->grid_metrics, denormalized_x, denormalized_y, &tapped_column, &tapped_row)) {
+                                        struct Entity *tapped_entity;
+                                        const uint16_t tapped_tile_index = (uint16_t)(tapped_row * level->implementation->grid_metrics.columns + tapped_column);
+                                        if (query_level_tile(level, tapped_tile_index, NULL, &tapped_entity, NULL, NULL)) {
+                                                if (tapped_entity != NULL && get_entity_type(tapped_entity) == ENTITY_PLAYER && tapped_entity != level->implementation->current_player) {
+                                                        // TODO: Swicth entity
+                                                }
+                                        }
+                                }
                         }
 
                         if (distance > SWIPE_DISTANCE_THRESHOLD && delta_time < SWIPE_TIME_THRESHOLD) {
@@ -593,9 +607,9 @@ bool level_receive_event(struct Level *const level, const SDL_Event *const event
                                         ? dx > 0.0f ? INPUT_RIGHT : INPUT_LEFT
                                         : dy > 0.0f ? INPUT_BACKWARD : INPUT_FORWARD;
                         }
-
                 }
 
+                level->implementation->gesture_start_time = 0;
                 return true;
         }
 
