@@ -150,7 +150,7 @@ static void write_undo_icon_geometry(struct Icon *const icon) {
 
         clear_geometry(icon->geometry);
         write_rounded_triangle_geometry(icon->geometry, x1, y1, x2, y2, x3, y3, icon->size / 20.0f);
-        write_bezier_curve_geometry(icon->geometry, px1, py1, px2, py2, cx1, cy1, cx2, cy2, icon->size / 10.0f);
+        write_bezier_curve_geometry(icon->geometry, px1, py1, cx1, cy1, cx2, cy2, px2, py2, icon->size / 10.0f);
 
         // Give the endpoint that isn't touching the triangle a round line cap
         write_circle_geometry(icon->geometry, px2, py2, icon->size / 20.0f);
@@ -178,7 +178,7 @@ static void write_redo_icon_geometry(struct Icon *const icon) {
 
         clear_geometry(icon->geometry);
         write_rounded_triangle_geometry(icon->geometry, x1, y1, x2, y2, x3, y3, icon->size / 20.0f);
-        write_bezier_curve_geometry(icon->geometry, px1, py1, px2, py2, cx1, cy1, cx2, cy2, icon->size / 10.0f);
+        write_bezier_curve_geometry(icon->geometry, px1, py1, cx1, cy1, cx2, cy2, px2, py2, icon->size / 10.0f);
 
         // Give the endpoint that isn't touching the triangle a round line cap
         write_circle_geometry(icon->geometry, px2, py2, icon->size / 20.0f);

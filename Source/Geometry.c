@@ -2,10 +2,12 @@
 
 #include <math.h>
 #include <float.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <errno.h>
 
+#include "Debug.h"
 #include "SDL_render.h"
 
 #include "Utilities.h"
@@ -150,12 +152,43 @@ static inline uint16_t add_geometry_vertex(struct Geometry *const geometry, cons
         return (uint16_t)geometry->vertex_count++;
 }
 
+#ifndef NDEBUG
+#define MAXIMUM_MAGNITUDE (1e6f)
+
+#define CHECK_FINITE_NUMBER(number, name)                                                                           \
+        do {                                                                                                        \
+                if (!isfinite((float)(number)) || fabsf((float)(number)) > MAXIMUM_MAGNITUDE) {                     \
+                        send_message(MESSAGE_ERROR,                                                                 \
+                                "Number that is nonfinite or greater than maximum maginute of (%E) found: %s (%E)", \
+                                (double)MAXIMUM_MAGNITUDE, name, (double)(number));                                 \
+                        return;                                                                                     \
+                }                                                                                                   \
+        } while (0)
+
+#define CHECK_FINITE_POINT(x, y, name)                                                                                                                  \
+        do {                                                                                                                                            \
+                if (!isfinite((float)(x)) || fabsf((float)(x)) > MAXIMUM_MAGNITUDE || !isfinite((float)(y)) || fabsf((float)(y)) > MAXIMUM_MAGNITUDE) { \
+                        send_message(MESSAGE_ERROR,                                                                                                     \
+                                "Point that is nonfinite or greater than maximum maginute of (%E) found: %s (%E, %E)",                                  \
+                                (double)MAXIMUM_MAGNITUDE, name, (double)(x), (double)(y));                                                             \
+                        return;                                                                                                                         \
+                }                                                                                                                                       \
+        } while (0)
+#else
+#define CHECK_FINITE_NUMBER(number, name) ((void)0)
+#define CHECK_FINITE_POINT(x, y, name) ((void)0)
+#endif
+
 void write_triangle_geometry(
         struct Geometry *const geometry,
         const float x1, const float y1,
         const float x2, const float y2,
         const float x3, const float y3
 ) {
+        CHECK_FINITE_POINT(x1, y1, "Triangle Point A");
+        CHECK_FINITE_POINT(x2, y2, "Triangle Point B");
+        CHECK_FINITE_POINT(x3, y3, "Triangle Point C");
+
         secure_geometry_vertex_capacity(geometry, geometry->vertex_count + 3ULL);
         secure_geometry_index_capacity(geometry, geometry->index_count + 3ULL);
 
@@ -171,6 +204,10 @@ void write_line_geometry(
         const float line_width,
         const enum LineCap rounded_caps
 ) {
+        CHECK_FINITE_POINT(x1, y1, "Line Point A");
+        CHECK_FINITE_POINT(x2, y2, "Line Point B");
+        CHECK_FINITE_NUMBER(line_width, "Line Line Width");
+
         const float dx = x2 - x1;
         const float dy = y2 - y1;
         const float length = sqrtf(dx * dx + dy * dy);
@@ -205,6 +242,10 @@ void write_rectangle_geometry(
         const float w, const float h,
         const float rotation
 ) {
+        CHECK_FINITE_POINT(x, y, "Rectangle Position");
+        CHECK_FINITE_POINT(w, h, "Rectangle Size");
+        CHECK_FINITE_NUMBER(rotation, "Rectangle Rotation");
+
         const float half_w = w / 2.0f;
         const float half_h = h / 2.0f;
 
@@ -234,6 +275,11 @@ void write_quadrilateral_geometry(
         const float x3, const float y3,
         const float x4, const float y4
 ) {
+        CHECK_FINITE_POINT(x1, y1, "Quadrilateral Point A");
+        CHECK_FINITE_POINT(x2, y2, "Quadrilateral Point B");
+        CHECK_FINITE_POINT(x3, y3, "Quadrilateral Point C");
+        CHECK_FINITE_POINT(x4, y4, "Quadrilateral Point D");
+
         secure_geometry_vertex_capacity(geometry, geometry->vertex_count + 4ULL);
         secure_geometry_index_capacity(geometry, geometry->index_count + 6ULL);
 
@@ -256,6 +302,9 @@ void write_circle_geometry(
         const float x, const float y,
         const float radius
 ) {
+        CHECK_FINITE_POINT(x, y, "Circle Position");
+        CHECK_FINITE_NUMBER(radius, "Circle Radius");
+
         write_ellipse_geometry(geometry, x, y, radius, radius, 0.0f);
 }
 
@@ -265,6 +314,10 @@ void write_ellipse_geometry(
         const float rx, const float ry,
         const float rotation
 ) {
+        CHECK_FINITE_POINT(cx, cy, "Ellipse Position");
+        CHECK_FINITE_POINT(rx, ry, "Ellipse Radii");
+        CHECK_FINITE_NUMBER(rotation, "Ellipse Rotation");
+
         write_elliptical_arc_geometry(geometry, cx, cy, rx, ry, rotation, 0.0f, 2.0f * (float)M_PI, false);
 }
 
@@ -276,6 +329,11 @@ void write_circular_arc_geometry(
         const float end_angle,
         const bool clockwise
 ) {
+        CHECK_FINITE_POINT(cx, cy, "Circular Arc Position");
+        CHECK_FINITE_NUMBER(radius, "Circular Arc Radius");
+        CHECK_FINITE_NUMBER(start_angle, "Circular Arc Start Angle");
+        CHECK_FINITE_NUMBER(end_angle, "Circular Arc End Angle");
+
         write_elliptical_arc_geometry(geometry, cx, cy, radius, radius, 0.0f, start_angle, end_angle, clockwise);
 }
 
@@ -288,6 +346,12 @@ void write_elliptical_arc_geometry(
         const float end_angle,
         const bool clockwise
 ) {
+        CHECK_FINITE_POINT(cx, cy, "Elliptical Arc Position");
+        CHECK_FINITE_POINT(rx, ry, "Elliptical Arc Radii");
+        CHECK_FINITE_NUMBER(rotation, "Elliptical Arc Rotation");
+        CHECK_FINITE_NUMBER(start_angle, "Elliptical Arc Start Angle");
+        CHECK_FINITE_NUMBER(end_angle, "Elliptical Arc End Angle");
+
         if (rx <= 0.0f || ry <= 0.0f || start_angle == end_angle) {
                 return;
         }
@@ -342,6 +406,10 @@ void write_circle_outline_geometry(
         const float radius,
         const float line_width
 ) {
+        CHECK_FINITE_POINT(cx, cy, "Circle Outline Position");
+        CHECK_FINITE_NUMBER(radius, "Circle Outline Radius");
+        CHECK_FINITE_NUMBER(line_width, "Circle Outline Line Width");
+
         write_ellipse_outline_geometry(geometry, cx, cy, radius, radius, line_width);
 }
 
@@ -351,6 +419,10 @@ void write_ellipse_outline_geometry(
         const float rx, const float ry,
         const float line_width
 ) {
+        CHECK_FINITE_POINT(cx, cy, "Ellipse Outline Position");
+        CHECK_FINITE_POINT(rx, ry, "Ellipse Outline Radii");
+        CHECK_FINITE_NUMBER(line_width, "Ellipse Outline Line Width");
+
         write_elliptical_arc_outline_geometry(geometry, cx, cy, rx, ry, 0.0f, line_width, 0.0f, 2.0f * (float)M_PI, false, LINE_CAP_NONE);
 }
 
@@ -364,6 +436,12 @@ void write_circular_arc_outline_geometry(
         const bool clockwise,
         const enum LineCap rounded_caps
 ) {
+        CHECK_FINITE_POINT(cx, cy, "Circular Arc Outline Position");
+        CHECK_FINITE_NUMBER(radius, "Circular Arc Outline Radius");
+        CHECK_FINITE_NUMBER(line_width, "Circular Arc Outline Line Width");
+        CHECK_FINITE_NUMBER(start_angle, "Circular Arc Outline Start Angle");
+        CHECK_FINITE_NUMBER(end_angle, "Circular Arc Outline End Angle");
+
         write_elliptical_arc_outline_geometry(geometry, cx, cy, radius, radius, 0.0f, line_width, start_angle, end_angle, clockwise, rounded_caps);
 }
 
@@ -378,6 +456,13 @@ void write_elliptical_arc_outline_geometry(
         const bool clockwise,
         const enum LineCap rounded_caps
 ) {
+        CHECK_FINITE_POINT(cx, cy, "Elliptical Arc Outline Position");
+        CHECK_FINITE_POINT(rx, ry, "Elliptical Arc Outline Radii");
+        CHECK_FINITE_NUMBER(rotation, "Elliptical Arc Outline Rotation");
+        CHECK_FINITE_NUMBER(line_width, "Elliptical Arc Outline Line Width");
+        CHECK_FINITE_NUMBER(start_angle, "Elliptical Arc Outline Start Angle");
+        CHECK_FINITE_NUMBER(end_angle, "Elliptical Arc Outline End Angle");
+
         if (rx <= 0.0f || ry <= 0.0f || start_angle == end_angle) {
                 return;
         }
@@ -520,6 +605,10 @@ void write_hexagon_geometry(
         const float radius,
         const float rotation
 ) {
+        CHECK_FINITE_POINT(x, y, "Hexagon Position");
+        CHECK_FINITE_NUMBER(radius, "Hexagon Radius");
+        CHECK_FINITE_NUMBER(rotation, "Hexagon Rotation");
+
         secure_geometry_vertex_capacity(geometry, geometry->vertex_count + 6ULL);
         secure_geometry_index_capacity(geometry, geometry->index_count + 12ULL);
 
@@ -549,10 +638,10 @@ void write_hexagon_geometry(
 
 static inline void compute_bezier_point(
         const float interpolation,
-        const float px1,    const float py1, // Endpoint A
-        const float px2,    const float py2, // Endpoint B
-        const float cx1,    const float cy1, // Control Point A
-        const float cx2,    const float cy2, // Control Point B
+        const float px1, const float py1,    // Endpoint A
+        const float cx1, const float cy1,    // Control Point A
+        const float cx2, const float cy2,    // Control Point B
+        const float px2, const float py2,    // Endpoint B
         float *const out_x, float *const out_y
 ) {
         const float t = interpolation;
@@ -568,10 +657,10 @@ static inline void compute_bezier_point(
 
 static inline void compute_bezier_tangent(
         const float interpolation,
-        const float px1, const float py1,
-        const float px2, const float py2,
-        const float cx1, const float cy1,
-        const float cx2, const float cy2,
+        const float px1, const float py1, // Endpoint A
+        const float cx1, const float cy1, // Control Point A
+        const float cx2, const float cy2, // Control Point B
+        const float px2, const float py2, // Endpoint B
         float *const out_dx, float *const out_dy
 ) {
         const float t = interpolation;
@@ -587,26 +676,24 @@ static inline void compute_bezier_tangent(
 void write_bezier_curve_geometry(
         struct Geometry *const geometry,
         const float px1,    const float py1, // Endpoint A
-        const float px2,    const float py2, // Endpoint B
         const float cx1,    const float cy1, // Control Point A
         const float cx2,    const float cy2, // Control Point B
+        const float px2,    const float py2, // Endpoint B
         const float line_width
 ) {
+        CHECK_FINITE_POINT(px1, py1, "Bezier Curve Endpoint A");
+        CHECK_FINITE_POINT(cx1, cy1, "Bezier Curve Control Point A");
+        CHECK_FINITE_POINT(cx2, cy2, "Bezier Curve Control Point B");
+        CHECK_FINITE_POINT(px2, py2, "Bezier Curve Endpoint B");
+        CHECK_FINITE_NUMBER(line_width, "Bezier Curve Line Width");
 
 #define DISTANCE(x1, y1, x2, y2) (sqrtf(((x2) - (x1)) * ((x2) - (x1)) + ((y2) - (y1)) * ((y2) - (y1))))
 
-        const float curvature
-                = DISTANCE(px1, py1, cx1, cy1)
-                + DISTANCE(cx1, cy1, cx2, cy2)
-                + DISTANCE(cx2, cy2, px2, py2)
-                / DISTANCE(px1, py1, px2, py2);
-        size_t samples = (size_t)(curvature * 5.0f);
-        if (samples < 5ULL) {
-                samples = 5ULL;
-        }
+        const float curvature = (DISTANCE(px1, py1, cx1, cy1) + DISTANCE(cx1, cy1, cx2, cy2) + DISTANCE(cx2, cy2, px2, py2)) / DISTANCE(px1, py1, px2, py2);
+        const size_t samples = curvature < 1.0f ? 5ULL : (size_t)(curvature * 5.0f);
 
-        float estimated_length = 0.0f;
         float x1 = px1, y1 = py1;
+        float estimated_length = 0.0f;
         for (size_t index = 1ULL; index <= samples; ++index) {
                 const float interpolation = (float)index / (float)samples;
 
@@ -628,8 +715,8 @@ void write_bezier_curve_geometry(
         secure_geometry_index_capacity(geometry, geometry->index_count + resolution * 6ULL);
 
         float tx, ty;
-        compute_bezier_tangent(0.0f, px1, py1, px2, py2, cx1, cy1, cx2, cy2, &tx, &ty);
-        compute_bezier_point(0.0f, px1, py1, px2, py2, cx1, cy1, cx2, cy2, &x1, &y1);
+        compute_bezier_tangent(0.0f, px1, py1, cx1, cy1, cx2, cy2, px2, py2, &tx, &ty);
+        compute_bezier_point(0.0f, px1, py1, cx1, cy1, cx2, cy2, px2, py2, &x1, &y1);
 
         const float half_width = line_width / 2.0f;
 
@@ -644,8 +731,8 @@ void write_bezier_curve_geometry(
                 const float interpolation = (float)index / (float)resolution;
 
                 float x2, y2;
-                compute_bezier_point(  interpolation, px1, py1, px2, py2, cx1, cy1, cx2, cy2, &x2, &y2);
-                compute_bezier_tangent(interpolation, px1, py1, px2, py2, cx1, cy1, cx2, cy2, &tx, &ty);
+                compute_bezier_point(interpolation, px1, py1, cx1, cy1, cx2, cy2, px2, py2, &x2, &y2);
+                compute_bezier_tangent(interpolation, px1, py1, cx1, cy1, cx2, cy2, px2, py2, &tx, &ty);
 
                 length = sqrtf(tx * tx + ty * ty);
                 nx = (length > 0.0f) ? (-ty / length) * half_width : 0.0f;
@@ -674,6 +761,11 @@ void write_rounded_triangle_geometry(
         const float x3, const float y3,
         const float rounded_radius
 ) {
+        CHECK_FINITE_POINT(x1, y1, "Rounded Triangle Point A");
+        CHECK_FINITE_POINT(x2, y2, "Rounded Triangle Point B");
+        CHECK_FINITE_POINT(x3, y3, "Rounded Triangle Point C");
+        CHECK_FINITE_NUMBER(rounded_radius, "Rounded Triangle Rounded Radius");
+
         if (rounded_radius <= 0.0f) {
                 write_triangle_geometry(geometry, x1, y1, x2, y2, x3, y3);
                 return;
@@ -830,6 +922,11 @@ void write_rounded_rectangle_geometry(
         const float rounded_radius,
         const float rotation
 ) {
+        CHECK_FINITE_POINT(x, y, "Rounded Rectangle Position");
+        CHECK_FINITE_POINT(w, h, "Rounded Rectangle Size");
+        CHECK_FINITE_NUMBER(rounded_radius, "Rounded Rectangle Rounded Radius");
+        CHECK_FINITE_NUMBER(rotation, "Rounded Rectangle Rotation");
+
         if (rounded_radius <= 0.0f) {
                 write_rectangle_geometry(geometry, x, y, w, h, rotation);
                 return;
@@ -883,6 +980,12 @@ void write_rounded_quadrilateral_geometry(
         const float x4, const float y4,
         const float rounded_radius
 ) {
+        CHECK_FINITE_POINT(x1, y1, "Rounded Quadrilateral Point A");
+        CHECK_FINITE_POINT(x2, y2, "Rounded Quadrilateral Point B");
+        CHECK_FINITE_POINT(x3, y3, "Rounded Quadrilateral Point C");
+        CHECK_FINITE_POINT(x4, y4, "Rounded Quadrilateral Point D");
+        CHECK_FINITE_NUMBER(rounded_radius, "Rounded Quadrilateral Rounded Radius");
+
         if (rounded_radius <= 0.0f) {
                 write_quadrilateral_geometry(geometry, x1, y1, x2, y2, x3, y3, x4, y4);
                 return;

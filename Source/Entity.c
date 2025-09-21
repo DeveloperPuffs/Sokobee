@@ -335,12 +335,12 @@ void update_entity(struct Entity *const entity, const double delta_time) {
                         entity->geometry,
                         left_antenna_endpoints[0].x,
                         left_antenna_endpoints[0].y,
-                        left_antenna_endpoints[1].x,
-                        left_antenna_endpoints[1].y,
                         left_antenna_control_points[0].x,
                         left_antenna_control_points[0].y,
                         left_antenna_control_points[1].x,
                         left_antenna_control_points[1].y,
+                        left_antenna_endpoints[1].x,
+                        left_antenna_endpoints[1].y,
                         line_width
                 );
 
@@ -348,12 +348,12 @@ void update_entity(struct Entity *const entity, const double delta_time) {
                         entity->geometry,
                         right_antenna_endpoints[0].x,
                         right_antenna_endpoints[0].y,
-                        right_antenna_endpoints[1].x,
-                        right_antenna_endpoints[1].y,
                         right_antenna_control_points[0].x,
                         right_antenna_control_points[0].y,
                         right_antenna_control_points[1].x,
                         right_antenna_control_points[1].y,
+                        right_antenna_endpoints[1].x,
+                        right_antenna_endpoints[1].y,
                         line_width
                 );
 
@@ -471,43 +471,49 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
                 return;
         }
 
-        entity->last_tile_index = change->move.last_tile_index;
-        entity->next_tile_index = change->move.next_tile_index;
+        if (change->type == CHANGE_WALK || change->type == CHANGE_PUSH || change->type == CHANGE_PUSHED) {
+                entity->last_tile_index = change->move.last_tile_index;
+                entity->next_tile_index = change->move.next_tile_index;
 
-        struct Action *const moving_action = &entity->moving.actions[0];
-        query_level_tile(entity->level, entity->next_tile_index, NULL, NULL, &moving_action->keyframes.points[1].x, &moving_action->keyframes.points[1].y);
+                struct Action *const moving_action = &entity->moving.actions[0];
+                query_level_tile(entity->level, entity->next_tile_index, NULL, NULL, &moving_action->keyframes.points[1].x, &moving_action->keyframes.points[1].y);
 
-        switch (change->type) {
-                case CHANGE_WALK: {
-                        moving_action->easing = QUAD_IN_OUT;
-                        break;
+                switch (change->type) {
+                        case CHANGE_WALK: {
+                                moving_action->easing = QUAD_IN_OUT;
+                                break;
+                        }
+
+                        case CHANGE_PUSH: {
+                                moving_action->easing = QUAD_OUT;
+                                break;
+                        }
+
+                        case CHANGE_PUSHED: {
+                                moving_action->easing = QUAD_IN;
+                                break;
+                        }
+
+                        default: {
+                                break;
+                        }
                 }
 
-                case CHANGE_PUSH: {
-                        moving_action->easing = QUAD_OUT;
-                        break;
-                }
+                start_animation(&entity->moving, 0ULL);
+                PULSE_ENTITY_SCALE(entity, 1.2f);
 
-                case CHANGE_PUSHED: {
-                        moving_action->easing = QUAD_IN;
-                        break;
-                }
+                if (entity->type == ENTITY_PLAYER) {
+                        struct Player *const player = &entity->as.player;
+                        start_animation(&player->flapping, 0ULL);
 
-                default: {
-                        break;
+                        struct Action *const bounce_away = &player->bouncing.actions[0];
+                        bounce_away->keyframes.points[1].x = change->input == INPUT_FORWARD ? -0.25f : 0.25f;
+                        bounce_away->keyframes.points[1].y = 0.0f;
+                        start_animation(&player->bouncing, 0ULL);
                 }
         }
 
-        start_animation(&entity->moving, 0ULL);
-        PULSE_ENTITY_SCALE(entity, 1.2f);
-
-        if (entity->type == ENTITY_PLAYER) {
-                struct Player *const player = &entity->as.player;
-                start_animation(&player->flapping, 0ULL);
-
-                struct Action *const bounce_away = &player->bouncing.actions[0];
-                bounce_away->keyframes.points[1].x = change->input == INPUT_FORWARD ? -0.25f : 0.25f;
-                bounce_away->keyframes.points[1].y = 0.0f;
-                start_animation(&player->bouncing, 0ULL);
+        if (change->type == CHANGE_TOGGLE) {
+                // TODO: Handle toggle animations
         }
 }

@@ -1,5 +1,6 @@
 #include "Level.h"
 
+#include <SDL_keycode.h>
 #include <SDL_mixer.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -101,6 +102,12 @@ static inline void step_history_swap_step(struct StepHistory *const source, stru
                                 break;
                         }
 
+                        case CHANGE_TOGGLE: {
+                                reversed.toggle.last_state = !reversed.toggle.last_state;
+                                reversed.toggle.next_state = !reversed.toggle.next_state;
+                                break;
+                        }
+
                         case CHANGE_INVALID: {
                                 continue;
                         }
@@ -195,20 +202,22 @@ struct LevelImplementation {
         uint16_t tile_count;
         struct Entity **entities;
         uint16_t entity_count;
+        uint16_t player_count;
         struct Entity *current_player;
         struct GridMetrics grid_metrics;
         struct Geometry *grid_geometry;
         struct StepHistory step_history;
         struct StepHistory undo_history;
-        enum Input buffered_input;
         bool has_buffered_input;
+        enum Input buffered_input;
+        void *buffered_input_data;
         uint32_t gesture_start_time;
         float gesture_swipe_x;
         float gesture_swipe_y;
 };
 
-static inline void level_move_step(struct Level *const level, struct Entity *const entity, const enum Input input) {
-        if (!entity_can_change(entity)) {
+static inline void level_process_move(struct Level *const level, const enum Input input) {
+        if (!entity_can_change(level->implementation->current_player)) {
                 if (!level->implementation->has_buffered_input) {
                         level->implementation->has_buffered_input = true;
                         level->implementation->buffered_input = input;
@@ -217,15 +226,15 @@ static inline void level_move_step(struct Level *const level, struct Entity *con
                 return;
         }
 
-        uint16_t tile_index = get_entity_tile_index(entity);
-        enum Orientation direction = get_entity_orientation(entity);
+        uint16_t tile_index = get_entity_tile_index(level->implementation->current_player);
+        enum Orientation direction = get_entity_orientation(level->implementation->current_player);
         if (input == INPUT_BACKWARD) {
                 direction = orientation_reverse(direction);
         }
 
-        struct Entity *next_entity = entity;
+        struct Entity *next_entity = level->implementation->current_player;
         while (true) {
-                const bool first_change = next_entity == entity;
+                const bool first_change = next_entity == level->implementation->current_player;
 
                 struct Change *const change = get_next_change_slot(&level->implementation->step_history);
                 change->input = input;
@@ -300,8 +309,8 @@ static inline void level_move_step(struct Level *const level, struct Entity *con
         }
 }
 
-static inline void level_turn_step(struct Level *const level, struct Entity *const entity, const enum Input input) {
-        if (!entity_can_change(entity)) {
+static inline void level_process_turn(struct Level *const level, const enum Input input) {
+        if (!entity_can_change(level->implementation->current_player)) {
                 if (!level->implementation->has_buffered_input) {
                         level->implementation->has_buffered_input = true;
                         level->implementation->buffered_input = input;
@@ -312,9 +321,9 @@ static inline void level_turn_step(struct Level *const level, struct Entity *con
 
         struct Change *const change = get_next_change_slot(&level->implementation->step_history);
         change->input = input;
-        change->entity = entity;
         change->type = CHANGE_TURN;
-        change->turn.last_orientation = get_entity_orientation(entity);
+        change->entity = level->implementation->current_player;
+        change->turn.last_orientation = get_entity_orientation(level->implementation->current_player);
         change->turn.next_orientation = input == INPUT_RIGHT
                 ? orientation_turn_right(change->turn.last_orientation)
                 : orientation_turn_left(change->turn.last_orientation);
@@ -322,6 +331,67 @@ static inline void level_turn_step(struct Level *const level, struct Entity *con
         commit_pending_step(&level->implementation->step_history);
         empty_step_history(&level->implementation->undo_history);
         play_sound(SOUND_TURN);
+}
+
+static inline void level_process_undo(struct Level *const level) {
+        if (!entity_can_change(level->implementation->current_player)) {
+                if (!level->implementation->has_buffered_input) {
+                        level->implementation->has_buffered_input = true;
+                        level->implementation->buffered_input = INPUT_UNDO;
+                }
+
+                return;
+        }
+
+        step_history_swap_step(&level->implementation->step_history, &level->implementation->undo_history);
+}
+
+static inline void level_process_redo(struct Level *const level) {
+        if (!entity_can_change(level->implementation->current_player)) {
+                if (!level->implementation->has_buffered_input) {
+                        level->implementation->has_buffered_input = true;
+                        level->implementation->buffered_input = INPUT_REDO;
+                }
+
+                return;
+        }
+
+        step_history_swap_step(&level->implementation->undo_history, &level->implementation->step_history);
+}
+
+static inline void level_process_switch(struct Level *const level, struct Entity *const optional_player) {
+        if (level->implementation->player_count == 1) {
+                return;
+        }
+
+        if (!entity_can_change(level->implementation->current_player)) {
+                if (!level->implementation->has_buffered_input) {
+                        level->implementation->has_buffered_input = true;
+                        level->implementation->buffered_input = INPUT_SWITCH;
+                        level->implementation->buffered_input_data = (void *)optional_player;
+                }
+
+                return;
+        }
+
+        struct Change *const current_player_change = get_next_change_slot(&level->implementation->step_history);
+        current_player_change->input = INPUT_SWITCH;
+        current_player_change->type = CHANGE_TOGGLE;
+        current_player_change->entity = level->implementation->current_player;
+        current_player_change->toggle.last_state = true;
+        current_player_change->toggle.next_state = false;
+
+        struct Change *const next_player_change = get_next_change_slot(&level->implementation->step_history);
+        next_player_change->input = INPUT_SWITCH;
+        next_player_change->type = CHANGE_TOGGLE;
+        next_player_change->entity = optional_player;// TODO: If this is NULL, cycle through players
+        next_player_change->toggle.last_state = false;
+        next_player_change->toggle.next_state = true;
+
+        commit_pending_step(&level->implementation->step_history);
+        empty_step_history(&level->implementation->undo_history);
+
+        level->implementation->current_player = optional_player;
 }
 
 static bool parse_level(const cJSON *const json, struct Level *const level);
@@ -510,54 +580,44 @@ bool level_receive_event(struct Level *const level, const SDL_Event *const event
                 return false;
         }
 
+        // TODO: On non-touch devices, LMB click for left turn and RMB click for right turn?
+
         if (event->type == SDL_KEYDOWN && event->key.repeat == 0) {
                 const SDL_Keycode key = event->key.keysym.sym;
 
                 if (key == SDLK_LEFT || key == SDLK_a) {
-                        level_turn_step(level, level->implementation->current_player, INPUT_LEFT);
+                        level_process_turn(level, INPUT_LEFT);
                         return true;
                 }
 
                 if (key == SDLK_RIGHT || key == SDLK_d) {
-                        level_turn_step(level, level->implementation->current_player, INPUT_RIGHT);
+                        level_process_turn(level, INPUT_RIGHT);
                         return true;
                 }
 
                 if (key == SDLK_UP || key == SDLK_w) {
-                        level_move_step(level, level->implementation->current_player, INPUT_FORWARD);
+                        level_process_move(level, INPUT_FORWARD);
                         return true;
                 }
 
                 if (key == SDLK_DOWN || key == SDLK_s) {
-                        level_move_step(level, level->implementation->current_player, INPUT_BACKWARD);
+                        level_process_move(level, INPUT_BACKWARD);
                         return true;
                 }
 
                 if (key == SDLK_z) {
-                        if (!entity_can_change(level->implementation->current_player)) {
-                                if (!level->implementation->has_buffered_input) {
-                                        level->implementation->has_buffered_input = true;
-                                        level->implementation->buffered_input = INPUT_UNDO;
-                                }
-
-                                return true;
-                        }
-
-                        step_history_swap_step(&level->implementation->step_history, &level->implementation->undo_history);
+                        level_process_undo(level);
                         return true;
                 }
 
                 if (key == SDLK_x || key == SDLK_y) {
-                        if (!entity_can_change(level->implementation->current_player)) {
-                                if (!level->implementation->has_buffered_input) {
-                                        level->implementation->has_buffered_input = true;
-                                        level->implementation->buffered_input = INPUT_UNDO;
-                                }
+                        level_process_redo(level);
+                        return true;
+                }
 
-                                return true;
-                        }
-
-                        step_history_swap_step(&level->implementation->undo_history, &level->implementation->step_history);
+                if (key == SDLK_LSHIFT || key == SDLK_RSHIFT) {
+                        // Pass 'NULL' to cycle through other players
+                        level_process_switch(level, NULL);
                         return true;
                 }
         }
@@ -595,17 +655,18 @@ bool level_receive_event(struct Level *const level, const SDL_Event *const event
                                         const uint16_t tapped_tile_index = (uint16_t)(tapped_row * level->implementation->grid_metrics.columns + tapped_column);
                                         if (query_level_tile(level, tapped_tile_index, NULL, &tapped_entity, NULL, NULL)) {
                                                 if (tapped_entity != NULL && get_entity_type(tapped_entity) == ENTITY_PLAYER && tapped_entity != level->implementation->current_player) {
-                                                        // TODO: Swicth entity
+                                                        level_process_switch(level, tapped_entity);
                                                 }
                                         }
                                 }
                         }
 
                         if (distance > SWIPE_DISTANCE_THRESHOLD && delta_time < SWIPE_TIME_THRESHOLD) {
-                                level->implementation->has_buffered_input = true;
-                                level->implementation->buffered_input = fabsf(dx) > fabsf(dy)
-                                        ? dx > 0.0f ? INPUT_RIGHT : INPUT_LEFT
-                                        : dy > 0.0f ? INPUT_BACKWARD : INPUT_FORWARD;
+                                if (fabsf(dx) > fabsf(dy)) {
+                                        level_process_turn(level, dx > 0.0f ? INPUT_RIGHT : INPUT_LEFT);
+                                } else {
+                                        level_process_move(level, dy > 0.0f ? INPUT_BACKWARD : INPUT_FORWARD);
+                                }
                         }
                 }
 
@@ -622,22 +683,27 @@ void update_level(struct Level *const level, const double delta_time) {
 
                 switch (level->implementation->buffered_input) {
                         case INPUT_BACKWARD: case INPUT_FORWARD: {
-                                level_move_step(level, level->implementation->current_player, level->implementation->buffered_input);
+                                level_process_move(level, level->implementation->buffered_input);
                                 break;
                         }
 
                         case INPUT_LEFT: case INPUT_RIGHT: {
-                                level_turn_step(level, level->implementation->current_player, level->implementation->buffered_input);
+                                level_process_turn(level, level->implementation->buffered_input);
                                 break;
                         }
 
                         case INPUT_UNDO: {
-                                step_history_swap_step(&level->implementation->step_history, &level->implementation->undo_history);
+                                level_process_undo(level);
                                 break;
                         }
 
                         case INPUT_REDO: {
-                                step_history_swap_step(&level->implementation->undo_history, &level->implementation->step_history);
+                                level_process_redo(level);
+                                break;
+                        }
+
+                        case INPUT_SWITCH: {
+                                level_process_switch(level, (struct Entity *)level->implementation->buffered_input_data);
                                 break;
                         }
 
@@ -741,6 +807,7 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
         implementation->entity_count = (uint16_t)entities_length / 4;
         implementation->entities = (struct Entity **)xcalloc(implementation->entity_count, sizeof(struct Entity *));
 
+        uint16_t player_count = 0;
         const cJSON *entity_part_json = entities_json->child;
         for (uint16_t entity_index = 0; entity_index < implementation->entity_count; ++entity_index) {
                 const cJSON *const entity_type_json = entity_part_json;
@@ -749,18 +816,46 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
                 const cJSON *const entity_orientation_json = entity_row_json->next;
                 entity_part_json = entity_orientation_json->next;
 
-                const enum EntityType entity_type = (enum EntityType)(uint8_t)entity_type_json->valuedouble;
+                const uint8_t entity_type_value = (uint8_t)entity_type_json->valuedouble;
+                enum EntityType entity_type;
+                bool selected_player = false;
+                switch (entity_type_value) {
+                        case 0: {
+                                entity_type = ENTITY_PLAYER;
+                                selected_player = true;
+                                ++player_count;
+                                break;
+                        }
+
+                        case 1: {
+                                entity_type = ENTITY_PLAYER;
+                                ++player_count;
+                                break;
+                        }
+
+                        case 2: {
+                                entity_type = ENTITY_BLOCK;
+                                break;
+                        }
+
+                        default: {
+                                send_message(MESSAGE_ERROR, "Unrecognized entity type of %d found when parsing level", entity_type_value);
+                                continue;
+                        }
+                }
+
                 const uint8_t entity_column = (uint8_t)entity_column_json->valuedouble;
                 const uint8_t entity_row = (uint8_t)entity_row_json->valuedouble;
                 const uint16_t entity_tile_index = (uint16_t)entity_row * (uint16_t)level->columns + (uint16_t)entity_column;
                 const enum Orientation entity_orientation = (enum Orientation)(uint8_t)entity_orientation_json->valuedouble;
                 implementation->entities[entity_index] = create_entity(level, entity_type, entity_tile_index, entity_orientation);
 
-                if (implementation->current_player == NULL) {
+                if (selected_player) {
                         implementation->current_player = implementation->entities[entity_index];
                 }
         }
 
+        implementation->player_count = player_count;
         return true;
 }
 

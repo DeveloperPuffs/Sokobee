@@ -142,9 +142,9 @@ void write_hexagon_geometry(
 void write_bezier_curve_geometry(
         struct Geometry *const geometry,
         const float px1,    const float py1, // Endpoint A
-        const float px2,    const float py2, // Endpoint B
         const float cx1,    const float cy1, // Control Point A
         const float cx2,    const float cy2, // Control Point B
+        const float px2,    const float py2, // Endpoint B
         const float line_width
 );
 
