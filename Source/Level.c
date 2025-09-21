@@ -238,7 +238,7 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
 
                 struct Change *const change = get_next_change_slot(&level->implementation->step_history);
                 change->input = input;
-                change->type = CHANGE_PUSH;
+                change->type = first_change ? CHANGE_PUSH : CHANGE_PUSHED;
                 change->entity = next_entity;
                 change->move.last_tile_index = tile_index;
 
@@ -465,6 +465,14 @@ bool initialize_level(struct Level *const level, const size_t number) {
         struct GridMetrics *const grid_metrics = &level->implementation->grid_metrics;
         grid_metrics->columns = (size_t)level->columns;
         grid_metrics->rows = (size_t)level->rows;
+
+        struct Change selected_player_focus = {0};
+        selected_player_focus.type = CHANGE_TOGGLE;
+        selected_player_focus.toggle.last_state = false;
+        selected_player_focus.toggle.next_state = true;
+        selected_player_focus.input = INPUT_SWITCH;
+        selected_player_focus.entity = level->implementation->current_player;
+        entity_handle_change(selected_player_focus.entity, &selected_player_focus);
 
         resize_level(level);
         return true;
@@ -853,6 +861,11 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
                 if (selected_player) {
                         implementation->current_player = implementation->entities[entity_index];
                 }
+        }
+
+        if (implementation->current_player == NULL) {
+                send_message(MESSAGE_ERROR, "Failed to parse level: No initially selected player found");
+                return false;
         }
 
         implementation->player_count = player_count;

@@ -33,17 +33,19 @@ struct Entity {
                         float wings_angle;
                         struct Animation flapping;
                         struct Animation bouncing;
+                        struct Animation focusing;
                         SDL_FPoint antenna_offset;
                         float float_time;
+                        float focus;
                 } player;
-
-                struct Block {
-                } block;
         } as;
 };
 
 #define PLAYER_CLOSED_WINGS_ANGLE (-(float)M_PI * 5.0f / 6.0f)
 #define PLAYER_OPEN_WINGS_ANGLE   (-(float)M_PI * 4.0f / 6.0f)
+
+#define PLAYER_FOCUSED_SCALE   (1.0f)
+#define PLAYER_UNFOCUSED_SCALE (0.85f)
 
 #define PULSE_ENTITY_SCALE(entity, scale)                                   \
         do {                                                                \
@@ -118,6 +120,7 @@ struct Entity *create_entity(struct Level *const level, const enum EntityType ty
                 player->wings_angle = PLAYER_CLOSED_WINGS_ANGLE;
                 player->antenna_offset.x = 0.0f;
                 player->antenna_offset.y = 0.0f;
+                player->focus = PLAYER_UNFOCUSED_SCALE;
 
                 initialize_animation(&player->flapping, 2ULL);
 
@@ -155,6 +158,14 @@ struct Entity *create_entity(struct Level *const level, const enum EntityType ty
                 bounce_back->easing = SINE_IN_OUT;
                 bounce_back->lazy_start = true;
                 bounce_back->duration = 100.0f;
+
+                initialize_animation(&player->focusing, 1ULL);
+                struct Action *const focusing_action = &player->focusing.actions[0];
+                focusing_action->target.float_pointer = &player->focus;
+                focusing_action->type = ACTION_FLOAT;
+                focusing_action->easing = BACK_OUT;
+                focusing_action->lazy_start = true;
+                focusing_action->duration = 200.0f;
         }
 
         return entity;
@@ -170,6 +181,7 @@ void destroy_entity(struct Entity *const entity) {
                 struct Player *const player = &entity->as.player;
                 deinitialize_animation(&player->flapping);
                 deinitialize_animation(&player->bouncing);
+                deinitialize_animation(&player->focusing);
         }
 
         deinitialize_animation(&entity->moving);
@@ -193,24 +205,31 @@ void update_entity(struct Entity *const entity, const double delta_time) {
 
                 update_animation(&player->flapping, delta_time);
                 update_animation(&player->bouncing, delta_time);
+                update_animation(&player->focusing, delta_time);
 
                 float x = entity->position.x;
                 float y = entity->position.y;
+                const float player_radius = radius * player->focus;
 
                 player->float_time += delta_time / 500.0f;
-                const float float_x = cosf(player->float_time) / 5.0f;
-                const float float_y = sinf(player->float_time) / 5.0f;
+                while (player->float_time >= 2.0f * (float)M_PI) {
+                        player->float_time -= 2.0f * (float)M_PI;
+                }
+
+                const float float_fade = CLAMP_VALUE((player->focus - PLAYER_UNFOCUSED_SCALE) / (PLAYER_FOCUSED_SCALE - PLAYER_UNFOCUSED_SCALE), 0.0f, 1.0f);
+                const float float_x = float_fade * cosf(player->float_time) / 5.0f;
+                const float float_y = float_fade * sinf(player->float_time) / 5.0f;
                 const float float_angle = (float_x + float_y) / 2.5f;
 
                 const float wings_angle = player->wings_angle + float_angle;
                 const float rotation = entity->angle + float_angle;
 
-                x += float_x * radius / 5.0f;
-                y += float_y * radius / 5.0f;
+                x += float_x * player_radius / 5.0f;
+                y += float_y * player_radius / 5.0f;
 
-                const float body_length = radius * 1.25f;
-                const float body_thickness = radius / 1.5f;
-                const float line_width = radius / 10.0f;
+                const float body_length = player_radius * 1.25f;
+                const float body_thickness = player_radius / 1.5f;
+                const float line_width = player_radius / 10.0f;
 
                 SDL_FPoint back_circle_position = (SDL_FPoint){x - body_length / 2.0f + body_thickness / 2.0f, y};
                 SDL_FPoint front_circle_position = (SDL_FPoint){x + body_length / 2.0f - body_thickness / 2.0f, y};
@@ -226,13 +245,13 @@ void update_entity(struct Entity *const entity, const double delta_time) {
                 };
 
                 const SDL_FPoint left_antenna_tip_position = (SDL_FPoint){
-                        .x = front_circle_position.x + radius / 1.5f,
-                        .y = y - radius / 1.5f
+                        .x = front_circle_position.x + player_radius / 1.5f,
+                        .y = y - player_radius / 1.5f
                 };
 
                 const SDL_FPoint right_antenna_tip_position = (SDL_FPoint){
-                        .x = front_circle_position.x + radius / 1.5f,
-                        .y = y + radius / 1.5f
+                        .x = front_circle_position.x + player_radius / 1.5f,
+                        .y = y + player_radius / 1.5f
                 };
 
                 SDL_FPoint left_antenna_endpoints[] = {
@@ -255,14 +274,14 @@ void update_entity(struct Entity *const entity, const double delta_time) {
                         (SDL_FPoint){right_antenna_tip_position.x - line_width * 0.0f, right_antenna_tip_position.y - body_thickness / 2.5f}
                 };
 
-                left_antenna_endpoints[1].x       += radius * player->antenna_offset.x;
-                left_antenna_endpoints[1].y       += radius * player->antenna_offset.y;
-                right_antenna_endpoints[1].x      += radius * player->antenna_offset.x;
-                right_antenna_endpoints[1].y      += radius * player->antenna_offset.y;
-                left_antenna_control_points[1].x  += radius * player->antenna_offset.x / 2.0f;
-                left_antenna_control_points[1].y  += radius * player->antenna_offset.y / 2.0f;
-                right_antenna_control_points[1].x += radius * player->antenna_offset.x / 2.0f;
-                right_antenna_control_points[1].y += radius * player->antenna_offset.y / 2.0f;
+                left_antenna_endpoints[1].x       += player_radius * player->antenna_offset.x;
+                left_antenna_endpoints[1].y       += player_radius * player->antenna_offset.y;
+                right_antenna_endpoints[1].x      += player_radius * player->antenna_offset.x;
+                right_antenna_endpoints[1].y      += player_radius * player->antenna_offset.y;
+                left_antenna_control_points[1].x  += player_radius * player->antenna_offset.x / 2.0f;
+                left_antenna_control_points[1].y  += player_radius * player->antenna_offset.y / 2.0f;
+                right_antenna_control_points[1].x += player_radius * player->antenna_offset.x / 2.0f;
+                right_antenna_control_points[1].y += player_radius * player->antenna_offset.y / 2.0f;
 
                 SDL_FPoint stinger[] = {
                         (SDL_FPoint){x - body_length / 2.0f,                      y + line_width * 1.5f},
@@ -417,7 +436,15 @@ enum Orientation get_entity_orientation(const struct Entity *const entity) {
 }
 
 bool entity_can_change(const struct Entity *const entity) {
-        return !entity->moving.active && !entity->turning.active && !entity->recoiling.active;
+        if (entity->moving.active || entity->turning.active || entity->recoiling.active) {
+                return false;
+        }
+
+        if (entity->type == ENTITY_PLAYER && entity->as.player.focusing.active) {
+                return false;
+        }
+
+        return true;
 }
 
 void entity_handle_change(struct Entity *const entity, const struct Change *const change) {
@@ -503,17 +530,26 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
                 PULSE_ENTITY_SCALE(entity, 1.2f);
 
                 if (entity->type == ENTITY_PLAYER) {
-                        struct Player *const player = &entity->as.player;
-                        start_animation(&player->flapping, 0ULL);
+                        if (change->type != CHANGE_PUSHED) {
+                                struct Player *const player = &entity->as.player;
+                                start_animation(&player->flapping, 0ULL);
 
-                        struct Action *const bounce_away = &player->bouncing.actions[0];
-                        bounce_away->keyframes.points[1].x = change->input == INPUT_FORWARD ? -0.25f : 0.25f;
-                        bounce_away->keyframes.points[1].y = 0.0f;
-                        start_animation(&player->bouncing, 0ULL);
+                                struct Action *const bounce_away = &player->bouncing.actions[0];
+                                bounce_away->keyframes.points[1].x = change->input == INPUT_FORWARD ? -0.25f : 0.25f;
+                                bounce_away->keyframes.points[1].y = 0.0f;
+                                start_animation(&player->bouncing, 0ULL);
+                        }
                 }
         }
 
         if (change->type == CHANGE_TOGGLE) {
-                // TODO: Handle toggle animations
+                if (entity->type != ENTITY_PLAYER) {
+                        send_message(MESSAGE_ERROR, "The toggle change can only be applied to player entities");
+                        return;
+                }
+
+                struct Player *const player = &entity->as.player;
+                player->focusing.actions[0].keyframes.floats[1] = change->toggle.next_state ? PLAYER_FOCUSED_SCALE : PLAYER_UNFOCUSED_SCALE;
+                start_animation(&player->focusing, 0ULL);
         }
 }
