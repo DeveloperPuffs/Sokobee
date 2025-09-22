@@ -1,2 +1,3 @@
 - Refactor the scenes to avoid using a scene manager and scene API
 - Improve gesture tracking and gesture controls to swipe in the turn direction
+- Optimize turning to 'cancel out' turning loops

@@ -91,7 +91,13 @@ static inline void step_history_pop_step(struct StepHistory *const step_history,
         --step_history->step_count;
 }
 
-static inline void step_history_swap_step(struct StepHistory *const source, struct StepHistory *const destination) {
+// I am providing a callback function because the level might need to inspect the reverted changes to conditionally update it's state (not only the entities' states)
+static inline void step_history_swap_step(
+        struct StepHistory *const source,
+        struct StepHistory *const destination,
+        void (*change_reverted)(const struct Change *, struct StepHistory *, struct StepHistory *, void *),
+        void *const callback_data
+) {
         if (source->step_count == 0ULL) {
                 return;
         }
@@ -145,6 +151,7 @@ static inline void step_history_swap_step(struct StepHistory *const source, stru
                 }
 
                 entity_handle_change(reversed.entity, &reversed);
+                change_reverted(&reversed, source, destination, callback_data);
 
                 if (destination->change_count >= destination->change_capacity) {
                         destination->change_capacity *= 2ULL;
@@ -303,6 +310,7 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
 
                 if (next_entity == NULL) {
                         empty_step_history(&level->implementation->undo_history);
+                        ++level->move_count;
 
                         if (first_change) {
                                 // This means that the next tile is valid but nothing will be pushed
@@ -373,12 +381,33 @@ static inline void level_process_turn(struct Level *const level, const enum Inpu
         play_sound(SOUND_TURN);
 }
 
-static inline void level_sync_current_player(struct Level *level) {
-        for (uint16_t entity_index = 0; entity_index < level->implementation->entity_count; ++entity_index) {
-                if (entity_is_focused(level->implementation->entities[entity_index])) {
-                        level->implementation->current_player_index = entity_index;
-                        return;
+static void change_reverted_callback(const struct Change *const change, struct StepHistory *, struct StepHistory *const destination, void *const callback_data) {
+        struct Level *const level = (struct Level *)callback_data;
+
+        if (change->type == CHANGE_TOGGLE) {
+                if (change->toggle.focused == true) {
+                        // Synchronize the current player index if a player switch was reverted
+                        for (uint16_t entity_index = 0; entity_index < level->implementation->entity_count; ++entity_index) {
+                                if (level->implementation->entities[entity_index] == change->entity) {
+                                        level->implementation->current_player_index = entity_index;
+                                        return;
+                                }
+                        }
                 }
+
+                return;
+        }
+
+        if (change->type == CHANGE_WALK || change->type == CHANGE_PUSH) {
+                if (destination == &level->implementation->undo_history) {
+                        --level->move_count;
+                }
+
+                if (destination == &level->implementation->step_history) {
+                        ++level->move_count;
+                }
+
+                return;
         }
 }
 
@@ -394,8 +423,7 @@ static inline void level_process_undo(struct Level *const level) {
                 return;
         }
 
-        step_history_swap_step(&level->implementation->step_history, &level->implementation->undo_history);
-        level_sync_current_player(level);
+        step_history_swap_step(&level->implementation->step_history, &level->implementation->undo_history, change_reverted_callback, (void *)level);
 }
 
 static inline void level_process_redo(struct Level *const level) {
@@ -410,8 +438,7 @@ static inline void level_process_redo(struct Level *const level) {
                 return;
         }
 
-        step_history_swap_step(&level->implementation->undo_history, &level->implementation->step_history);
-        level_sync_current_player(level);
+        step_history_swap_step(&level->implementation->undo_history, &level->implementation->step_history, change_reverted_callback, (void *)level);
 }
 
 static inline void level_process_switch(struct Level *const level, struct Entity *const optional_player) {

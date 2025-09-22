@@ -33,5 +33,3 @@ struct Change;
 bool entity_can_change(const struct Entity *const entity);
 
 void entity_handle_change(struct Entity *const entity, const struct Change *const change);
-
-bool entity_is_focused(const struct Entity *const entity);

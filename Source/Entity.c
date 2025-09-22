@@ -555,7 +555,3 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
                 start_animation(&player->focusing, 0ULL);
         }
 }
-
-bool entity_is_focused(const struct Entity *const entity) {
-        return entity->type == ENTITY_PLAYER && entity->as.player.focused;
-}
