@@ -36,6 +36,7 @@ struct Entity {
                         struct Animation focusing;
                         SDL_FPoint antenna_offset;
                         float float_time;
+                        bool focused;
                         float focus;
                 } player;
         } as;
@@ -121,6 +122,7 @@ struct Entity *create_entity(struct Level *const level, const enum EntityType ty
                 player->antenna_offset.x = 0.0f;
                 player->antenna_offset.y = 0.0f;
                 player->focus = PLAYER_UNFOCUSED_SCALE;
+                player->focused = false;
 
                 initialize_animation(&player->flapping, 2ULL);
 
@@ -468,7 +470,7 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
                 return;
         }
 
-        if (change->type == CHANGE_INVALID) {
+        if (change->type == CHANGE_BLOCKED || change->type == CHANGE_INVALID) {
                 float x, y;
                 query_level_tile(entity->level, entity->next_tile_index, NULL, NULL, &x, &y);
 
@@ -485,7 +487,7 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
                 start_animation(&entity->recoiling, 0ULL);
                 PULSE_ENTITY_SCALE(entity, 1.1f);
 
-                if (entity->type == ENTITY_PLAYER) {
+                if (entity->type == ENTITY_PLAYER && change->type != CHANGE_INVALID) {
                         struct Player *const player = &entity->as.player;
                         start_animation(&player->flapping, 0ULL);
 
@@ -529,16 +531,14 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
                 start_animation(&entity->moving, 0ULL);
                 PULSE_ENTITY_SCALE(entity, 1.2f);
 
-                if (entity->type == ENTITY_PLAYER) {
-                        if (change->type != CHANGE_PUSHED) {
-                                struct Player *const player = &entity->as.player;
-                                start_animation(&player->flapping, 0ULL);
+                if (entity->type == ENTITY_PLAYER && change->type != CHANGE_PUSHED) {
+                        struct Player *const player = &entity->as.player;
+                        start_animation(&player->flapping, 0ULL);
 
-                                struct Action *const bounce_away = &player->bouncing.actions[0];
-                                bounce_away->keyframes.points[1].x = change->input == INPUT_FORWARD ? -0.25f : 0.25f;
-                                bounce_away->keyframes.points[1].y = 0.0f;
-                                start_animation(&player->bouncing, 0ULL);
-                        }
+                        struct Action *const bounce_away = &player->bouncing.actions[0];
+                        bounce_away->keyframes.points[1].x = change->input == INPUT_FORWARD ? -0.25f : 0.25f;
+                        bounce_away->keyframes.points[1].y = 0.0f;
+                        start_animation(&player->bouncing, 0ULL);
                 }
         }
 
@@ -549,7 +549,13 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
                 }
 
                 struct Player *const player = &entity->as.player;
-                player->focusing.actions[0].keyframes.floats[1] = change->toggle.next_state ? PLAYER_FOCUSED_SCALE : PLAYER_UNFOCUSED_SCALE;
+                player->focused = change->toggle.focused;
+
+                player->focusing.actions[0].keyframes.floats[1] = player->focused ? PLAYER_FOCUSED_SCALE : PLAYER_UNFOCUSED_SCALE;
                 start_animation(&player->focusing, 0ULL);
         }
+}
+
+bool entity_is_focused(const struct Entity *const entity) {
+        return entity->type == ENTITY_PLAYER && entity->as.player.focused;
 }

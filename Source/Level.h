@@ -67,6 +67,7 @@ enum ChangeType {
         CHANGE_PUSH,
         CHANGE_PUSHED,
         CHANGE_TOGGLE,
+        CHANGE_BLOCKED,
         CHANGE_INVALID
 };
 
@@ -87,8 +88,7 @@ struct Change {
                         enum Orientation direction;
                 } face;
                 struct {
-                        bool last_state;
-                        bool next_state;
+                        bool focused;
                 } toggle;
         };
 };
