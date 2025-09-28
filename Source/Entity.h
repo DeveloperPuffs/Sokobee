@@ -14,7 +14,13 @@ enum EntityType {
 struct Level;
 struct Entity;
 
-struct Entity *create_entity(struct Level *const level, const enum EntityType type, const uint16_t tile_index, const enum Orientation orientation);
+struct Entity *create_entity(
+        struct Level *const level,
+        const enum EntityType type,
+        const uint8_t column,
+        const uint8_t row,
+        const enum Orientation orientation
+);
 
 void destroy_entity(struct Entity *const entity);
 
@@ -22,11 +28,15 @@ void update_entity(struct Entity *const entity, const double delta_time);
 
 void resize_entity(struct Entity *const entity, const float radius);
 
-enum EntityType get_entity_type(const struct Entity *const entity);
-
-uint16_t get_entity_tile_index(const struct Entity *const entity);
-
-enum Orientation get_entity_orientation(const struct Entity *const entity);
+void query_entity(
+        struct Entity *const entity,
+        enum EntityType *const out_type,
+        uint8_t *const out_column,
+        uint8_t *const out_row,
+        enum Orientation *const out_orientation,
+        float *const out_x,
+        float *const out_y
+);
 
 struct Change;
 

@@ -2,6 +2,7 @@
 
 #include <SDL_keycode.h>
 #include <SDL_mixer.h>
+#include <SDL_stdinc.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -91,6 +92,13 @@ static inline void step_history_pop_step(struct StepHistory *const step_history,
         --step_history->step_count;
 }
 
+#define SWAP_VALUES(type, a, b)       \
+        do {                          \
+                type temporary = (a); \
+                (a) = (b);            \
+                (b) = temporary;      \
+        } while (0)
+
 // I am providing a callback function because the level might need to inspect the reverted changes to conditionally update it's state (not only the entities' states)
 static inline void step_history_swap_step(
         struct StepHistory *const source,
@@ -123,9 +131,8 @@ static inline void step_history_swap_step(
 
                                 reversed.input = reversed.input == INPUT_FORWARD ? INPUT_BACKWARD : INPUT_FORWARD;
 
-                                uint16_t tile_index = reversed.move.last_tile_index;
-                                reversed.move.last_tile_index = reversed.move.next_tile_index;
-                                reversed.move.next_tile_index = tile_index;
+                                SWAP_VALUES(uint16_t, reversed.move.last_column, reversed.move.next_column);
+                                SWAP_VALUES(uint16_t, reversed.move.last_row, reversed.move.next_row);
                                 break;
                         }
 
@@ -134,9 +141,7 @@ static inline void step_history_swap_step(
 
                                 reversed.input = reversed.input == INPUT_LEFT ? INPUT_RIGHT : INPUT_LEFT;
 
-                                enum Orientation orientation = reversed.turn.last_orientation;
-                                reversed.turn.last_orientation = reversed.turn.next_orientation;
-                                reversed.turn.next_orientation = orientation;
+                                SWAP_VALUES(enum Orientation, reversed.turn.last_orientation, reversed.turn.next_orientation);
                                 break;
                         }
 
@@ -171,6 +176,8 @@ static inline void step_history_swap_step(
         source->change_count = step_start;
         --source->step_count;
 }
+
+#undef SWAP_VALUES
 
 static inline struct Change *get_next_change_slot(struct StepHistory *const step_history) {
         if (step_history->change_count >= step_history->change_capacity) {
@@ -219,6 +226,8 @@ static inline void discard_pending_step(struct StepHistory *const step_history, 
         step_history->change_count -= step_changes;
 }
 
+#undef STEP_HISTORY_INITIAL_CAPACITY
+
 #define TAP_TIME_THRESHOLD       (300)
 #define SWIPE_DISTANCE_THRESHOLD (0.15f)
 #define SWIPE_TIME_THRESHOLD     (500)
@@ -234,6 +243,7 @@ static inline void discard_pending_step(struct StepHistory *const step_history, 
 #define EVENT_IS_GESTURE_MOTION(event) ((event)->type == SDL_FINGERMOTION)
 #endif
 
+struct BlockCluster;
 struct LevelImplementation {
         char *title;
         enum TileType *tiles;
@@ -243,6 +253,8 @@ struct LevelImplementation {
         uint16_t player_count;
         uint16_t current_player_index;
         struct Entity *switch_anchor_player;
+        uint16_t block_cluster_count;
+        struct BlockCluster *block_clusters;
         struct GridMetrics grid_metrics;
         struct Geometry *grid_geometry;
         struct StepHistory step_history;
@@ -254,6 +266,127 @@ struct LevelImplementation {
         float gesture_swipe_x;
         float gesture_swipe_y;
 };
+
+#define BLOCK_CLUSTER_INITIAL_BLOCK_CAPACITY 2
+#define BLOCK_CLUSTER_INITIAL_LINK_CAPACITY 1
+struct BlockCluster {
+        struct Level *level;
+        uint16_t block_count;
+        uint16_t block_capacity;
+        struct Entity **blocks;
+        uint16_t link_count;
+        uint16_t link_capacity;
+        struct Entity **link_blocks;
+        struct Geometry *geometry;
+};
+
+void initialize_block_cluster(struct BlockCluster *const block_cluster, struct Level *const level) {
+        ASSERT_ALL(block_cluster != NULL, level != NULL);
+
+        block_cluster->level = level;
+
+        block_cluster->block_count = 0;
+        block_cluster->block_capacity = BLOCK_CLUSTER_INITIAL_BLOCK_CAPACITY;
+        block_cluster->blocks = (struct Entity **)xmalloc((size_t)block_cluster->block_capacity * sizeof(struct Entity *));
+
+        block_cluster->link_count = 0;
+        block_cluster->link_capacity = BLOCK_CLUSTER_INITIAL_LINK_CAPACITY;
+        block_cluster->link_blocks = (struct Entity **)malloc((size_t)block_cluster->link_capacity * 2ULL * sizeof(struct Entity *));
+
+        block_cluster->geometry = create_geometry();
+        set_geometry_color(block_cluster->geometry, COLOR_BROWN, COLOR_OPAQUE);
+}
+
+void update_block_cluster(struct BlockCluster *const block_cluster) {
+        ASSERT_ALL(block_cluster != NULL);
+
+        clear_geometry(block_cluster->geometry);
+
+        const float tile_radius = block_cluster->level->implementation->grid_metrics.tile_radius;
+        const float line_width = tile_radius / 5.0f;
+        const float tile_offset = line_width / 2.0f;
+
+        for (uint16_t link_index = 0; link_index < block_cluster->link_count; ++link_index) {
+                float x1, y1, x2, y2;
+                query_entity(block_cluster->link_blocks[link_index * 2 + 0], NULL, NULL, NULL, NULL, &x1, &y1);
+                query_entity(block_cluster->link_blocks[link_index * 2 + 1], NULL, NULL, NULL, NULL, &x2, &y2);
+                write_line_geometry(block_cluster->geometry, x1, y1 - tile_offset, x2, y2 - tile_offset, line_width, LINE_CAP_BOTH);
+        }
+
+        render_geometry(block_cluster->geometry);
+}
+
+void deinitialize_block_cluster(struct BlockCluster *const block_cluster) {
+        if (block_cluster == NULL) {
+                send_message(MESSAGE_WARNING, "Failed to deinitialize block cluster: Block cluster given to deinitialize is NULL");
+                return;
+        }
+
+        if (block_cluster->blocks != NULL) {
+                xfree(block_cluster->blocks);
+                block_cluster->blocks = NULL;
+                block_cluster->block_count = 0;
+                block_cluster->block_capacity = 0;
+        }
+
+        if (block_cluster->link_blocks != NULL) {
+                xfree(block_cluster->link_blocks);
+                block_cluster->link_blocks = NULL;
+                block_cluster->link_count = 0;
+                block_cluster->link_capacity = 0;
+        }
+
+        if (block_cluster->geometry != NULL) {
+                destroy_geometry(block_cluster->geometry);
+                block_cluster->geometry = NULL;
+        }
+
+        block_cluster->level = NULL;
+}
+
+void block_cluster_push_block(struct BlockCluster *const block_cluster, struct Entity *const block) {
+        ASSERT_ALL(block_cluster != NULL, block != NULL);
+
+        uint8_t block_column, block_row;
+        query_entity(block, NULL, &block_column, &block_row, NULL, NULL, NULL);
+
+        for (uint8_t adjacency_index = 0; adjacency_index < HEXAGON_NEIGHBOR_COUNT; ++adjacency_index) {
+                const enum HexagonNeighbor neighbor = (enum HexagonNeighbor)(int)adjacency_index;
+
+                size_t adjacency_column, adjacency_row;
+                if (!get_hexagon_neighbor((size_t)block_column, (size_t)block_row, neighbor, NULL, &adjacency_column, &adjacency_row)) {
+                        continue;
+                }
+
+                for (uint16_t other_block_index = 0; other_block_index < block_cluster->block_count; ++other_block_index) {
+                        struct Entity *const other_block = block_cluster->blocks[other_block_index];
+
+                        uint8_t other_block_column, other_block_row;
+                        query_entity(other_block, NULL, &other_block_column, &other_block_row, NULL, NULL, NULL);
+                        if (other_block_column == adjacency_column && other_block_row == adjacency_row) {
+                                if (block_cluster->link_count == block_cluster->link_capacity) {
+                                        block_cluster->link_capacity *= 2;
+                                        block_cluster->link_blocks = xrealloc(block_cluster->link_blocks, block_cluster->link_capacity * 2ULL * sizeof(struct Entity *));
+                                }
+
+                                const uint16_t link_index = block_cluster->link_count++;
+                                block_cluster->link_blocks[link_index * 2 + 0] = other_block;
+                                block_cluster->link_blocks[link_index * 2 + 1] = block;
+                                break;
+                        }
+                }
+        }
+
+        if (block_cluster->block_count == block_cluster->block_capacity) {
+                block_cluster->block_capacity *= 2;
+                block_cluster->blocks = xrealloc(block_cluster->blocks, block_cluster->block_capacity * sizeof(struct Entity *));
+        }
+
+        block_cluster->blocks[block_cluster->block_count++] = block;
+}
+
+#undef BLOCK_CLUSTER_INITIAL_BLOCK_CAPACITY
+#undef BLOCK_CLUSTER_INITIAL_LINK_CAPACITY
 
 static inline void level_process_move(struct Level *const level, const enum Input input) {
         struct Entity *const current_player = level->implementation->entities[level->implementation->current_player_index];
@@ -269,8 +402,9 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
 
         level->implementation->switch_anchor_player = NULL;
 
-        uint16_t tile_index = get_entity_tile_index(current_player);
-        enum Orientation direction = get_entity_orientation(current_player);
+        uint8_t column, row;
+        enum Orientation direction;
+        query_entity(current_player, NULL, &column, &row, &direction, NULL, NULL);
         if (input == INPUT_BACKWARD) {
                 direction = orientation_reverse(direction);
         }
@@ -283,17 +417,20 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
                 change->input = input;
                 change->type = first_change ? CHANGE_PUSH : CHANGE_PUSHED;
                 change->entity = next_entity;
-                change->move.last_tile_index = tile_index;
+                change->move.last_column = column;
+                change->move.last_row = row;
 
-                if (!orientation_advance_index(direction, level->columns, level->rows, &tile_index)) {
+                size_t advanced_column, advanced_row;
+                if (!orientation_advance(direction, (size_t)column, (size_t)row, level->columns, level->rows, &advanced_column, &advanced_row)) {
                         discard_pending_step(&level->implementation->step_history, direction);
                         return;
                 }
 
-                change->move.next_tile_index = tile_index;
+                change->move.next_column = column = (uint8_t)advanced_column;
+                change->move.next_row = row = (uint8_t)advanced_row;
 
                 enum TileType tile_type;
-                query_level_tile(level, tile_index, &tile_type, &next_entity, NULL, NULL);
+                query_level_tile(level, column, row, &tile_type, &next_entity, NULL, NULL);
 
                 if (tile_type == TILE_EMPTY) {
                         discard_pending_step(&level->implementation->step_history, direction);
@@ -302,10 +439,15 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
                 }
 
                 // Players can walk on slab tiles but blocks can't get pushed onto them
-                if (tile_type == TILE_SLAB && get_entity_type(change->entity) == ENTITY_BLOCK) {
-                        discard_pending_step(&level->implementation->step_history, direction);
-                        play_sound(SOUND_HIT);
-                        return;
+                if (tile_type == TILE_SLAB) {
+                        enum EntityType entity_type;
+                        query_entity(change->entity, &entity_type, NULL, NULL, NULL, NULL, NULL);
+
+                        if (entity_type == ENTITY_BLOCK) {
+                                discard_pending_step(&level->implementation->step_history, direction);
+                                play_sound(SOUND_HIT);
+                                return;
+                        }
                 }
 
                 if (next_entity == NULL) {
@@ -324,9 +466,12 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
 
                         bool did_win = true;
                         for (uint16_t tile_index = 0; tile_index < level->implementation->tile_count; ++tile_index) {
+                                const uint8_t tile_column = (uint8_t)(tile_index % level->columns);
+                                const uint8_t tile_row = (uint8_t)(tile_index / level->columns);
+
                                 enum TileType tile_type;
                                 struct Entity *entity;
-                                query_level_tile(level, tile_index, &tile_type, &entity, NULL, NULL);
+                                query_level_tile(level, tile_column, tile_row, &tile_type, &entity, NULL, NULL);
 
                                 if (tile_type == TILE_SPOT) {
                                         if (entity == NULL) {
@@ -334,7 +479,9 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
                                                 break;
                                         }
 
-                                        if (get_entity_type(entity) != ENTITY_BLOCK) {
+                                        enum EntityType entity_type;
+                                        query_entity(entity, &entity_type, NULL, NULL, NULL, NULL, NULL);
+                                        if (entity_type != ENTITY_BLOCK) {
                                                 did_win = false;
                                                 break;
                                         }
@@ -371,7 +518,8 @@ static inline void level_process_turn(struct Level *const level, const enum Inpu
         change->input = input;
         change->type = CHANGE_TURN;
         change->entity = current_player;
-        change->turn.last_orientation = get_entity_orientation(current_player);
+
+        query_entity(current_player, NULL, NULL, NULL, &change->turn.last_orientation, NULL, NULL);
         change->turn.next_orientation = input == INPUT_RIGHT
                 ? orientation_turn_right(change->turn.last_orientation)
                 : orientation_turn_left(change->turn.last_orientation);
@@ -475,8 +623,10 @@ static inline void level_process_switch(struct Level *const level, struct Entity
                 }
 
                 // If no player is given, cycle through entities to find the next player to switch to
+                enum EntityType entity_type;
                 const uint16_t entity_index = (level->implementation->current_player_index + index + 1) % level->implementation->entity_count;
-                if (get_entity_type(level->implementation->entities[entity_index]) == ENTITY_PLAYER) {
+                query_entity(level->implementation->entities[entity_index], &entity_type, NULL, NULL, NULL, NULL, NULL);
+                if (entity_type == ENTITY_PLAYER) {
                         level->implementation->current_player_index = entity_index;
                         break;
                 }
@@ -527,7 +677,7 @@ struct Level *load_level(const size_t number) {
 }
 
 void destroy_level(struct Level *const level) {
-        if (!level) {
+        if (level == NULL) {
                 send_message(MESSAGE_WARNING, "Level given to destroy is NULL");
                 return;
         }
@@ -547,6 +697,8 @@ bool initialize_level(struct Level *const level, const size_t number) {
         level->implementation->grid_geometry = create_geometry();
         level->implementation->current_player_index = UINT16_MAX;
         level->implementation->switch_anchor_player = NULL;
+        level->implementation->block_cluster_count = 0;
+        level->implementation->block_clusters = NULL;
         level->implementation->gesture_start_time = 0;
 
         initialize_step_history(&level->implementation->step_history);
@@ -596,7 +748,7 @@ bool initialize_level(struct Level *const level, const size_t number) {
 }
 
 void deinitialize_level(struct Level *const level) {
-        if (!level) {
+        if (level == NULL) {
                 send_message(MESSAGE_WARNING, "Level given to deinitialize is NULL");
                 return;
         }
@@ -610,8 +762,16 @@ void deinitialize_level(struct Level *const level) {
 
         destroy_geometry(level->implementation->grid_geometry);
 
+        if (level->implementation->block_clusters) {
+                for (uint16_t block_cluster_index = 0; block_cluster_index < level->implementation->block_cluster_count; ++block_cluster_index) {
+                        deinitialize_block_cluster(&level->implementation->block_clusters[block_cluster_index]);
+                }
+
+                xfree(level->implementation->block_clusters);
+        }
+
         if (level->implementation->entities) {
-                for (size_t entity_index = 0ULL; entity_index < level->implementation->entity_count; ++entity_index) {
+                for (uint16_t entity_index = 0; entity_index < level->implementation->entity_count; ++entity_index) {
                         destroy_entity(level->implementation->entities[entity_index]);
                 }
 
@@ -634,43 +794,45 @@ char *get_level_title(struct Level *const level) {
         return level->implementation->title;
 }
 
+#define SAFE_ASSIGNMENT(pointer, value)     \
+        do {                                \
+                if ((pointer) != NULL) {    \
+                        *(pointer) = value; \
+                }                           \
+        } while (0)
+
 bool query_level_tile(
         const struct Level *const level,
-        const uint16_t tile_index,
+        const uint8_t column,
+        const uint8_t row,
         enum TileType *const out_tile_type,
         struct Entity **const out_entity,
         float *const out_x,
         float *const out_y
 ) {
-        if (tile_index >= level->implementation->tile_count) {
+        if (column >= level->columns || row >= level->rows) {
                 return false;
         }
 
-        const enum TileType tile_type = level->implementation->tiles[tile_index];
-        if (out_tile_type) {
-                *out_tile_type = tile_type;
-        }
+        ASSERT_ALL(level != NULL, out_tile_type != NULL || out_entity != NULL || out_x != NULL || out_y != NULL);
 
-        const struct GridMetrics *const grid_metrics = &level->implementation->grid_metrics;
-        const uint16_t columns = (uint16_t)grid_metrics->columns;
+        const enum TileType tile_type = level->implementation->tiles[row * level->columns + column];
 
         float x, y;
-        get_grid_tile_position(grid_metrics, (size_t)(tile_index % columns), (size_t)(tile_index / columns), &x, &y);
+        get_grid_tile_position(&level->implementation->grid_metrics, column, row, &x, &y);
 
-        if (out_x) {
-                *out_x = x;
-        }
+        SAFE_ASSIGNMENT(out_tile_type, tile_type);
+        SAFE_ASSIGNMENT(out_x, x);
+        SAFE_ASSIGNMENT(out_y, tile_type == TILE_SLAB ? y - level->implementation->grid_metrics.tile_radius / 4.0f : y);
 
-        if (out_y) {
-                *out_y = tile_type == TILE_SLAB ? y - grid_metrics->tile_radius / 4.0f : y;
-        }
-
-        if (out_entity) {
+        if (out_entity != NULL) {
                 *out_entity = NULL;
 
                 for (uint16_t entity_index = 0; entity_index < level->implementation->entity_count; ++entity_index) {
+                        uint8_t entity_column, entity_row;
                         struct Entity *const entity = level->implementation->entities[entity_index];
-                        if (get_entity_tile_index(entity) == tile_index) {
+                        query_entity(entity, NULL, &entity_column, &entity_row, NULL, NULL, NULL);
+                        if (entity_column == column && entity_row == row) {
                                 *out_entity = entity;
                                 break;
                         }
@@ -679,6 +841,8 @@ bool query_level_tile(
 
         return true;
 }
+
+#undef SAFE_ASSIGNMENT
 
 static inline void get_event_position(const SDL_Event *const event, const int screen_width, const int screen_height, float *const x, float *const y) {
 #ifndef NDEBUG
@@ -777,10 +941,10 @@ bool level_receive_event(struct Level *const level, const SDL_Event *const event
                                 size_t tapped_column, tapped_row;
                                 if (get_grid_tile_at_position(&level->implementation->grid_metrics, denormalized_x, denormalized_y, &tapped_column, &tapped_row)) {
                                         struct Entity *tapped_entity;
-                                        const uint16_t tapped_tile_index = (uint16_t)(tapped_row * level->implementation->grid_metrics.columns + tapped_column);
-                                        if (query_level_tile(level, tapped_tile_index, NULL, &tapped_entity, NULL, NULL)) {
-                                                struct Entity *const current_player = level->implementation->entities[level->implementation->current_player_index];
-                                                if (tapped_entity != NULL && get_entity_type(tapped_entity) == ENTITY_PLAYER && tapped_entity != current_player) {
+                                        if (query_level_tile(level, (uint8_t)tapped_column, (uint8_t)tapped_row, NULL, &tapped_entity, NULL, NULL) && tapped_entity != NULL) {
+                                                enum EntityType tapped_entity_type;
+                                                query_entity(tapped_entity, &tapped_entity_type, NULL, NULL, NULL, NULL, NULL);
+                                                if (tapped_entity_type == ENTITY_PLAYER && tapped_entity != level->implementation->entities[level->implementation->current_player_index]) {
                                                         level_process_switch(level, tapped_entity);
                                                 }
                                         }
@@ -842,19 +1006,12 @@ void update_level(struct Level *const level, const double delta_time) {
 
         render_geometry(level->implementation->grid_geometry);
 
-        for (size_t entity_index = 0ULL; entity_index < level->implementation->entity_count; ++entity_index) {
-                struct Entity *const entity = level->implementation->entities[entity_index];
-                if (get_entity_type(entity) != ENTITY_PLAYER) {
-                        update_entity(entity, delta_time);
-                }
+        for (uint16_t entity_index = 0; entity_index < level->implementation->entity_count; ++entity_index) {
+                update_entity(level->implementation->entities[entity_index], delta_time);
         }
 
-        // Add another pass to update players last (I forgot why though)
-        for (size_t entity_index = 0ULL; entity_index < level->implementation->entity_count; ++entity_index) {
-                struct Entity *const entity = level->implementation->entities[entity_index];
-                if (get_entity_type(entity) == ENTITY_PLAYER) {
-                        update_entity(entity, delta_time);
-                }
+        for (uint16_t block_cluster_index = 0; block_cluster_index < level->implementation->block_cluster_count; ++block_cluster_index) {
+                update_block_cluster(&level->implementation->block_clusters[block_cluster_index]);
         }
 }
 
@@ -865,16 +1022,18 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
         }
 
         const cJSON *const title_json    = cJSON_GetObjectItemCaseSensitive(json, "title");
+        const cJSON *const clusters_json = cJSON_GetObjectItemCaseSensitive(json, "clusters");
         const cJSON *const columns_json  = cJSON_GetObjectItemCaseSensitive(json, "columns");
         const cJSON *const rows_json     = cJSON_GetObjectItemCaseSensitive(json, "rows");
         const cJSON *const tiles_json    = cJSON_GetObjectItemCaseSensitive(json, "tiles");
         const cJSON *const entities_json = cJSON_GetObjectItemCaseSensitive(json, "entities");
 
         if (
-                !cJSON_IsString(title_json) ||
-                !cJSON_IsNumber(columns_json) ||
-                !cJSON_IsNumber(rows_json) ||
-                !cJSON_IsArray(tiles_json) ||
+                !cJSON_IsString(title_json)    ||
+                !cJSON_IsNumber(clusters_json) ||
+                !cJSON_IsNumber(columns_json)  ||
+                !cJSON_IsNumber(rows_json)     ||
+                !cJSON_IsArray(tiles_json)     ||
                 !cJSON_IsArray(entities_json)
         ) {
                 send_message(MESSAGE_ERROR, "Failed to parse level: JSON data is invalid");
@@ -882,6 +1041,14 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
         }
 
         level->implementation->title = xstrdup(title_json->valuestring);
+
+        level->implementation->block_cluster_count = (uint16_t)clusters_json->valuedouble;
+        if (level->implementation->block_cluster_count != 0) {
+                level->implementation->block_clusters = (struct BlockCluster *)xmalloc(level->implementation->block_cluster_count * sizeof(struct BlockCluster));
+                for (uint16_t block_cluster_index = 0; block_cluster_index < level->implementation->block_cluster_count; ++block_cluster_index) {
+                        initialize_block_cluster(&level->implementation->block_clusters[block_cluster_index], level);
+                }
+        }
 
         const double columns = columns_json->valuedouble;
         if (floor(columns) != columns || columns <= 0.0 || columns > (double)LEVEL_DIMENSION_LIMIT) {
@@ -895,18 +1062,17 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
                 return false;
         }
 
-        struct LevelImplementation *const implementation = level->implementation;
         level->columns = (uint8_t)columns;
         level->rows = (uint8_t)rows;
 
         const size_t tile_count = (size_t)cJSON_GetArraySize(tiles_json);
-        implementation->tile_count = (size_t)level->columns * (size_t)level->rows;
-        if (tile_count != implementation->tile_count) {
-                send_message(MESSAGE_ERROR, "Failed to parse level: The tile count of %zu does not match the expected tile count of %zu (%u * %u)", tile_count, implementation->tile_count, level->columns, level->rows);
+        level->implementation->tile_count = (size_t)level->columns * (size_t)level->rows;
+        if (tile_count != level->implementation->tile_count) {
+                send_message(MESSAGE_ERROR, "Failed to parse level: The tile count of %zu does not match the expected tile count of %zu (%u * %u)", tile_count, level->implementation->tile_count, level->columns, level->rows);
                 return false;
         }
 
-        implementation->tiles = (enum TileType *)xmalloc(implementation->tile_count * sizeof(enum TileType));
+        level->implementation->tiles = (enum TileType *)xmalloc(level->implementation->tile_count * sizeof(enum TileType));
 
         size_t tile_index = 0ULL;
         const cJSON *tile_json = NULL;
@@ -922,85 +1088,78 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
                         return false;
                 }
 
-                implementation->tiles[tile_index++] = (enum TileType)(uint8_t)tile;
+                level->implementation->tiles[tile_index++] = (enum TileType)(uint8_t)tile;
         }
 
         const int entities_length = cJSON_GetArraySize(entities_json);
-        if (entities_length % 4) {
-                send_message(MESSAGE_ERROR, "Failed to parse level: Entities array length of %d is not a multiple of 4", entities_length);
+        if (entities_length % 5 != 0) {
+                send_message(MESSAGE_ERROR, "Failed to parse level: Entities array length of %d is not a multiple of 5", entities_length);
                 return false;
         }
 
-        implementation->entity_count = (uint16_t)entities_length / 4;
-        implementation->entities = (struct Entity **)xcalloc(implementation->entity_count, sizeof(struct Entity *));
+        level->implementation->entity_count = (uint16_t)entities_length / 5;
+        level->implementation->entities = (struct Entity **)xcalloc(level->implementation->entity_count, sizeof(struct Entity *));
 
-        uint16_t player_count = 0;
         const cJSON *entity_part_json = entities_json->child;
-        for (uint16_t entity_index = 0; entity_index < implementation->entity_count; ++entity_index) {
-                const cJSON *const entity_type_json = entity_part_json;
-                const cJSON *const entity_column_json = entity_type_json->next;
-                const cJSON *const entity_row_json = entity_column_json->next;
+        for (uint16_t entity_index = 0; entity_index < level->implementation->entity_count; ++entity_index) {
+                const cJSON *const entity_type_json        = entity_part_json;
+                const cJSON *const entity_column_json      = entity_type_json->next;
+                const cJSON *const entity_row_json         = entity_column_json->next;
                 const cJSON *const entity_orientation_json = entity_row_json->next;
-                entity_part_json = entity_orientation_json->next;
+                const cJSON *const entity_data_json        = entity_orientation_json->next;
+                entity_part_json                           = entity_data_json->next;
 
-                const uint8_t entity_type_value = (uint8_t)entity_type_json->valuedouble;
-                enum EntityType entity_type;
-                switch (entity_type_value) {
-                        case 0: {
-                                entity_type = ENTITY_PLAYER;
+                const enum EntityType entity_type         = (enum EntityType)(uint8_t)entity_type_json->valuedouble;
+                const uint8_t entity_column               = (uint8_t)entity_column_json->valuedouble;
+                const uint8_t entity_row                  = (uint8_t)entity_row_json->valuedouble;
+                const enum Orientation entity_orientation = (enum Orientation)(uint8_t)entity_orientation_json->valuedouble;
+                const uint16_t entity_data                = (uint16_t)entity_data_json->valuedouble;
+
+                struct Entity *const entity = create_entity(level, entity_type, entity_column, entity_row, entity_orientation);
+                level->implementation->entities[entity_index] = entity;
+
+                if (entity_type == ENTITY_PLAYER) {
+                        ++level->implementation->player_count;
+
+                        if (entity_data == 1) {
+#ifndef NDEBUG
                                 if (level->implementation->current_player_index != UINT16_MAX) {
-                                        send_message(MESSAGE_ERROR, "Failed to parse level: Mutliple initially selected player entities found");
-                                        return false;
+                                        send_message(MESSAGE_WARNING, "Multiple intially selected players found while parsing level");
                                 }
+#endif
 
                                 level->implementation->current_player_index = entity_index;
-                                ++player_count;
-                                break;
-                        }
-
-                        case 1: {
-                                entity_type = ENTITY_PLAYER;
-                                ++player_count;
-                                break;
-                        }
-
-                        case 2: {
-                                entity_type = ENTITY_BLOCK;
-                                break;
-                        }
-
-                        default: {
-                                send_message(MESSAGE_ERROR, "Unrecognized entity type of %d found when parsing level", entity_type_value);
-                                continue;
                         }
                 }
 
-                const uint8_t entity_column = (uint8_t)entity_column_json->valuedouble;
-                const uint8_t entity_row = (uint8_t)entity_row_json->valuedouble;
-                const uint16_t entity_tile_index = (uint16_t)entity_row * (uint16_t)level->columns + (uint16_t)entity_column;
-                const enum Orientation entity_orientation = (enum Orientation)(uint8_t)entity_orientation_json->valuedouble;
-                implementation->entities[entity_index] = create_entity(level, entity_type, entity_tile_index, entity_orientation);
+                if (entity_type == ENTITY_BLOCK) {
+                        if (entity_data != 0) {
+                                const uint16_t block_cluster_index = entity_data - 1;
+                                if (block_cluster_index >= level->implementation->block_cluster_count) {
+                                        send_message(MESSAGE_ERROR, "Failed to fully parse block with invalid block cluster index of %d", (int)block_cluster_index);
+                                        continue;
+                                }
+
+                                block_cluster_push_block(&level->implementation->block_clusters[block_cluster_index], entity);
+                        }
+                }
         }
 
-        if (implementation->current_player_index == UINT16_MAX) {
+        if (level->implementation->current_player_index == UINT16_MAX) {
                 send_message(MESSAGE_ERROR, "Failed to parse level: No initially selected player found");
                 return false;
         }
 
-        implementation->player_count = player_count;
         return true;
 }
 
 static void resize_level(struct Level *const level) {
-        struct LevelImplementation *const implementation = level->implementation;
-        clear_geometry(implementation->grid_geometry);
-
         int drawable_width, drawable_height;
         SDL_GetRendererOutputSize(get_context_renderer(), &drawable_width, &drawable_height);
 
         const float grid_padding = fminf((float)drawable_width, (float)drawable_height) / 10.0f;
 
-        struct GridMetrics *const grid_metrics = &implementation->grid_metrics;
+        struct GridMetrics *const grid_metrics = &level->implementation->grid_metrics;
         grid_metrics->bounding_x = grid_padding;
         grid_metrics->bounding_y = grid_padding;
         grid_metrics->bounding_width  = (float)drawable_width  - grid_padding * 2.0f;
@@ -1013,10 +1172,12 @@ static void resize_level(struct Level *const level) {
         grid_metrics->bounding_y -= thickness / 2.0f;
         grid_metrics->grid_y -= thickness / 2.0f;
 
-        set_geometry_color(implementation->grid_geometry, COLOR_GOLD, COLOR_OPAQUE);
+        clear_geometry(level->implementation->grid_geometry);
+
+        set_geometry_color(level->implementation->grid_geometry, COLOR_GOLD, COLOR_OPAQUE);
         for (uint8_t row = 0; row < level->rows; ++row) {
                 for (uint8_t column = 0; column < level->columns; ++column) {
-                        const enum TileType tile_type = implementation->tiles[(size_t)row * (size_t)level->columns + (size_t)column];
+                        const enum TileType tile_type = level->implementation->tiles[(size_t)row * (size_t)level->columns + (size_t)column];
                         if (tile_type == TILE_EMPTY || tile_type == TILE_SLAB) {
                                 continue;
                         }
@@ -1028,37 +1189,37 @@ static void resize_level(struct Level *const level) {
                         size_t neighbor_column;
                         size_t neighbor_row;
 
-                        if (get_hexagon_neighbor(&implementation->grid_metrics, (size_t)column, (size_t)row, HEXAGON_NEIGHBOR_BOTTOM, &neighbor_column, &neighbor_row)) {
-                                const size_t neighbor_index = neighbor_row * implementation->grid_metrics.columns + neighbor_column;
-                                const enum TileType neighbor_tile_type = implementation->tiles[neighbor_index];
+                        if (get_hexagon_neighbor((size_t)column, (size_t)row, HEXAGON_NEIGHBOR_BOTTOM, &level->implementation->grid_metrics, &neighbor_column, &neighbor_row)) {
+                                const size_t neighbor_index = neighbor_row * level->implementation->grid_metrics.columns + neighbor_column;
+                                const enum TileType neighbor_tile_type = level->implementation->tiles[neighbor_index];
                                 if (neighbor_tile_type != TILE_EMPTY) {
                                         thickness_mask &= ~HEXAGON_THICKNESS_MASK_BOTTOM;
                                 }
                         }
 
-                        if (get_hexagon_neighbor(&level->implementation->grid_metrics, (size_t)column, (size_t)row, HEXAGON_NEIGHBOR_BOTTOM_LEFT, &neighbor_column, &neighbor_row)) {
-                                const size_t neighbor_index = neighbor_row * implementation->grid_metrics.columns + neighbor_column;
-                                const enum TileType neighbor_tile_type = implementation->tiles[neighbor_index];
+                        if (get_hexagon_neighbor((size_t)column, (size_t)row, HEXAGON_NEIGHBOR_BOTTOM_LEFT, &level->implementation->grid_metrics, &neighbor_column, &neighbor_row)) {
+                                const size_t neighbor_index = neighbor_row * level->implementation->grid_metrics.columns + neighbor_column;
+                                const enum TileType neighbor_tile_type = level->implementation->tiles[neighbor_index];
                                 if (neighbor_tile_type != TILE_EMPTY) {
                                         thickness_mask &= ~HEXAGON_THICKNESS_MASK_LEFT;
                                 }
                         }
 
-                        if (get_hexagon_neighbor(&level->implementation->grid_metrics, (size_t)column, (size_t)row, HEXAGON_NEIGHBOR_BOTTOM_RIGHT, &neighbor_column, &neighbor_row)) {
-                                const size_t neighbor_index = neighbor_row * implementation->grid_metrics.columns + neighbor_column;
-                                const enum TileType neighbor_tile_type = implementation->tiles[neighbor_index];
+                        if (get_hexagon_neighbor((size_t)column, (size_t)row, HEXAGON_NEIGHBOR_BOTTOM_RIGHT, &level->implementation->grid_metrics, &neighbor_column, &neighbor_row)) {
+                                const size_t neighbor_index = neighbor_row * level->implementation->grid_metrics.columns + neighbor_column;
+                                const enum TileType neighbor_tile_type = level->implementation->tiles[neighbor_index];
                                 if (neighbor_tile_type != TILE_EMPTY) {
                                         thickness_mask &= ~HEXAGON_THICKNESS_MASK_RIGHT;
                                 }
                         }
 
-                        write_hexagon_thickness_geometry(implementation->grid_geometry, x, y, tile_radius + line_width / 2.0f, thickness, thickness_mask);
+                        write_hexagon_thickness_geometry(level->implementation->grid_geometry, x, y, tile_radius + line_width / 2.0f, thickness, thickness_mask);
                 }
         }
 
         for (uint8_t row = 0; row < level->rows; ++row) {
                 for (uint8_t column = 0; column < level->columns; ++column) {
-                        const enum TileType tile_type = implementation->tiles[(size_t)row * (size_t)level->columns + (size_t)column];
+                        const enum TileType tile_type = level->implementation->tiles[(size_t)row * (size_t)level->columns + (size_t)column];
                         if (tile_type == TILE_EMPTY || tile_type == TILE_SLAB) {
                                 continue;
                         }
@@ -1066,17 +1227,17 @@ static void resize_level(struct Level *const level) {
                         float x, y;
                         get_grid_tile_position(grid_metrics, (size_t)column, (size_t)row, &x, &y);
 
-                        set_geometry_color(implementation->grid_geometry, COLOR_LIGHT_YELLOW, COLOR_OPAQUE);
-                        write_hexagon_geometry(implementation->grid_geometry, x, y, tile_radius + line_width / 2.0f, 0.0f);
+                        set_geometry_color(level->implementation->grid_geometry, COLOR_LIGHT_YELLOW, COLOR_OPAQUE);
+                        write_hexagon_geometry(level->implementation->grid_geometry, x, y, tile_radius + line_width / 2.0f, 0.0f);
 
                         // Don't use the color macros in expressions
                         if (tile_type == TILE_SPOT) {
-                                set_geometry_color(implementation->grid_geometry, COLOR_GOLD, COLOR_OPAQUE);
+                                set_geometry_color(level->implementation->grid_geometry, COLOR_GOLD, COLOR_OPAQUE);
                         } else {
-                                set_geometry_color(implementation->grid_geometry, COLOR_YELLOW, COLOR_OPAQUE);
+                                set_geometry_color(level->implementation->grid_geometry, COLOR_YELLOW, COLOR_OPAQUE);
                         }
 
-                        write_hexagon_geometry(implementation->grid_geometry, x, y, tile_radius - line_width / 2.0f, 0.0f);
+                        write_hexagon_geometry(level->implementation->grid_geometry, x, y, tile_radius - line_width / 2.0f, 0.0f);
                 }
         }
 
@@ -1085,7 +1246,7 @@ static void resize_level(struct Level *const level) {
 
         for (uint8_t row = 0; row < level->rows; ++row) {
                 for (uint8_t column = 0; column < level->columns; ++column) {
-                        const enum TileType tile_type = implementation->tiles[(size_t)row * (size_t)level->columns + (size_t)column];
+                        const enum TileType tile_type = level->implementation->tiles[(size_t)row * (size_t)level->columns + (size_t)column];
                         if (tile_type != TILE_SLAB) {
                                 continue;
                         }
@@ -1095,18 +1256,18 @@ static void resize_level(struct Level *const level) {
 
                         y -= slab_thickness;
 
-                        set_geometry_color(implementation->grid_geometry, COLOR_GOLD, COLOR_OPAQUE);
-                        write_hexagon_thickness_geometry(implementation->grid_geometry, x, y, slab_radius + line_width / 2.0f, slab_thickness, HEXAGON_THICKNESS_MASK_ALL);
+                        set_geometry_color(level->implementation->grid_geometry, COLOR_GOLD, COLOR_OPAQUE);
+                        write_hexagon_thickness_geometry(level->implementation->grid_geometry, x, y, slab_radius + line_width / 2.0f, slab_thickness, HEXAGON_THICKNESS_MASK_ALL);
 
-                        set_geometry_color(implementation->grid_geometry, COLOR_LIGHT_YELLOW, COLOR_OPAQUE);
-                        write_hexagon_geometry(implementation->grid_geometry, x, y, slab_radius + line_width / 2.0f, 0.0f);
+                        set_geometry_color(level->implementation->grid_geometry, COLOR_LIGHT_YELLOW, COLOR_OPAQUE);
+                        write_hexagon_geometry(level->implementation->grid_geometry, x, y, slab_radius + line_width / 2.0f, 0.0f);
 
-                        set_geometry_color(implementation->grid_geometry, COLOR_YELLOW, COLOR_OPAQUE);
-                        write_hexagon_geometry(implementation->grid_geometry, x, y, slab_radius - line_width / 2.0f, 0.0f);
+                        set_geometry_color(level->implementation->grid_geometry, COLOR_YELLOW, COLOR_OPAQUE);
+                        write_hexagon_geometry(level->implementation->grid_geometry, x, y, slab_radius - line_width / 2.0f, 0.0f);
                 }
         }
 
-        for (uint16_t entity_index = 0; entity_index < implementation->entity_count; ++entity_index) {
-                resize_entity(implementation->entities[entity_index], implementation->grid_metrics.tile_radius);
+        for (uint16_t entity_index = 0; entity_index < level->implementation->entity_count; ++entity_index) {
+                resize_entity(level->implementation->entities[entity_index], level->implementation->grid_metrics.tile_radius);
         }
 }

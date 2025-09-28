@@ -43,7 +43,8 @@ char *get_level_title(struct Level *const level);
 struct Entity;
 bool query_level_tile(
         const struct Level *const level,
-        const uint16_t tile_index,
+        const uint8_t column,
+        const uint8_t row,
         enum TileType *const out_tile_type,
         struct Entity **const out_entity,
         float *const out_x,
@@ -77,8 +78,8 @@ struct Change {
         struct Entity *entity;
         union {
                 struct {
-                        uint16_t last_tile_index;
-                        uint16_t next_tile_index;
+                        uint8_t last_column, last_row;
+                        uint8_t next_column, next_row;
                 } move;
                 struct {
                         enum Orientation last_orientation;

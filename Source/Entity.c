@@ -15,8 +15,8 @@ struct Entity {
         struct Level *level;
         enum EntityType type;
         struct Geometry *geometry;
-        uint16_t last_tile_index;
-        uint16_t next_tile_index;
+        uint8_t last_column, last_row;
+        uint8_t next_column, next_row;
         enum Orientation last_orientation;
         enum Orientation next_orientation;
         struct Animation recoiling;
@@ -54,13 +54,13 @@ struct Entity {
                 restart_animation(&(entity)->scaling, 0ULL);                \
         } while (0);                                                        \
 
-struct Entity *create_entity(struct Level *const level, const enum EntityType type, const uint16_t tile_index, const enum Orientation orientation) {
+struct Entity *create_entity(struct Level *const level, const enum EntityType type, const uint8_t column, const uint8_t row, const enum Orientation orientation) {
         struct Entity *const entity = (struct Entity *)xmalloc(sizeof(struct Entity));
         entity->type = type;
         entity->level = level;
         entity->geometry = create_geometry();
-        entity->last_tile_index = tile_index;
-        entity->next_tile_index = tile_index;
+        entity->last_column = entity->next_column = column;
+        entity->last_row = entity->next_row = row;
         entity->last_orientation = orientation;
         entity->next_orientation = orientation;
         entity->angle = orientation_angle(orientation);
@@ -415,27 +415,43 @@ void update_entity(struct Entity *const entity, const double delta_time) {
 void resize_entity(struct Entity *const entity, const float radius) {
         entity->radius = radius;
 
-        query_level_tile(entity->level, entity->next_tile_index, NULL, NULL, &entity->position.x, &entity->position.y);
-
         if (entity->moving.active) {
                 // If there is a moving animation, update the positions of the animation's start and end keyframes
                 struct Action *const moving_action = &entity->moving.actions[0];
-                query_level_tile(entity->level, entity->last_tile_index, NULL, NULL, &moving_action->keyframes.points[0].x, &moving_action->keyframes.points[0].y);
-                query_level_tile(entity->level, entity->next_tile_index, NULL, NULL, &moving_action->keyframes.points[1].x, &moving_action->keyframes.points[1].y);
+                query_level_tile(entity->level, entity->last_column, entity->last_row, NULL, NULL, &moving_action->keyframes.points[0].x, &moving_action->keyframes.points[0].y);
+                query_level_tile(entity->level, entity->next_column, entity->next_row, NULL, NULL, &moving_action->keyframes.points[1].x, &moving_action->keyframes.points[1].y);
+                return;
         }
+
+        query_level_tile(entity->level, entity->next_column, entity->next_row, NULL, NULL, &entity->position.x, &entity->position.y);
 }
 
-enum EntityType get_entity_type(const struct Entity *const entity) {
-        return entity->type;
+#define SAFE_ASSIGNMENT(pointer, value)     \
+        do {                                \
+                if ((pointer) != NULL) {    \
+                        *(pointer) = value; \
+                }                           \
+        } while (0)
+
+void query_entity(
+        struct Entity *const entity,
+        enum EntityType *const out_type,
+        uint8_t *const out_column,
+        uint8_t *const out_row,
+        enum Orientation *const out_orientation,
+        float *const out_x,
+        float *const out_y
+) {
+        ASSERT_ALL(entity != NULL, out_type != NULL || out_column != NULL || out_row != NULL || out_orientation != NULL || out_x != NULL || out_y != NULL);
+        SAFE_ASSIGNMENT(out_type, entity->type);
+        SAFE_ASSIGNMENT(out_column, entity->next_column);
+        SAFE_ASSIGNMENT(out_row, entity->next_row);
+        SAFE_ASSIGNMENT(out_orientation, entity->next_orientation);
+        SAFE_ASSIGNMENT(out_x, entity->position.x);
+        SAFE_ASSIGNMENT(out_y, entity->position.y);
 }
 
-uint16_t get_entity_tile_index(const struct Entity *const entity) {
-        return entity->next_tile_index;
-}
-
-enum Orientation get_entity_orientation(const struct Entity *const entity) {
-        return entity->next_orientation;
-}
+#undef SAFE_ASSIGNMENT
 
 bool entity_can_change(const struct Entity *const entity) {
         if (entity->moving.active || entity->turning.active || entity->recoiling.active) {
@@ -472,7 +488,7 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
 
         if (change->type == CHANGE_BLOCKED || change->type == CHANGE_INVALID) {
                 float x, y;
-                query_level_tile(entity->level, entity->next_tile_index, NULL, NULL, &x, &y);
+                query_level_tile(entity->level, entity->next_column, entity->next_row, NULL, NULL, &x, &y);
 
                 const float angle = -orientation_angle(change->face.direction);
 
@@ -501,11 +517,13 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
         }
 
         if (change->type == CHANGE_WALK || change->type == CHANGE_PUSH || change->type == CHANGE_PUSHED) {
-                entity->last_tile_index = change->move.last_tile_index;
-                entity->next_tile_index = change->move.next_tile_index;
+                entity->last_column = change->move.last_column;
+                entity->last_row    = change->move.last_row;
+                entity->next_column = change->move.next_column;
+                entity->next_row    = change->move.next_row;
 
                 struct Action *const moving_action = &entity->moving.actions[0];
-                query_level_tile(entity->level, entity->next_tile_index, NULL, NULL, &moving_action->keyframes.points[1].x, &moving_action->keyframes.points[1].y);
+                query_level_tile(entity->level, entity->next_column, entity->next_row, NULL, NULL, &moving_action->keyframes.points[1].x, &moving_action->keyframes.points[1].y);
 
                 switch (change->type) {
                         case CHANGE_WALK: {

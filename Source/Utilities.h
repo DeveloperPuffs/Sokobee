@@ -147,12 +147,19 @@ static inline enum Orientation orientation_reverse(const enum Orientation orient
         }
 }
 
-static inline bool orientation_advance_index(const enum Orientation orientation, const uint8_t columns, const uint8_t rows, uint16_t *const out_index) {
-        int8_t column = (int8_t)(*out_index % (uint16_t)columns);
-        int8_t row    = (int8_t)(*out_index / (uint16_t)columns);
+static inline bool orientation_advance(
+        const enum Orientation orientation,
+        const size_t column,
+        const size_t row,
+        const size_t columns,
+        const size_t rows,
+        size_t *const out_column,
+        size_t *const out_row
+) {
+        ASSERT_ALL(out_column != NULL || out_row != NULL);
 
-        int8_t next_column = column;
-        int8_t next_row    = row;
+        intmax_t next_column = (intmax_t)column;
+        intmax_t next_row    = (intmax_t)row;
 
         switch (orientation) {
                 case UPPER_RIGHT: {
@@ -206,11 +213,18 @@ static inline bool orientation_advance_index(const enum Orientation orientation,
                 }
         }
 
-        if (next_column < 0 || next_row < 0 || next_column >= columns || next_row >= rows) {
+        if (next_column < 0 || next_row < 0 || next_column >= (intmax_t)columns || next_row >= (intmax_t)rows) {
                 return false;
         }
 
-        *out_index = (uint16_t)(next_row * (int8_t)columns + next_column);
+        if (out_column != NULL) {
+                *out_column = (size_t)next_column;
+        }
+
+        if (out_row != NULL) {
+                *out_row = (size_t)next_row;
+        }
+
         return true;
 }
 
@@ -275,13 +289,26 @@ static const struct HexagonNeighborOffset odd_hexagon_neighbor_offsets[HEXAGON_N
         (struct HexagonNeighborOffset){.column = +1, .row = +1}, // BOTTOM_RIGHT
 };
 
-static inline bool get_hexagon_neighbor(const struct GridMetrics *const grid_metrics, const size_t column, const size_t row, const enum HexagonNeighbor neighbor, size_t *const out_column, size_t *const out_row) {
+static inline bool get_hexagon_neighbor(
+        const size_t column,
+        const size_t row,
+        const enum HexagonNeighbor neighbor,
+        const struct GridMetrics *const optional_grid_metrics,
+        size_t *const out_column,
+        size_t *const out_row
+) {
         const struct HexagonNeighborOffset *const offsets = (column & 1ULL) ? odd_hexagon_neighbor_offsets : even_hexagon_neighbor_offsets;
         const size_t neighbor_row    = row    + (size_t)offsets[neighbor].row;
         const size_t neighbor_column = column + (size_t)offsets[neighbor].column;
 
-        if (neighbor_row < 0ULL || neighbor_column < 0ULL || neighbor_row >= grid_metrics->rows || neighbor_column >= grid_metrics->columns) {
+        if (neighbor_row < 0ULL || neighbor_column < 0ULL) {
                 return false;
+        }
+
+        if (optional_grid_metrics != NULL) {
+                if (neighbor_column >= optional_grid_metrics->columns || neighbor_row >= optional_grid_metrics->rows) {
+                        return false;
+                }
         }
 
         if (out_row != NULL) {
@@ -324,7 +351,7 @@ static inline bool get_grid_tile_at_position(const struct GridMetrics *grid_metr
 
         for (int neighbor = 0; neighbor < HEXAGON_NEIGHBOR_COUNT; ++neighbor) {
                 size_t neighbor_column, neighbor_row;
-                if (get_hexagon_neighbor(grid_metrics, approximate_column, approximate_row, (enum HexagonNeighbor)neighbor, &neighbor_column, &neighbor_row)) {
+                if (get_hexagon_neighbor(approximate_column, approximate_row, (enum HexagonNeighbor)neighbor, grid_metrics, &neighbor_column, &neighbor_row)) {
                         float neighbor_x, neighbor_y;
                         if (get_grid_tile_position(grid_metrics, neighbor_column, neighbor_row, &neighbor_x, &neighbor_y)) {
                                 if ((fabsf(x - neighbor_x) * 2.0f / sqrtf(3.0f) + fabsf(y - neighbor_y)) / grid_metrics->tile_radius <= 1.0f) {

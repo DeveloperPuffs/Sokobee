@@ -24,6 +24,15 @@ enum MessageSeverity {
 
 #include "Memory.h"
 
+void _assert_all(const char *const expressions[], const bool values[], const size_t assertion_count);
+
+#define ASSERT_ALL(...)                                                               \
+        do {                                                                          \
+                const char *const expressions[] = {#__VA_ARGS__};                     \
+                bool values[] = {__VA_ARGS__};                                        \
+                _assert_all(expressions, values, sizeof(values) / sizeof(values[0])); \
+        } while (0)
+
 #define TIME_STRING_SIZE 64
 
 static const char *const message_severity_strings[MESSAGE_COUNT] = {
@@ -89,6 +98,8 @@ bool debug_panel_receive_event(const SDL_Event *const event);
 void update_debug_panel(const double delta_time);
 
 #else
+
+#define ASSERT_ALL(...) ((void)0)
 
 #define send_message(...) ((void)0)
 

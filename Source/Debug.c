@@ -2,6 +2,7 @@
 
 #include "Debug.h"
 
+#include <assert.h>
 #include <stdint.h>
 
 #include <stdlib.h>
@@ -13,6 +14,17 @@
 #include "Geometry.h"
 #include "Utilities.h"
 #include "Text.h"
+
+#ifndef NDEBUG
+void _assert_all(const char *const expressions[], const bool values[], const size_t assertion_count) {
+        for (size_t assertion_index = 0ULL; assertion_index < assertion_count; ++assertion_index) {
+                if (!values[assertion_index]) {
+                        send_message(MESSAGE_FATAL, "Assertion failed: %s", expressions[assertion_index]);
+                        assert(values[assertion_index]);
+                }
+        }
+}
+#endif
 
 #if defined(__WIN32__)
 

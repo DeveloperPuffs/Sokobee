@@ -142,19 +142,19 @@ static void resize_main_menu_scene(void) {
                         button->thickness_mask = HEXAGON_THICKNESS_MASK_ALL;
                         size_t neighbor_column, neighbor_row;
 
-                        if (get_hexagon_neighbor(&levels_grid_metrics, column, row, HEXAGON_NEIGHBOR_BOTTOM, &neighbor_column, &neighbor_row)) {
+                        if (get_hexagon_neighbor(column, row, HEXAGON_NEIGHBOR_BOTTOM, &levels_grid_metrics, &neighbor_column, &neighbor_row)) {
                                 if (neighbor_row * levels_grid_metrics.columns + neighbor_column < LEVEL_COUNT) {
                                         button->thickness_mask &= ~HEXAGON_THICKNESS_MASK_BOTTOM;
                                 }
                         }
 
-                        if (get_hexagon_neighbor(&levels_grid_metrics, column, row, HEXAGON_NEIGHBOR_BOTTOM_LEFT, &neighbor_column, &neighbor_row)) {
+                        if (get_hexagon_neighbor(column, row, HEXAGON_NEIGHBOR_BOTTOM_LEFT, &levels_grid_metrics, &neighbor_column, &neighbor_row)) {
                                 if (neighbor_row * levels_grid_metrics.columns + neighbor_column < LEVEL_COUNT) {
                                         button->thickness_mask &= ~HEXAGON_THICKNESS_MASK_LEFT;
                                 }
                         }
 
-                        if (get_hexagon_neighbor(&levels_grid_metrics, column, row, HEXAGON_NEIGHBOR_BOTTOM_RIGHT, &neighbor_column, &neighbor_row)) {
+                        if (get_hexagon_neighbor(column, row, HEXAGON_NEIGHBOR_BOTTOM_RIGHT, &levels_grid_metrics, &neighbor_column, &neighbor_row)) {
                                 if (neighbor_row * levels_grid_metrics.columns + neighbor_column < LEVEL_COUNT) {
                                         button->thickness_mask &= ~HEXAGON_THICKNESS_MASK_RIGHT;
                                 }
