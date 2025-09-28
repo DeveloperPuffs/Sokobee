@@ -1,6 +1,5 @@
 {
         "title": "Hexscape",
-        "clusters": 0,
         "columns": 5,
         "rows": 6,
         "tiles": [
@@ -19,5 +18,6 @@
                 1, 2, 4, 0, 0,
                 1, 1, 3, 0, 0,
                 1, 1, 2, 0, 0
-        ]
+        ],
+        "joints": []
 }

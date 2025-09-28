@@ -12,6 +12,7 @@
 #include "Geometry.h"
 #include "Animation.h"
 #include "Utilities.h"
+#include "Defines.h"
 #include "Icons.h"
 #include "Text.h"
 

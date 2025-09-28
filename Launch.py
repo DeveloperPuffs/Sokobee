@@ -52,7 +52,8 @@ def main():
 
         if executable_path.is_file():
                 print(f"Running: {executable_path}")
-                subprocess.run([str(executable_path)], cwd=root_directory, check=True)
+                result = subprocess.run([str(executable_path)], cwd=root_directory)
+                print(f"Program exited with code {result.returncode}")
         else:
                 print(f"Executable not found: {executable_path}")
 

@@ -6,6 +6,7 @@
 #include "Context.h"
 #include "Geometry.h"
 #include "Utilities.h"
+#include "Defines.h"
 #include "Debug.h"
 
 #define LAYER_GRID_COLUMNS (10ULL)

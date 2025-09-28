@@ -8,7 +8,7 @@
 #include "Audio.h"
 #include "Persistent.h"
 #include "Animation.h"
-#include "Utilities.h"
+#include "Defines.h"
 #include "Context.h"
 #include "Layers.h"
 #include "Level.h"

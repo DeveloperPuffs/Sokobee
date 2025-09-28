@@ -9,10 +9,10 @@
 #include "Layers.h"
 #include "Context.h"
 #include "Persistent.h"
+#include "Defines.h"
+#include "Memory.h"
 #include "Scenes.h"
 #include "Text.h"
-
-#define WINDOW_MINIMIZED_THROTTLE (100ULL)
 
 static void initialize(void);
 
@@ -94,7 +94,7 @@ static void update(const double delta_time) {
                 }
 
                 if (event.type == SDL_WINDOW_MINIMIZED) {
-                        SDL_Delay((Uint32)WINDOW_MINIMIZED_THROTTLE);
+                        SDL_Delay(WINDOW_MINIMIZED_THROTTLE);
                         return;
                 }
 

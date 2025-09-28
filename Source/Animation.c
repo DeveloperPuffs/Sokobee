@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 #include "Debug.h"
+#include "Memory.h"
 
 #define C1 (1.70158f)
 #define C2 (C1 * 1.525f)

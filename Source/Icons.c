@@ -2,6 +2,7 @@
 
 #include "Geometry.h"
 #include "Utilities.h"
+#include "Defines.h"
 
 struct Icon {
         enum IconType type;

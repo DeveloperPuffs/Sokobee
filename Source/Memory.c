@@ -4,13 +4,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "Debug.h"
+#include "Defines.h"
+
 #ifndef NDEBUG
 
 struct AllocationInformation {
         void *pointer;
         size_t size;
         const char *file;
-        size_t line;
+        int line;
+        const char *function;
         struct AllocationInformation *next;
 };
 
@@ -21,32 +25,36 @@ static size_t peak_bytes = 0ULL;
 
 void flush_memory_leaks(void) {
         if (allocation_informations == NULL) {
-                fprintf(stdout, "flush_memory_leaks(): No leaked memory\n");
-                fflush(stdout);
+                send_message(MESSAGE_INFORMATION, "flush_memory_leaks(): No leaked memory");
                 return;
         }
 
-        fprintf(stderr, "flush_memory_leaks(): %zu active allocations (totalling %zu bytes) leaked\n", active_allocations, active_bytes);
+        send_message(MESSAGE_ERROR, "flush_memory_leaks(): %zu active allocations (totalling %zu bytes) leaked", active_allocations, active_bytes);
         for (struct AllocationInformation *current_allocation_information = allocation_informations; current_allocation_information != NULL; current_allocation_information = current_allocation_information->next) {
-                fprintf(stderr, "flush_memory_leaks(): %p (%zu bytes) allocated at %s:%zu\n", current_allocation_information->pointer, current_allocation_information->size, current_allocation_information->file, current_allocation_information->line);
+                send_message(
+                        MESSAGE_ERROR, 
+                        "flush_memory_leaks(): %p (%zu bytes) allocated at %s:%d in %s()",
+                        current_allocation_information->pointer,
+                        current_allocation_information->size,
+                        current_allocation_information->file,
+                        current_allocation_information->line,
+                        current_allocation_information->function
+                );
         }
-
-        fflush(stderr);
 }
 
-static void track_allocation(void *const pointer, const size_t size, const char *const file, const size_t line) {
-        struct AllocationInformation *const allocation_information = malloc(sizeof(struct AllocationInformation));
+static void track_allocation(void *const pointer, const size_t size, const char *const file, const int line, const char *const function) {
+        struct AllocationInformation *const allocation_information = (struct AllocationInformation *)malloc(sizeof(struct AllocationInformation));
         if (allocation_information == NULL) {
-                fprintf(stderr, "Failed to track allocation for %p", pointer);
-                fflush(stderr);
-
-                exit(EXIT_FAILURE);
+                send_message(MESSAGE_ERROR, "Failed to track allocation for %p (%zu bytes) allocated at %s:%d in %s()", pointer, size, file, line, function);
+                abort();
         }
 
         allocation_information->pointer = pointer;
         allocation_information->size = size;
         allocation_information->file = file;
         allocation_information->line = line;
+        allocation_information->function = function;
         allocation_information->next = allocation_informations;
         allocation_informations = allocation_information;
 
@@ -55,12 +63,17 @@ static void track_allocation(void *const pointer, const size_t size, const char 
 
         if (active_bytes > peak_bytes) {
                 peak_bytes = active_bytes;
-                // fprintf(stdout, "Warning: Peak memory usage (of %zu bytes) reached with %p (%zu bytes) from %s:%zu\n", peak_bytes, pointer, size, file, line);
-                // fflush(stdout);
+                if (peak_bytes > SAFE_MEMORY_LIMIT_BYTES) {
+                        send_message(
+                                MESSAGE_WARNING,
+                                "Tracked memory peaked at %zu bytes due to allocation for %p (%zu bytes) allocated at %s:%d in %s()",
+                                peak_bytes, pointer, size, file, line, function
+                        );
+                }
         }
 }
 
-static void remove_allocation(void *const pointer, const char *const file, const size_t line) {
+static void remove_allocation(void *const pointer, const char *const file, const int line, const char *const function) {
         struct AllocationInformation **current_allocation_information = &allocation_informations;
 
         while (*current_allocation_information != NULL) {
@@ -78,73 +91,64 @@ static void remove_allocation(void *const pointer, const char *const file, const
                 current_allocation_information = &(*current_allocation_information)->next;
         }
 
-        fprintf(stderr, "xfree(%p): Unrecognized pointer at %s:%zu\n", pointer, file, line);
-        fflush(stderr);
+        send_message(MESSAGE_WARNING, "xfree(%p): Pointer is unrecognized at %s:%d in %s()", pointer, file, line, function);
 }
 
-void *track_malloc(const size_t size, const char *const file, const size_t line) {
+void *track_malloc(const size_t size, const char *const file, const int line, const char *const function) {
         void *const allocated = malloc(size);
         if (allocated == NULL) {
-                fprintf(stderr, "xmalloc(%zu): Out of memory at %s:%zu\n", size, file, line);
-                fflush(stderr);
-
-                exit(EXIT_FAILURE);
+                send_message(MESSAGE_ERROR, "xmalloc(%zu): Allocation failed at %s:%d in %s()", size, file, line, function);
+                abort();
         }
 
-        track_allocation(allocated, size, file, line);
+        track_allocation(allocated, size, file, line, function);
         return allocated;
 }
 
-void *track_calloc(const size_t count, const size_t size, const char *const file, const size_t line) {
+void *track_calloc(const size_t count, const size_t size, const char *const file, const int line, const char *const function) {
         void *const allocated = calloc(count, size);
         if (allocated == NULL) {
-                fprintf(stderr, "xcalloc(%zu, %zu): Out of memory at %s:%zu\n", count, size, file, line);
-                fflush(stderr);
-
-                exit(EXIT_FAILURE);
+                send_message(MESSAGE_ERROR, "xcalloc(%zu, %zu): Allocation failed at %s:%d in %s()", count, size, file, line, function);
+                abort();
         }
 
-        track_allocation(allocated, size, file, line);
+        track_allocation(allocated, size, file, line, function);
         return allocated;
 }
 
-void *track_realloc(void *const pointer, const size_t size, const char *const file, const size_t line) {
+void *track_realloc(void *const pointer, const size_t size, const char *const file, const int line, const char *const function) {
         if (pointer != NULL) {
-                remove_allocation(pointer, file, line);
+                remove_allocation(pointer, file, line, function);
         }
 
         void *const reallocated = realloc(pointer, size);
         if (reallocated == NULL) {
-                fprintf(stderr, "xrealloc(%p, %zu): Out of memory at %s:%zu\n", pointer, size, file, line);
-                fflush(stderr);
-
-                exit(EXIT_FAILURE);
+                send_message(MESSAGE_ERROR, "xrealloc(%p, %zu): Allocation failed at %s:%d in %s()", pointer, size, file, line, function);
+                abort();
         }
 
-        track_allocation(reallocated, size, file, line);
+        track_allocation(reallocated, size, file, line, function);
         return reallocated;
 }
 
-char *track_strdup(const char *const string, const char *const file, const size_t line) {
+char *track_strdup(const char *const string, const char *const file, const int line, const char *const function) {
         char *const duplicated = strdup(string);
         if (duplicated == NULL) {
-                fprintf(stderr, "xstrdup(%s): Out of memory at %s:%zu\n", string, file, line);
-                fflush(stderr);
-
-                exit(EXIT_FAILURE);
+                send_message(MESSAGE_ERROR, "xstrdup(%s): Allocation failed at %s:%d in %s()", string, file, line, function);
+                abort();
         }
 
         // NOTE: The size here is just the size of the pointer, but it should be fine
-        track_allocation(duplicated, sizeof(duplicated), file, line);
+        track_allocation(duplicated, sizeof(duplicated), file, line, function);
         return duplicated;
 }
 
-void track_free(void *const pointer, const char *const file, const size_t line) {
+void track_free(void *const pointer, const char *const file, const int line, const char *const function) {
         if (pointer == NULL) {
                 return;
         }
 
-        remove_allocation(pointer, file, line);
+        remove_allocation(pointer, file, line, function);
         free(pointer);
 }
 

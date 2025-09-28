@@ -9,6 +9,7 @@
 #include "Animation.h"
 #include "Utilities.h"
 #include "Debug.h"
+#include "Defines.h"
 #include "Memory.h"
 
 struct Entity {
@@ -418,20 +419,13 @@ void resize_entity(struct Entity *const entity, const float radius) {
         if (entity->moving.active) {
                 // If there is a moving animation, update the positions of the animation's start and end keyframes
                 struct Action *const moving_action = &entity->moving.actions[0];
-                query_level_tile(entity->level, entity->last_column, entity->last_row, NULL, NULL, &moving_action->keyframes.points[0].x, &moving_action->keyframes.points[0].y);
-                query_level_tile(entity->level, entity->next_column, entity->next_row, NULL, NULL, &moving_action->keyframes.points[1].x, &moving_action->keyframes.points[1].y);
+                query_level_tile(entity->level, entity->last_column, entity->last_row, NULL_X2, &moving_action->keyframes.points[0].x, &moving_action->keyframes.points[0].y);
+                query_level_tile(entity->level, entity->next_column, entity->next_row, NULL_X2, &moving_action->keyframes.points[1].x, &moving_action->keyframes.points[1].y);
                 return;
         }
 
-        query_level_tile(entity->level, entity->next_column, entity->next_row, NULL, NULL, &entity->position.x, &entity->position.y);
+        query_level_tile(entity->level, entity->next_column, entity->next_row, NULL_X2, &entity->position.x, &entity->position.y);
 }
-
-#define SAFE_ASSIGNMENT(pointer, value)     \
-        do {                                \
-                if ((pointer) != NULL) {    \
-                        *(pointer) = value; \
-                }                           \
-        } while (0)
 
 void query_entity(
         struct Entity *const entity,
@@ -450,8 +444,6 @@ void query_entity(
         SAFE_ASSIGNMENT(out_x, entity->position.x);
         SAFE_ASSIGNMENT(out_y, entity->position.y);
 }
-
-#undef SAFE_ASSIGNMENT
 
 bool entity_can_change(const struct Entity *const entity) {
         if (entity->moving.active || entity->turning.active || entity->recoiling.active) {
@@ -488,7 +480,7 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
 
         if (change->type == CHANGE_BLOCKED || change->type == CHANGE_INVALID) {
                 float x, y;
-                query_level_tile(entity->level, entity->next_column, entity->next_row, NULL, NULL, &x, &y);
+                query_level_tile(entity->level, entity->next_column, entity->next_row, NULL_X2, &x, &y);
 
                 const float angle = -orientation_angle(change->face.direction);
 
@@ -523,7 +515,7 @@ void entity_handle_change(struct Entity *const entity, const struct Change *cons
                 entity->next_row    = change->move.next_row;
 
                 struct Action *const moving_action = &entity->moving.actions[0];
-                query_level_tile(entity->level, entity->next_column, entity->next_row, NULL, NULL, &moving_action->keyframes.points[1].x, &moving_action->keyframes.points[1].y);
+                query_level_tile(entity->level, entity->next_column, entity->next_row, NULL_X2, &moving_action->keyframes.points[1].x, &moving_action->keyframes.points[1].y);
 
                 switch (change->type) {
                         case CHANGE_WALK: {

@@ -9,6 +9,7 @@
 #include "Animation.h"
 #include "Context.h"
 #include "Utilities.h"
+#include "Defines.h"
 
 #define TOOLTIP_PADDING (5.0f)
 #define TOOLTIP_CURSOR_OFFSET (10.0f)

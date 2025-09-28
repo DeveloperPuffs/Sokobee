@@ -18,9 +18,8 @@
 #include "Memory.h"
 #include "Entity.h"
 #include "Geometry.h"
+#include "Defines.h"
 #include "Debug.h"
-
-#define LEVEL_DIMENSION_LIMIT 20
 
 #define STEP_HISTORY_INITIAL_CAPACITY (64ULL)
 
@@ -91,13 +90,6 @@ static inline void step_history_pop_step(struct StepHistory *const step_history,
 
         --step_history->step_count;
 }
-
-#define SWAP_VALUES(type, a, b)       \
-        do {                          \
-                type temporary = (a); \
-                (a) = (b);            \
-                (b) = temporary;      \
-        } while (0)
 
 // I am providing a callback function because the level might need to inspect the reverted changes to conditionally update it's state (not only the entities' states)
 static inline void step_history_swap_step(
@@ -177,8 +169,6 @@ static inline void step_history_swap_step(
         --source->step_count;
 }
 
-#undef SWAP_VALUES
-
 static inline struct Change *get_next_change_slot(struct StepHistory *const step_history) {
         if (step_history->change_count >= step_history->change_capacity) {
                 step_history->change_capacity *= 2ULL;
@@ -243,7 +233,18 @@ static inline void discard_pending_step(struct StepHistory *const step_history, 
 #define EVENT_IS_GESTURE_MOTION(event) ((event)->type == SDL_FINGERMOTION)
 #endif
 
-struct BlockCluster;
+enum JointType {
+        JOINT_SOLID = 0,
+        JOINT_HONEY,
+        JOINT_COUNT
+};
+
+struct Joint {
+        enum JointType type;
+        struct Entity *block1;
+        struct Entity *block2;
+};
+
 struct LevelImplementation {
         char *title;
         enum TileType *tiles;
@@ -253,8 +254,9 @@ struct LevelImplementation {
         uint16_t player_count;
         uint16_t current_player_index;
         struct Entity *switch_anchor_player;
-        uint16_t block_cluster_count;
-        struct BlockCluster *block_clusters;
+        uint16_t joint_count;
+        struct Joint *joints;
+        struct Geometry *joints_geometry;
         struct GridMetrics grid_metrics;
         struct Geometry *grid_geometry;
         struct StepHistory step_history;
@@ -266,127 +268,6 @@ struct LevelImplementation {
         float gesture_swipe_x;
         float gesture_swipe_y;
 };
-
-#define BLOCK_CLUSTER_INITIAL_BLOCK_CAPACITY 2
-#define BLOCK_CLUSTER_INITIAL_LINK_CAPACITY 1
-struct BlockCluster {
-        struct Level *level;
-        uint16_t block_count;
-        uint16_t block_capacity;
-        struct Entity **blocks;
-        uint16_t link_count;
-        uint16_t link_capacity;
-        struct Entity **link_blocks;
-        struct Geometry *geometry;
-};
-
-void initialize_block_cluster(struct BlockCluster *const block_cluster, struct Level *const level) {
-        ASSERT_ALL(block_cluster != NULL, level != NULL);
-
-        block_cluster->level = level;
-
-        block_cluster->block_count = 0;
-        block_cluster->block_capacity = BLOCK_CLUSTER_INITIAL_BLOCK_CAPACITY;
-        block_cluster->blocks = (struct Entity **)xmalloc((size_t)block_cluster->block_capacity * sizeof(struct Entity *));
-
-        block_cluster->link_count = 0;
-        block_cluster->link_capacity = BLOCK_CLUSTER_INITIAL_LINK_CAPACITY;
-        block_cluster->link_blocks = (struct Entity **)malloc((size_t)block_cluster->link_capacity * 2ULL * sizeof(struct Entity *));
-
-        block_cluster->geometry = create_geometry();
-        set_geometry_color(block_cluster->geometry, COLOR_BROWN, COLOR_OPAQUE);
-}
-
-void update_block_cluster(struct BlockCluster *const block_cluster) {
-        ASSERT_ALL(block_cluster != NULL);
-
-        clear_geometry(block_cluster->geometry);
-
-        const float tile_radius = block_cluster->level->implementation->grid_metrics.tile_radius;
-        const float line_width = tile_radius / 5.0f;
-        const float tile_offset = line_width / 2.0f;
-
-        for (uint16_t link_index = 0; link_index < block_cluster->link_count; ++link_index) {
-                float x1, y1, x2, y2;
-                query_entity(block_cluster->link_blocks[link_index * 2 + 0], NULL, NULL, NULL, NULL, &x1, &y1);
-                query_entity(block_cluster->link_blocks[link_index * 2 + 1], NULL, NULL, NULL, NULL, &x2, &y2);
-                write_line_geometry(block_cluster->geometry, x1, y1 - tile_offset, x2, y2 - tile_offset, line_width, LINE_CAP_BOTH);
-        }
-
-        render_geometry(block_cluster->geometry);
-}
-
-void deinitialize_block_cluster(struct BlockCluster *const block_cluster) {
-        if (block_cluster == NULL) {
-                send_message(MESSAGE_WARNING, "Failed to deinitialize block cluster: Block cluster given to deinitialize is NULL");
-                return;
-        }
-
-        if (block_cluster->blocks != NULL) {
-                xfree(block_cluster->blocks);
-                block_cluster->blocks = NULL;
-                block_cluster->block_count = 0;
-                block_cluster->block_capacity = 0;
-        }
-
-        if (block_cluster->link_blocks != NULL) {
-                xfree(block_cluster->link_blocks);
-                block_cluster->link_blocks = NULL;
-                block_cluster->link_count = 0;
-                block_cluster->link_capacity = 0;
-        }
-
-        if (block_cluster->geometry != NULL) {
-                destroy_geometry(block_cluster->geometry);
-                block_cluster->geometry = NULL;
-        }
-
-        block_cluster->level = NULL;
-}
-
-void block_cluster_push_block(struct BlockCluster *const block_cluster, struct Entity *const block) {
-        ASSERT_ALL(block_cluster != NULL, block != NULL);
-
-        uint8_t block_column, block_row;
-        query_entity(block, NULL, &block_column, &block_row, NULL, NULL, NULL);
-
-        for (uint8_t adjacency_index = 0; adjacency_index < HEXAGON_NEIGHBOR_COUNT; ++adjacency_index) {
-                const enum HexagonNeighbor neighbor = (enum HexagonNeighbor)(int)adjacency_index;
-
-                size_t adjacency_column, adjacency_row;
-                if (!get_hexagon_neighbor((size_t)block_column, (size_t)block_row, neighbor, NULL, &adjacency_column, &adjacency_row)) {
-                        continue;
-                }
-
-                for (uint16_t other_block_index = 0; other_block_index < block_cluster->block_count; ++other_block_index) {
-                        struct Entity *const other_block = block_cluster->blocks[other_block_index];
-
-                        uint8_t other_block_column, other_block_row;
-                        query_entity(other_block, NULL, &other_block_column, &other_block_row, NULL, NULL, NULL);
-                        if (other_block_column == adjacency_column && other_block_row == adjacency_row) {
-                                if (block_cluster->link_count == block_cluster->link_capacity) {
-                                        block_cluster->link_capacity *= 2;
-                                        block_cluster->link_blocks = xrealloc(block_cluster->link_blocks, block_cluster->link_capacity * 2ULL * sizeof(struct Entity *));
-                                }
-
-                                const uint16_t link_index = block_cluster->link_count++;
-                                block_cluster->link_blocks[link_index * 2 + 0] = other_block;
-                                block_cluster->link_blocks[link_index * 2 + 1] = block;
-                                break;
-                        }
-                }
-        }
-
-        if (block_cluster->block_count == block_cluster->block_capacity) {
-                block_cluster->block_capacity *= 2;
-                block_cluster->blocks = xrealloc(block_cluster->blocks, block_cluster->block_capacity * sizeof(struct Entity *));
-        }
-
-        block_cluster->blocks[block_cluster->block_count++] = block;
-}
-
-#undef BLOCK_CLUSTER_INITIAL_BLOCK_CAPACITY
-#undef BLOCK_CLUSTER_INITIAL_LINK_CAPACITY
 
 static inline void level_process_move(struct Level *const level, const enum Input input) {
         struct Entity *const current_player = level->implementation->entities[level->implementation->current_player_index];
@@ -404,7 +285,7 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
 
         uint8_t column, row;
         enum Orientation direction;
-        query_entity(current_player, NULL, &column, &row, &direction, NULL, NULL);
+        query_entity(current_player, NULL, &column, &row, &direction, NULL_X2);
         if (input == INPUT_BACKWARD) {
                 direction = orientation_reverse(direction);
         }
@@ -430,7 +311,7 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
                 change->move.next_row = row = (uint8_t)advanced_row;
 
                 enum TileType tile_type;
-                query_level_tile(level, column, row, &tile_type, &next_entity, NULL, NULL);
+                query_level_tile(level, column, row, &tile_type, &next_entity, NULL_X2);
 
                 if (tile_type == TILE_EMPTY) {
                         discard_pending_step(&level->implementation->step_history, direction);
@@ -441,7 +322,7 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
                 // Players can walk on slab tiles but blocks can't get pushed onto them
                 if (tile_type == TILE_SLAB) {
                         enum EntityType entity_type;
-                        query_entity(change->entity, &entity_type, NULL, NULL, NULL, NULL, NULL);
+                        query_entity(change->entity, &entity_type, NULL_X5);
 
                         if (entity_type == ENTITY_BLOCK) {
                                 discard_pending_step(&level->implementation->step_history, direction);
@@ -471,7 +352,7 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
 
                                 enum TileType tile_type;
                                 struct Entity *entity;
-                                query_level_tile(level, tile_column, tile_row, &tile_type, &entity, NULL, NULL);
+                                query_level_tile(level, tile_column, tile_row, &tile_type, &entity, NULL_X2);
 
                                 if (tile_type == TILE_SPOT) {
                                         if (entity == NULL) {
@@ -480,7 +361,7 @@ static inline void level_process_move(struct Level *const level, const enum Inpu
                                         }
 
                                         enum EntityType entity_type;
-                                        query_entity(entity, &entity_type, NULL, NULL, NULL, NULL, NULL);
+                                        query_entity(entity, &entity_type, NULL_X5);
                                         if (entity_type != ENTITY_BLOCK) {
                                                 did_win = false;
                                                 break;
@@ -519,7 +400,7 @@ static inline void level_process_turn(struct Level *const level, const enum Inpu
         change->type = CHANGE_TURN;
         change->entity = current_player;
 
-        query_entity(current_player, NULL, NULL, NULL, &change->turn.last_orientation, NULL, NULL);
+        query_entity(current_player, NULL_X3, &change->turn.last_orientation, NULL_X2);
         change->turn.next_orientation = input == INPUT_RIGHT
                 ? orientation_turn_right(change->turn.last_orientation)
                 : orientation_turn_left(change->turn.last_orientation);
@@ -625,7 +506,7 @@ static inline void level_process_switch(struct Level *const level, struct Entity
                 // If no player is given, cycle through entities to find the next player to switch to
                 enum EntityType entity_type;
                 const uint16_t entity_index = (level->implementation->current_player_index + index + 1) % level->implementation->entity_count;
-                query_entity(level->implementation->entities[entity_index], &entity_type, NULL, NULL, NULL, NULL, NULL);
+                query_entity(level->implementation->entities[entity_index], &entity_type, NULL_X5);
                 if (entity_type == ENTITY_PLAYER) {
                         level->implementation->current_player_index = entity_index;
                         break;
@@ -694,11 +575,12 @@ bool initialize_level(struct Level *const level, const size_t number) {
         level->completion_callback_data = NULL;
 
         level->implementation = (struct LevelImplementation *)xmalloc(sizeof(struct LevelImplementation));
-        level->implementation->grid_geometry = create_geometry();
         level->implementation->current_player_index = UINT16_MAX;
         level->implementation->switch_anchor_player = NULL;
-        level->implementation->block_cluster_count = 0;
-        level->implementation->block_clusters = NULL;
+        level->implementation->joint_count = 0;
+        level->implementation->joints = NULL;
+        level->implementation->joints_geometry = create_geometry();
+        level->implementation->grid_geometry = create_geometry();
         level->implementation->gesture_start_time = 0;
 
         initialize_step_history(&level->implementation->step_history);
@@ -761,13 +643,10 @@ void deinitialize_level(struct Level *const level) {
         destroy_step_history(&level->implementation->undo_history);
 
         destroy_geometry(level->implementation->grid_geometry);
+        destroy_geometry(level->implementation->joints_geometry);
 
-        if (level->implementation->block_clusters) {
-                for (uint16_t block_cluster_index = 0; block_cluster_index < level->implementation->block_cluster_count; ++block_cluster_index) {
-                        deinitialize_block_cluster(&level->implementation->block_clusters[block_cluster_index]);
-                }
-
-                xfree(level->implementation->block_clusters);
+        if (level->implementation->joints != NULL) {
+                xfree(level->implementation->joints);
         }
 
         if (level->implementation->entities) {
@@ -793,13 +672,6 @@ void deinitialize_level(struct Level *const level) {
 char *get_level_title(struct Level *const level) {
         return level->implementation->title;
 }
-
-#define SAFE_ASSIGNMENT(pointer, value)     \
-        do {                                \
-                if ((pointer) != NULL) {    \
-                        *(pointer) = value; \
-                }                           \
-        } while (0)
 
 bool query_level_tile(
         const struct Level *const level,
@@ -831,7 +703,7 @@ bool query_level_tile(
                 for (uint16_t entity_index = 0; entity_index < level->implementation->entity_count; ++entity_index) {
                         uint8_t entity_column, entity_row;
                         struct Entity *const entity = level->implementation->entities[entity_index];
-                        query_entity(entity, NULL, &entity_column, &entity_row, NULL, NULL, NULL);
+                        query_entity(entity, NULL, &entity_column, &entity_row, NULL_X3);
                         if (entity_column == column && entity_row == row) {
                                 *out_entity = entity;
                                 break;
@@ -841,8 +713,6 @@ bool query_level_tile(
 
         return true;
 }
-
-#undef SAFE_ASSIGNMENT
 
 static inline void get_event_position(const SDL_Event *const event, const int screen_width, const int screen_height, float *const x, float *const y) {
 #ifndef NDEBUG
@@ -941,9 +811,9 @@ bool level_receive_event(struct Level *const level, const SDL_Event *const event
                                 size_t tapped_column, tapped_row;
                                 if (get_grid_tile_at_position(&level->implementation->grid_metrics, denormalized_x, denormalized_y, &tapped_column, &tapped_row)) {
                                         struct Entity *tapped_entity;
-                                        if (query_level_tile(level, (uint8_t)tapped_column, (uint8_t)tapped_row, NULL, &tapped_entity, NULL, NULL) && tapped_entity != NULL) {
+                                        if (query_level_tile(level, (uint8_t)tapped_column, (uint8_t)tapped_row, NULL, &tapped_entity, NULL_X2) && tapped_entity != NULL) {
                                                 enum EntityType tapped_entity_type;
-                                                query_entity(tapped_entity, &tapped_entity_type, NULL, NULL, NULL, NULL, NULL);
+                                                query_entity(tapped_entity, &tapped_entity_type, NULL_X5);
                                                 if (tapped_entity_type == ENTITY_PLAYER && tapped_entity != level->implementation->entities[level->implementation->current_player_index]) {
                                                         level_process_switch(level, tapped_entity);
                                                 }
@@ -1006,12 +876,60 @@ void update_level(struct Level *const level, const double delta_time) {
 
         render_geometry(level->implementation->grid_geometry);
 
-        for (uint16_t entity_index = 0; entity_index < level->implementation->entity_count; ++entity_index) {
-                update_entity(level->implementation->entities[entity_index], delta_time);
+        clear_geometry(level->implementation->joints_geometry);
+
+        const float tile_radius = level->implementation->grid_metrics.tile_radius;
+        const float line_width = tile_radius / 2.5f;
+        const float block_offset = tile_radius / -10.0f;
+        const float line_shrink = line_width * 1.5f;
+
+        for (uint16_t joint_index = 0; joint_index < level->implementation->joint_count; ++joint_index) {
+                struct Joint *const joint = &level->implementation->joints[joint_index];
+
+                float x1, y1, x2, y2;
+                query_entity(joint->block1, NULL_X4, &x1, &y1);
+                query_entity(joint->block2, NULL_X4, &x2, &y2);
+
+                y1 += block_offset;
+                y2 += block_offset;
+
+                const float distance_x = x2 - x1;
+                const float distance_y = y2 - y1;
+                const float length = sqrtf(distance_x * distance_x + distance_y * distance_y);
+                const float unit_x = distance_x / length;
+                const float unit_y = distance_y / length;
+
+                x1 += unit_x * line_shrink;
+                y1 += unit_y * line_shrink;
+                x2 -= unit_x * line_shrink;
+                y2 -= unit_y * line_shrink;
+
+                switch (joint->type) {
+                        case JOINT_SOLID: {
+                                const float thickness_offset = -block_offset * 2.0f;
+                                set_geometry_color(level->implementation->joints_geometry, COLOR_GOLD, COLOR_OPAQUE);
+                                write_line_geometry(level->implementation->joints_geometry, x1, y1 + thickness_offset, x2, y2 + thickness_offset, line_width, LINE_CAP_NONE);
+                                set_geometry_color(level->implementation->joints_geometry, COLOR_LIGHT_YELLOW, COLOR_OPAQUE);
+                                write_line_geometry(level->implementation->joints_geometry, x1, y1, x2, y2, line_width, LINE_CAP_NONE);
+                                break;
+                        }
+
+                        case JOINT_HONEY: {
+                                set_geometry_color(level->implementation->joints_geometry, COLOR_HONEY, COLOR_OPAQUE);
+                                write_line_geometry(level->implementation->joints_geometry, x1, y1, x2, y2, line_width, LINE_CAP_BOTH);
+                                break;
+                        }
+
+                        default: {
+                                break;
+                        }
+                }
         }
 
-        for (uint16_t block_cluster_index = 0; block_cluster_index < level->implementation->block_cluster_count; ++block_cluster_index) {
-                update_block_cluster(&level->implementation->block_clusters[block_cluster_index]);
+        render_geometry(level->implementation->joints_geometry);
+
+        for (uint16_t entity_index = 0; entity_index < level->implementation->entity_count; ++entity_index) {
+                update_entity(level->implementation->entities[entity_index], delta_time);
         }
 }
 
@@ -1022,33 +940,25 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
         }
 
         const cJSON *const title_json    = cJSON_GetObjectItemCaseSensitive(json, "title");
-        const cJSON *const clusters_json = cJSON_GetObjectItemCaseSensitive(json, "clusters");
         const cJSON *const columns_json  = cJSON_GetObjectItemCaseSensitive(json, "columns");
         const cJSON *const rows_json     = cJSON_GetObjectItemCaseSensitive(json, "rows");
         const cJSON *const tiles_json    = cJSON_GetObjectItemCaseSensitive(json, "tiles");
         const cJSON *const entities_json = cJSON_GetObjectItemCaseSensitive(json, "entities");
+        const cJSON *const joints_json   = cJSON_GetObjectItemCaseSensitive(json, "joints");
 
         if (
-                !cJSON_IsString(title_json)    ||
-                !cJSON_IsNumber(clusters_json) ||
-                !cJSON_IsNumber(columns_json)  ||
-                !cJSON_IsNumber(rows_json)     ||
-                !cJSON_IsArray(tiles_json)     ||
-                !cJSON_IsArray(entities_json)
+                !cJSON_IsString(title_json)   ||
+                !cJSON_IsNumber(columns_json) ||
+                !cJSON_IsNumber(rows_json)    ||
+                !cJSON_IsArray(tiles_json)    ||
+                !cJSON_IsArray(entities_json) ||
+                !cJSON_IsArray(joints_json)
         ) {
                 send_message(MESSAGE_ERROR, "Failed to parse level: JSON data is invalid");
                 return false;
         }
 
         level->implementation->title = xstrdup(title_json->valuestring);
-
-        level->implementation->block_cluster_count = (uint16_t)clusters_json->valuedouble;
-        if (level->implementation->block_cluster_count != 0) {
-                level->implementation->block_clusters = (struct BlockCluster *)xmalloc(level->implementation->block_cluster_count * sizeof(struct BlockCluster));
-                for (uint16_t block_cluster_index = 0; block_cluster_index < level->implementation->block_cluster_count; ++block_cluster_index) {
-                        initialize_block_cluster(&level->implementation->block_clusters[block_cluster_index], level);
-                }
-        }
 
         const double columns = columns_json->valuedouble;
         if (floor(columns) != columns || columns <= 0.0 || columns > (double)LEVEL_DIMENSION_LIMIT) {
@@ -1092,12 +1002,12 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
         }
 
         const int entities_length = cJSON_GetArraySize(entities_json);
-        if (entities_length % 5 != 0) {
-                send_message(MESSAGE_ERROR, "Failed to parse level: Entities array length of %d is not a multiple of 5", entities_length);
+        if (entities_length % LEVEL_DATA_ENTITY_STRIDE != 0) {
+                send_message(MESSAGE_ERROR, "Failed to parse level: Entities array length of %d is not a multiple of %d", entities_length, LEVEL_DATA_ENTITY_STRIDE);
                 return false;
         }
 
-        level->implementation->entity_count = (uint16_t)entities_length / 5;
+        level->implementation->entity_count = (uint16_t)(entities_length / LEVEL_DATA_ENTITY_STRIDE);
         level->implementation->entities = (struct Entity **)xcalloc(level->implementation->entity_count, sizeof(struct Entity *));
 
         const cJSON *entity_part_json = entities_json->child;
@@ -1108,6 +1018,17 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
                 const cJSON *const entity_orientation_json = entity_row_json->next;
                 const cJSON *const entity_data_json        = entity_orientation_json->next;
                 entity_part_json                           = entity_data_json->next;
+
+                if (
+                        !cJSON_IsNumber(entity_type_json)        ||
+                        !cJSON_IsNumber(entity_column_json)      ||
+                        !cJSON_IsNumber(entity_row_json)         ||
+                        !cJSON_IsNumber(entity_orientation_json) ||
+                        !cJSON_IsNumber(entity_data_json)
+                ) {
+                        send_message(MESSAGE_ERROR, "Failed to parse level: Failed to parse entity %d: JSON data is invalid", (int)entity_index);
+                        return false;
+                }
 
                 const enum EntityType entity_type         = (enum EntityType)(uint8_t)entity_type_json->valuedouble;
                 const uint8_t entity_column               = (uint8_t)entity_column_json->valuedouble;
@@ -1131,23 +1052,43 @@ static bool parse_level(const cJSON *const json, struct Level *const level) {
                                 level->implementation->current_player_index = entity_index;
                         }
                 }
-
-                if (entity_type == ENTITY_BLOCK) {
-                        if (entity_data != 0) {
-                                const uint16_t block_cluster_index = entity_data - 1;
-                                if (block_cluster_index >= level->implementation->block_cluster_count) {
-                                        send_message(MESSAGE_ERROR, "Failed to fully parse block with invalid block cluster index of %d", (int)block_cluster_index);
-                                        continue;
-                                }
-
-                                block_cluster_push_block(&level->implementation->block_clusters[block_cluster_index], entity);
-                        }
-                }
         }
 
         if (level->implementation->current_player_index == UINT16_MAX) {
                 send_message(MESSAGE_ERROR, "Failed to parse level: No initially selected player found");
                 return false;
+        }
+
+        const int joints_length = cJSON_GetArraySize(joints_json);
+        if (joints_length % LEVEL_DATA_JOINT_STRIDE != 0) {
+                send_message(MESSAGE_ERROR, "Failed to parse level: Joints array length of %d is not a multiple of %d", joints_length, LEVEL_DATA_JOINT_STRIDE);
+                return false;
+        }
+
+        level->implementation->joint_count = (uint16_t)(joints_length / LEVEL_DATA_JOINT_STRIDE);
+        level->implementation->joints = (struct Joint *)xmalloc(level->implementation->joint_count * sizeof(struct Joint));
+
+        const cJSON *joint_part_json = joints_json->child;
+        for (uint16_t joint_index = 0; joint_index < level->implementation->joint_count; ++joint_index) {
+                const cJSON *const joint_type_json    = joint_part_json;
+                const cJSON *const joint_block1_index = joint_type_json->next;
+                const cJSON *const joint_block2_index = joint_block1_index->next;
+                joint_part_json                       = joint_block2_index->next;
+
+                if (
+                        !cJSON_IsNumber(joint_type_json)    ||
+                        !cJSON_IsNumber(joint_block1_index) ||
+                        !cJSON_IsNumber(joint_block2_index)
+                ) {
+                        send_message(MESSAGE_ERROR, "Failed to parse level: Failed to parse joint %d: JSON data is invalid", (int)joint_index);
+                        return false;
+                }
+
+                level->implementation->joints[joint_index].type = (enum JointType)(int)joint_type_json->valuedouble;
+                level->implementation->joints[joint_index].block1 = level->implementation->entities[(uint16_t)joint_block1_index->valuedouble];
+                level->implementation->joints[joint_index].block2 = level->implementation->entities[(uint16_t)joint_block2_index->valuedouble];
+
+                // TODO: Validate by making sure both 'block1' and 'block2' are block entities
         }
 
         return true;

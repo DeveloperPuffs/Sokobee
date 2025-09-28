@@ -2,29 +2,101 @@
 
 #include "Debug.h"
 
-#include <assert.h>
 #include <stdint.h>
-
+#include <time.h>
+#include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
 #include "SDL_timer.h"
+#include "SDL_platform.h"
 
 #include "Context.h"
 #include "Geometry.h"
 #include "Utilities.h"
+#include "Defines.h"
 #include "Text.h"
 
-#ifndef NDEBUG
-void _assert_all(const char *const expressions[], const bool values[], const size_t assertion_count) {
+void _assert_all_implementation(
+        const char *const file,
+        const int line,
+        const char *const function,
+        const char *const expressions,
+        const bool values[],
+        const size_t assertion_count
+) {
         for (size_t assertion_index = 0ULL; assertion_index < assertion_count; ++assertion_index) {
                 if (!values[assertion_index]) {
-                        send_message(MESSAGE_FATAL, "Assertion failed: %s", expressions[assertion_index]);
-                        assert(values[assertion_index]);
+                        send_message(
+                                MESSAGE_FATAL,
+                                "assert(%s): Assertion #%zu failed at %s:%d in %s()",
+                                expressions, assertion_index,
+                                file, line, function
+                        );
+
+                        abort();
                 }
         }
 }
+
+#define TIME_STRING_SIZE 64
+
+static const char *const message_severity_strings[MESSAGE_COUNT] = {
+        [MESSAGE_FATAL]       = "      \033[37;41mMESSAGE_FATAL\033[m",
+        [MESSAGE_ERROR]       = "      \033[31mMESSAGE_ERROR\033[m",
+        [MESSAGE_WARNING]     = "    \033[33mMESSAGE_WARNING\033[m",
+        [MESSAGE_INFORMATION] = "\033[32mMESSAGE_INFORMATION\033[m",
+        [MESSAGE_DEBUG]       = "      \033[36mMESSAGE_DEBUG\033[m",
+        [MESSAGE_VERBOSE]     = "    \033[34mMESSAGE_VERBOSE\033[m"
+};
+
+void send_message(const enum MessageSeverity message_severity, const char *const message, ...) {
+        struct timespec time_specification;
+        struct tm local_time;
+        char time_string[TIME_STRING_SIZE];
+
+#undef TIME_STRING_SIZE
+
+#if defined(__WIN32__)
+        timespec_get(&time_specification, TIME_UTC);
+        localtime_s(&local_time, &time_specification.tv_sec);
+#else
+        timespec_get(&time_specification, TIME_UTC);
+        localtime_r(&time_specification.tv_sec, &local_time);
 #endif
+
+        strftime(time_string, sizeof(time_string), "%Y-%m-%d - %I:%M:%S", &local_time);
+
+        va_list arguments;
+        va_start(arguments, message);
+
+#if defined(__WIN32__)
+        const size_t size = (size_t)_vscprintf(message, arguments) + 1ULL;
+#else
+        const size_t size = (size_t)vsnprintf(NULL, 0ULL, message, arguments) + 1ULL;
+#endif
+
+        char *const formatted_message = (char *)malloc(size);
+        ASSERT_ALL(formatted_message != NULL); // This should be fine, debug messages only get sent on debug mode
+
+        vsnprintf(formatted_message, size, message, arguments);
+
+        FILE *const stream = message_severity <= MESSAGE_ERROR ? stderr : stdout;
+        fprintf(
+                stream,
+                "%s(%s.%09ld %s): %s\n",
+                message_severity_strings[message_severity],
+                time_string,
+                time_specification.tv_nsec,
+                local_time.tm_hour >= 12 ? "PM" : "AM",
+                formatted_message
+        );
+
+        fflush(stream);
+        free(formatted_message);
+        va_end(arguments);
+}
 
 #if defined(__WIN32__)
 
