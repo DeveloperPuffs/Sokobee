@@ -1,76 +1,8 @@
 #pragma once
 
-#include <stdio.h>
-#include <stdbool.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <errno.h>
-#include <math.h>
-
-#include "Geometry.h"
-#include "Memory.h"
 #include "Debug.h"
-
-// ================================================================================================
-// File IO
-// ================================================================================================
-
-static inline char *load_text_file(const char *const path) {
-        FILE *const file = fopen(path, "rb");
-        if (file == NULL) {
-                send_message(MESSAGE_ERROR, "Failed to load text file \"%s\": %s", path, strerror(errno));
-                return NULL;
-        }
-
-        fseek(file, 0L, SEEK_END);
-        const size_t size = (size_t)ftell(file);
-        rewind(file);
-
-        char *const buffer = (char *)xmalloc(size + 1ULL);
-        if (fread(buffer, 1ULL, size, file) != size) {
-                send_message(MESSAGE_ERROR, "Failed to read text file \"%s\": %s", path, strerror(errno));
-                xfree(buffer);
-                fclose(file);
-                return NULL;
-        }
-
-        buffer[size] = '\0';
-        fclose(file);
-
-        return buffer;
-}
-
-// ================================================================================================
-// Math Helpers
-// ================================================================================================
-
-#define MINIMUM_VALUE(a, b)                  (a < b ? a : b)
-
-#define MAXIMUM_VALUE(a, b)                  (a > b ? a : b)
-
-#define CLAMP_VALUE(value, minimum, maximum) (value < minimum ? minimum : (value > maximum ? maximum : value))
-
-#define RANDOM_INTEGER(minimum, maximum)     ((size_t)minimum + (size_t)rand() % ((size_t)maximum - (size_t)minimum + 1ULL))
-
-#define RANDOM_NUMBER(minimum, maximum)      ((size_t)minimum + ((float)rand() / (float)RAND_MAX) * ((size_t)maximum - (size_t)minimum))
-
-static inline void rotate_point(float *const px, float *const py, const float ox, const float oy, const float rotation) {
-        if (rotation == 0.0f || px == NULL || py == NULL) {
-                return;
-        }
-
-        const float sin = sinf(rotation);
-        const float cos = cosf(rotation);
-        const float dx = *px - ox;
-        const float dy = *py - oy;
-        *px = ox + dx * cos - dy * sin;
-        *py = oy + dx * sin + dy * cos;
-}
-
-// ================================================================================================
-// Hexagon Orientation
-// ================================================================================================
+#include "Defines.h"
+#include "Geometry.h"
 
 enum Orientation {
         UPPER_RIGHT,
@@ -205,10 +137,6 @@ static inline bool orientation_advance(
 
         return true;
 }
-
-// ================================================================================================
-// Hexagon Grid Metrics
-// ================================================================================================
 
 struct GridMetrics {
         size_t columns;
@@ -426,50 +354,4 @@ static inline void populate_scrolling_grid_metrics(struct GridMetrics *const gri
 
         grid_metrics->grid_x = grid_metrics->bounding_x + (grid_metrics->bounding_width  - grid_metrics->grid_width)  / 2.0f;
         grid_metrics->grid_y = grid_metrics->bounding_y + (grid_metrics->bounding_height - grid_metrics->grid_height) / 2.0f;
-}
-
-// ================================================================================================
-// Extruded Hexagon Thickness
-// ================================================================================================
-
-enum HexagonThicknessMask {
-        HEXAGON_THICKNESS_MASK_NONE   = 0,
-        HEXAGON_THICKNESS_MASK_LEFT   = 1 << 0,
-        HEXAGON_THICKNESS_MASK_BOTTOM = 1 << 1,
-        HEXAGON_THICKNESS_MASK_RIGHT  = 1 << 2,
-        HEXAGON_THICKNESS_MASK_ALL    = HEXAGON_THICKNESS_MASK_LEFT | HEXAGON_THICKNESS_MASK_BOTTOM | HEXAGON_THICKNESS_MASK_RIGHT
-};
-
-static inline void write_hexagon_thickness_geometry(
-        struct Geometry *const geometry,
-        const float x, const float y,
-        const float radius,
-        const float thickness,
-        const enum HexagonThicknessMask thickness_mask
-) {
-        if (thickness_mask == HEXAGON_THICKNESS_MASK_NONE) {
-                return;
-        }
-
-        const float ax1 = x - radius,        ay1 = y;
-        const float ax2 = x - radius / 2.0f, ay2 = y + radius * sqrtf(3.0f) / 2.0f;
-        const float ax3 = x + radius / 2.0f, ay3 = y + radius * sqrtf(3.0f) / 2.0f;
-        const float ax4 = x + radius,        ay4 = y;
-
-#define THICKER thickness +
-
-        if ((thickness_mask & HEXAGON_THICKNESS_MASK_LEFT) == HEXAGON_THICKNESS_MASK_LEFT) {
-                write_quadrilateral_geometry(geometry, ax1, ay1, ax2, ay2, ax2, THICKER ay2, ax1, THICKER ay1);
-        }
-
-        if ((thickness_mask & HEXAGON_THICKNESS_MASK_BOTTOM) == HEXAGON_THICKNESS_MASK_BOTTOM) {
-                write_quadrilateral_geometry(geometry, ax2, ay2, ax3, ay3, ax3, THICKER ay3, ax2, THICKER ay2);
-        }
-
-        if ((thickness_mask & HEXAGON_THICKNESS_MASK_RIGHT) == HEXAGON_THICKNESS_MASK_RIGHT) {
-                write_quadrilateral_geometry(geometry, ax3, ay3, ax4, ay4, ax4, THICKER ay4, ax3, THICKER ay3);
-        }
-
-#undef THICKER
-
 }

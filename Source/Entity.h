@@ -3,10 +3,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "Utilities.h"
+#include "Hexagons.h"
 
 enum EntityType {
-        ENTITY_PLAYER,
+        ENTITY_PLAYER = 0,
         ENTITY_BLOCK,
         ENTITY_COUNT
 };

@@ -1,13 +1,14 @@
+#include <SDL_video.h>
 #include <time.h>
 #include <stdlib.h>
 
-#include "SDL.h"
+#include "SDL_video.h"
 
 #include "Audio.h"
 #include "Debug.h"
 #include "Cursor.h"
 #include "Layers.h"
-#include "Context.h"
+#include "Renderer.h"
 #include "Persistent.h"
 #include "Defines.h"
 #include "Memory.h"
@@ -19,6 +20,8 @@ static void initialize(void);
 static void update(const double delta_time);
 
 static void terminate(const int exit_code);
+
+static SDL_Window *window = NULL;
 
 int main(int, char *[]) {
         srand((unsigned int)time(NULL));
@@ -55,8 +58,14 @@ static void initialize(void) {
                 terminate(EXIT_FAILURE);
         }
 
-        if (!initialize_context()) {
-                send_message(MESSAGE_FATAL, "Failed to initialize program: Failed to initialize context");
+        window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+        if (window == NULL) {
+                send_message(MESSAGE_FATAL, "Failed to initalize program: Failed to open window");
+                terminate(EXIT_FAILURE);
+        }
+
+        if (!initialize_renderer(window)) {
+                send_message(MESSAGE_FATAL, "Failed to initialize program: Failed to intialize renderer");
                 terminate(EXIT_FAILURE);
         }
 
@@ -111,10 +120,6 @@ static void update(const double delta_time) {
                 }
         }
 
-        SDL_Renderer *const renderer = get_context_renderer();
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
-
         update_layers(delta_time);
         render_background_layer();
         update_scene_manager(delta_time);
@@ -126,7 +131,10 @@ static void update(const double delta_time) {
         request_cursor(CURSOR_ARROW);
         request_tooltip(false);
 
-        SDL_RenderPresent(renderer);
+        if (!renderer_render()) {
+                send_message(MESSAGE_FATAL, "Failed to render frame");
+                terminate(EXIT_FAILURE);
+        }
 
         finish_debug_frame_profiling();
 }
@@ -139,7 +147,7 @@ static void terminate(const int exit_code) {
         terminate_layers();
         terminate_cursor();
 
-        terminate_context();
+        SDL_DestroyWindow(window);
         terminate_audio();
         unload_fonts();
 

@@ -9,7 +9,6 @@
 #include "Persistent.h"
 #include "Animation.h"
 #include "Defines.h"
-#include "Context.h"
 #include "Layers.h"
 #include "Level.h"
 #include "Icons.h"
