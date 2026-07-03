@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://bmcu7h13gyer2"]
+
+[ext_resource type="Script" uid="uid://ddd3l8kcv4r43" path="res://source/menu.gd" id="1_xdvgc"]
+
+[node name="Menu" type="Node2D" unique_id=1584002619 node_paths=PackedStringArray("_play_button", "_quit_button")]
+script = ExtResource("1_xdvgc")
+_play_button = NodePath("PlayButton")
+_quit_button = NodePath("QuitButton")
+
+[node name="PlayButton" type="Button" parent="." unique_id=1369185608]
+offset_left = 503.0
+offset_top = 352.0
+offset_right = 646.0
+offset_bottom = 393.32678
+text = "Play"
+
+[node name="QuitButton" type="Button" parent="." unique_id=1988531172]
+offset_left = 504.0
+offset_top = 430.0
+offset_right = 647.0
+offset_bottom = 471.32678
+text = "Quit"

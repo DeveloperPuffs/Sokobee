@@ -1,0 +1,30 @@
+{
+	"title": "Testing",
+	"tiles": [
+		{"type": "TILE_FLOOR", "q": 0, "r": 0},
+
+		{"type": "TILE_FLOOR", "q": 1, "r": 0},
+		{"type": "TILE_FLOOR", "q": -1, "r": 0},
+		{"type": "TILE_FLOOR", "q": 0, "r": 1},
+		{"type": "TILE_FLOOR", "q": 0, "r": -1},
+		{"type": "TILE_FLOOR", "q": 1, "r": -1},
+		{"type": "TILE_FLOOR", "q": -1, "r": 1},
+
+		{"type": "TILE_FLOOR", "q": 2, "r": 0},
+		{"type": "TILE_GOAL", "q": 2, "r": -1},
+		{"type": "TILE_FLOOR", "q": 2, "r": -2},
+		{"type": "TILE_FLOOR", "q": 1, "r": 1},
+		{"type": "TILE_FLOOR", "q": 1, "r": -2},
+		{"type": "TILE_FLOOR", "q": 0, "r": 2},
+		{"type": "TILE_FLOOR", "q": 0, "r": -2},
+		{"type": "TILE_FLOOR", "q": -1, "r": 2},
+		{"type": "TILE_FLOOR", "q": -1, "r": -1},
+		{"type": "TILE_FLOOR", "q": -2, "r": 2},
+		{"type": "TILE_FLOOR", "q": -2, "r": 1},
+		{"type": "TILE_FLOOR", "q": -2, "r": 0}
+	],
+	"entities": [
+		{"type": "character", "q": 0, "r": 0, "facing": "TOP_LEFT"},
+		{"type": "block", "q": -1, "r": 1}
+	]
+}
