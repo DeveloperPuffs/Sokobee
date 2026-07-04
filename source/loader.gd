@@ -10,35 +10,28 @@ static func load_level_state(level_data_file_path: String) -> Variant:
 
 	var state := State.new()
 
-	for tile in json.data["tiles"]:
+	for tile: Dictionary in json.data["tiles"]:
 		var tile_position := Vector2i(tile["q"], tile["r"])
-		var tile_type: State.TileType = _tile_type_from_string(tile["type"])
-		state.tiles[tile_position] = tile_type
+		var goal: bool = tile.get("goal", false)
+		var height: int = tile.get("height", 0)
+		state.tiles[tile_position] = Tile.new(tile_position, goal, height)
 
 	for entity in json.data["entities"]:
 		var tile_position = Vector2i(entity["q"], entity["r"])
+		var tile := state.tiles[tile_position]
 		match entity["type"]:
 			"character":
 				var facing_direction: Hexagon.Direction = _direction_from_string(entity["facing"])
-				var character := Character.new(tile_position, facing_direction)
+				var character := Character.new(tile, facing_direction)
 				state.entities.append(character)
 				state.characters.append(character)
 			"block":
-				var block := Block.new(tile_position)
+				var block := Block.new(tile)
 				state.entities.append(block)
 
 	state.active_character = state.characters[0]
 
 	return state
-
-static func _tile_type_from_string(tile_type_string: String) -> Variant:
-	match tile_type_string:
-		"TILE_FLOOR":
-			return State.TileType.TILE_FLOOR
-		"TILE_GOAL":
-			return State.TileType.TILE_GOAL
-		_:
-			return null
 
 static func _direction_from_string(direction_string: String) -> Variant:
 	match direction_string:

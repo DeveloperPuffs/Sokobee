@@ -10,7 +10,14 @@ enum Direction {
 	TOP_RIGHT,
 }
 
-const TILE_SIZE := 32.0
+# Hexagon tiles with the flat-top orientation
+const TILE_SIZE := 128.0
+const TILE_WIDTH := 2.0 * TILE_SIZE
+const TILE_HEIGHT := sqrt(3.0) * TILE_SIZE
+const HEIGHT_OFFSET := 3.0 * TILE_SIZE / 8.0
+
+# This leaves 10 z-indices for each tile
+const Z_INDEX_SCALE := 10
 
 static func get_opposite_direction(direction: Direction) -> Direction:
 	return ((direction as int + 3) % 6) as Direction
@@ -33,10 +40,14 @@ static func get_direction_vector(direction: Direction) -> Vector2i:
 
 	return DIRECTION_VECTORS[direction as int]
 
-static func get_world_position(tile_position: Vector2i) -> Vector2:
-	var x := 1.5 * tile_position.x * TILE_SIZE
-	var y := (sqrt(3.0) / 2.0 * tile_position.x + sqrt(3.0) * tile_position.y) * TILE_SIZE
-	return Vector2(x, y)
-
 static func get_direction_rotation(direction: Direction) -> float:
 	return PI / 3.0 * (direction as int) + PI / 6.0
+
+static func get_tile_world_position(tile_position: Vector2i, tile_height: int) -> Vector2:
+	var x := 1.5 * tile_position.x * TILE_SIZE
+	var y := (sqrt(3.0) / 2.0 * tile_position.x + sqrt(3.0) * tile_position.y) * TILE_SIZE
+	y -= tile_height * HEIGHT_OFFSET
+	return Vector2(x, y)
+
+static func get_tile_z_index(tile_position: Vector2i) -> int:
+	return (tile_position.x + 2 * tile_position.y) * Z_INDEX_SCALE

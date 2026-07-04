@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://b68jrnaws4an1"]
 
 [ext_resource type="Script" uid="uid://bg0sgpjuhbi8" path="res://source/bee.gd" id="1_cncwb"]
-[ext_resource type="Texture2D" uid="uid://ke5an6udfk77" path="res://assets/sprites/character_placeholder.png" id="2_v8t8v"]
+[ext_resource type="Texture2D" uid="uid://dlhdmvgayqlam" path="res://assets/sprites/character_placeholder.svg" id="2_cncwb"]
 
 [node name="Bee" type="Node2D" unique_id=51751001]
 script = ExtResource("1_cncwb")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=650162549]
 rotation = 1.5662609
-texture = ExtResource("2_v8t8v")
+texture = ExtResource("2_cncwb")

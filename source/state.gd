@@ -1,12 +1,7 @@
 class_name State
 
 
-enum TileType {
-	TILE_FLOOR,
-	TILE_GOAL,
-}
-
-var tiles: Dictionary[Vector2i, TileType]
+var tiles: Dictionary[Vector2i, Tile]
 var entities: Array[Entity]
 
 var characters: Array[Character]

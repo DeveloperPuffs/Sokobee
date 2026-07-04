@@ -5,33 +5,42 @@ static func win_check(state: State) -> bool:
 	var block_positions: Array[Vector2i] = []
 	for entity in state.entities:
 		if is_instance_of(entity, Block):
-			block_positions.append(entity.tile_position)
+			block_positions.append(entity.current_tile.position)
 
-	for tile_position: Vector2i in state.tiles.keys():
-		var tile_type := state.tiles[tile_position]
-		if tile_type == State.TileType.TILE_GOAL:
-			if not block_positions.has(tile_position):
-				return false	
+	for tile: Tile in state.tiles.values():
+		if not tile.goal:
+			continue
+
+		if not block_positions.has(tile.position):
+			return false	
 
 	return true
 
 static func try_move_entity(state: State, entity: Entity, direction: Hexagon.Direction) -> bool:
-	var target_position := entity.tile_position + Hexagon.get_direction_vector(direction)
-	if not state.tiles.has(target_position):
+	var current_tile := entity.current_tile
+
+	var target_position := current_tile.position + Hexagon.get_direction_vector(direction)
+	var target_tile: Tile = state.tiles.get(target_position)
+	if target_tile == null:
 		return false
+
+	if entity is Block:
+		# Blocks cannot be pushed upwards
+		if target_tile.height > current_tile.height:
+			return false
 
 	for other_entity in state.entities:
 		if other_entity == entity:
 			continue
 
-		if other_entity.tile_position == target_position:
+		if other_entity.current_tile == target_tile:
 			if try_move_entity(state, other_entity, direction):
-				entity.tile_position = target_position
+				entity.current_tile = target_tile
 				return true
 			else:
 				return false
 
-	entity.tile_position = target_position
+	entity.current_tile = target_tile
 	return true
 
 static func rotate_character_left(character: Character) -> void:

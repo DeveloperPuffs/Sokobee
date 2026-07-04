@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dq7jvm0qavs3c"
-path="res://.godot/imported/block_placeholder.png-6f5553228f5b3a547e3952dbfb230896.ctex"
+uid="uid://cwf7loncp08by"
+path="res://.godot/imported/cell_goal.svg-5faa31fc7dcf0828df71adf7723c453d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/block_placeholder.png"
-dest_files=["res://.godot/imported/block_placeholder.png-6f5553228f5b3a547e3952dbfb230896.ctex"]
+source_file="res://assets/sprites/cell_goal.svg"
+dest_files=["res://.godot/imported/cell_goal.svg-5faa31fc7dcf0828df71adf7723c453d.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=0.125
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

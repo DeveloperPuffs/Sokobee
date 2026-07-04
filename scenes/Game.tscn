@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bbkp0k38byhvc" path="res://source/game.gd" id="1_78awf"]
 [ext_resource type="PackedScene" uid="uid://b68jrnaws4an1" path="res://scenes/Bee.tscn" id="2_aug50"]
 [ext_resource type="Script" uid="uid://bywmv4jan3kfq" path="res://source/honeycomb.gd" id="2_s0nni"]
+[ext_resource type="PackedScene" uid="uid://b1uvikogqsnhd" path="res://scenes/Cell.tscn" id="3_400sg"]
 [ext_resource type="Script" uid="uid://dgfix7gsximbb" path="res://source/camera.gd" id="3_aug50"]
 [ext_resource type="PackedScene" uid="uid://cmv0kkthsgbs" path="res://scenes/Honey.tscn" id="3_kiw3p"]
 [ext_resource type="Script" uid="uid://f13kh8vlymei" path="res://source/inputs.gd" id="4_kiw3p"]
@@ -15,6 +16,7 @@ _honeycomb = NodePath("Honeycomb")
 [node name="Honeycomb" type="Node2D" parent="." unique_id=1823192092 node_paths=PackedStringArray("_camera")]
 script = ExtResource("2_s0nni")
 _camera = NodePath("../Camera")
+_cell_scene = ExtResource("3_400sg")
 _bee_scene = ExtResource("2_aug50")
 _honey_scene = ExtResource("3_kiw3p")
 

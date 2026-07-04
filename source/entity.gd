@@ -1,7 +1,7 @@
 class_name Entity
 
 
-var tile_position: Vector2i
+var current_tile: Tile
 
-func _init(_tile_position: Vector2i) -> void:
-	tile_position = _tile_position
+func _init(_current_tile: Tile) -> void:
+	current_tile = _current_tile
