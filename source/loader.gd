@@ -22,7 +22,8 @@ static func load_level_state(level_data_file_path: String) -> Variant:
 		match entity["type"]:
 			"character":
 				var facing_direction: Hexagon.Direction = _direction_from_string(entity["facing"])
-				var character := Character.new(tile, facing_direction)
+				var asleep: bool = entity.get("asleep", false)
+				var character := Character.new(tile, facing_direction, asleep)
 				state.entities.append(character)
 				state.characters.append(character)
 			"block":

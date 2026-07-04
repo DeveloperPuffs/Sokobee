@@ -25,7 +25,7 @@
 	],
 	"entities": [
 		{"type": "character", "q": 0, "r": 0, "facing": "TOP_LEFT"},
-		{"type": "character", "q": 1, "r": -1, "facing": "BOTTOM_CENTER"},
+		{"type": "character", "q": 1, "r": -1, "facing": "BOTTOM_CENTER", "asleep": true},
 		{"type": "block", "q": -1, "r": 1}
 	]
 }

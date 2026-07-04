@@ -6,7 +6,7 @@ signal exited_game
 
 @export var _inputs: Inputs
 @export var _honeycomb: Honeycomb
-@export var _indicator: Sprite2D
+@export var _character_indicator: Sprite2D
 
 var _state: State
 var _history: History
@@ -34,7 +34,7 @@ func _load_level() -> void:
 
 	_history = History.new()
 	_honeycomb.load(_state)
-	_update_indicator()
+	_update_character_indicator()
 
 func _on_move_forward() -> void:
 	var snapshot := Snapshot.new(_state)
@@ -45,7 +45,7 @@ func _on_move_forward() -> void:
 			_load_level()
 		else:
 			_history.save_snapshot(snapshot)
-			_update_indicator()
+			_update_character_indicator()
 
 func _on_move_backward() -> void:
 	var snapshot := Snapshot.new(_state)
@@ -57,7 +57,7 @@ func _on_move_backward() -> void:
 			_load_level()
 		else:
 			_history.save_snapshot(snapshot)
-			_update_indicator()
+			_update_character_indicator()
 
 func _on_turn_left() -> void:
 	_history.take_snapshot(_state)
@@ -69,11 +69,11 @@ func _on_turn_right() -> void:
 
 func _on_undo_step() -> void:
 	_history.undo_snapshot(_state)
-	_update_indicator()
+	_update_character_indicator()
 
 func _on_redo_step() -> void:
 	_history.redo_snapshot(_state)
-	_update_indicator()
+	_update_character_indicator()
 
 func _on_restart_level() -> void:
 	_load_level()
@@ -91,12 +91,12 @@ func _on_click_tile() -> void:
 	for other_character in _state.characters:
 		if other_character == active_character:
 			continue
-		
+
 		if clicked_tile == other_character.current_tile:
 			var snapshot := Snapshot.new(_state)
 			if Logic.select_character(_state, other_character):
 				_history.save_snapshot(snapshot)
-				_update_indicator()
+				_update_character_indicator()
 			return
 
 func _get_clicked_tile(world_position: Vector2) -> Tile:
@@ -114,7 +114,7 @@ func _get_clicked_tile(world_position: Vector2) -> Tile:
 
 	return clicked_tile
 
-func _update_indicator() -> void:
+func _update_character_indicator() -> void:
 	var tile := _state.active_character.current_tile
-	_indicator.position = Hexagon.get_tile_world_position(tile.position, tile.height)
-	_indicator.z_index = Hexagon.get_tile_z_index(tile.position) + 1
+	_character_indicator.position = Hexagon.get_tile_world_position(tile.position, tile.height)
+	_character_indicator.z_index = Hexagon.get_tile_z_index(tile.position) + 1

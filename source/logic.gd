@@ -29,6 +29,13 @@ static func try_move_entity(state: State, entity: Entity, direction: Hexagon.Dir
 		if target_tile.height > current_tile.height:
 			return false
 
+	if entity is Character:
+		var character := entity as Character
+		if character.asleep:
+			# Sleeping characters cannot be pushed upwards
+			if target_tile.height > current_tile.height:
+				return false
+
 	for other_entity in state.entities:
 		if other_entity == entity:
 			continue
@@ -51,6 +58,9 @@ static func rotate_character_right(character: Character) -> void:
 
 static func select_character(state: State, character: Character) -> bool:
 	if character == state.active_character:
+		return false
+
+	if character.asleep:
 		return false
 
 	state.active_character = character
