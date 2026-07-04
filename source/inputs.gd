@@ -9,6 +9,7 @@ signal turned_right
 signal undid_step
 signal redid_step
 signal restarted_level
+signal clicked_tile
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("move_forward"):
@@ -25,3 +26,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		redid_step.emit()
 	elif event.is_action_pressed("restart_level"):
 		restarted_level.emit()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			clicked_tile.emit()

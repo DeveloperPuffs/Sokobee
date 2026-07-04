@@ -7,11 +7,13 @@
 [ext_resource type="Script" uid="uid://dgfix7gsximbb" path="res://source/camera.gd" id="3_aug50"]
 [ext_resource type="PackedScene" uid="uid://cmv0kkthsgbs" path="res://scenes/Honey.tscn" id="3_kiw3p"]
 [ext_resource type="Script" uid="uid://f13kh8vlymei" path="res://source/inputs.gd" id="4_kiw3p"]
+[ext_resource type="Texture2D" uid="uid://crmgacjrdnpx8" path="res://assets/sprites/indicator_placeholder.svg" id="6_400sg"]
 
-[node name="Game" type="Node2D" unique_id=1780889916 node_paths=PackedStringArray("_inputs", "_honeycomb")]
+[node name="Game" type="Node2D" unique_id=1780889916 node_paths=PackedStringArray("_inputs", "_honeycomb", "_indicator")]
 script = ExtResource("1_78awf")
 _inputs = NodePath("Inputs")
 _honeycomb = NodePath("Honeycomb")
+_indicator = NodePath("Indicator")
 
 [node name="Honeycomb" type="Node2D" parent="." unique_id=1823192092 node_paths=PackedStringArray("_camera")]
 script = ExtResource("2_s0nni")
@@ -19,6 +21,9 @@ _camera = NodePath("../Camera")
 _cell_scene = ExtResource("3_400sg")
 _bee_scene = ExtResource("2_aug50")
 _honey_scene = ExtResource("3_kiw3p")
+
+[node name="Indicator" type="Sprite2D" parent="." unique_id=735838806]
+texture = ExtResource("6_400sg")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=617214754]
 script = ExtResource("3_aug50")

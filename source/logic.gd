@@ -48,3 +48,10 @@ static func rotate_character_left(character: Character) -> void:
 
 static func rotate_character_right(character: Character) -> void:
 	character.facing_direction = Hexagon.get_direction_turned_right(character.facing_direction)
+
+static func select_character(state: State, character: Character) -> bool:
+	if character == state.active_character:
+		return false
+
+	state.active_character = character
+	return true

@@ -10,9 +10,9 @@
 		{"q": 1, "r": -1, "height": 1},
 		{"q": -1, "r": 1, "height": 1},
 
-		{"q": 2, "r": 0},
+		{"q": 2, "r": 0, "height": 2},
 		{"q": 2, "r": -1, "goal": true},
-		{"q": 2, "r": -2},
+		{"q": 2, "r": -2, "height": 1},
 		{"q": 1, "r": 1},
 		{"q": 1, "r": -2},
 		{"q": 0, "r": 2},
@@ -25,6 +25,7 @@
 	],
 	"entities": [
 		{"type": "character", "q": 0, "r": 0, "facing": "TOP_LEFT"},
+		{"type": "character", "q": 1, "r": -1, "facing": "BOTTOM_CENTER"},
 		{"type": "block", "q": -1, "r": 1}
 	]
 }

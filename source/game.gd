@@ -5,8 +5,8 @@ extends Node2D
 signal exited_game
 
 @export var _inputs: Inputs
-
 @export var _honeycomb: Honeycomb
+@export var _indicator: Sprite2D
 
 var _state: State
 var _history: History
@@ -20,6 +20,7 @@ func _ready() -> void:
 	_inputs.undid_step.connect(_on_undo_step)
 	_inputs.redid_step.connect(_on_redo_step)
 	_inputs.restarted_level.connect(_on_restart_level)
+	_inputs.clicked_tile.connect(_on_click_tile)
 
 	_current_level = 1
 	_load_level()
@@ -33,6 +34,7 @@ func _load_level() -> void:
 
 	_history = History.new()
 	_honeycomb.load(_state)
+	_update_indicator()
 
 func _on_move_forward() -> void:
 	var snapshot := Snapshot.new(_state)
@@ -43,6 +45,7 @@ func _on_move_forward() -> void:
 			_load_level()
 		else:
 			_history.save_snapshot(snapshot)
+			_update_indicator()
 
 func _on_move_backward() -> void:
 	var snapshot := Snapshot.new(_state)
@@ -54,6 +57,7 @@ func _on_move_backward() -> void:
 			_load_level()
 		else:
 			_history.save_snapshot(snapshot)
+			_update_indicator()
 
 func _on_turn_left() -> void:
 	_history.take_snapshot(_state)
@@ -65,9 +69,52 @@ func _on_turn_right() -> void:
 
 func _on_undo_step() -> void:
 	_history.undo_snapshot(_state)
+	_update_indicator()
 
 func _on_redo_step() -> void:
 	_history.redo_snapshot(_state)
+	_update_indicator()
 
 func _on_restart_level() -> void:
 	_load_level()
+
+func _on_click_tile() -> void:
+	var world_position := get_global_mouse_position()
+	var clicked_tile := _get_clicked_tile(world_position)
+	if clicked_tile == null:
+		return
+
+	var active_character := _state.active_character
+	if clicked_tile == active_character.current_tile:
+		return
+
+	for other_character in _state.characters:
+		if other_character == active_character:
+			continue
+		
+		if clicked_tile == other_character.current_tile:
+			var snapshot := Snapshot.new(_state)
+			if Logic.select_character(_state, other_character):
+				_history.save_snapshot(snapshot)
+				_update_indicator()
+			return
+
+func _get_clicked_tile(world_position: Vector2) -> Tile:
+	var clicked_tile: Tile = null
+	var clicked_z_index := 0
+
+	for tile: Tile in _state.tiles.values():
+		if not Hexagon.check_point_tile_interesection(world_position, tile.position, tile.height):
+			continue
+
+		var tile_z_index := Hexagon.get_tile_z_index(tile.position)
+		if clicked_tile == null or tile_z_index > clicked_z_index:
+			clicked_z_index = tile_z_index
+			clicked_tile = tile
+
+	return clicked_tile
+
+func _update_indicator() -> void:
+	var tile := _state.active_character.current_tile
+	_indicator.position = Hexagon.get_tile_world_position(tile.position, tile.height)
+	_indicator.z_index = Hexagon.get_tile_z_index(tile.position) + 1
