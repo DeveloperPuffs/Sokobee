@@ -14,7 +14,7 @@ enum Direction {
 const TILE_SIZE := 128.0
 const TILE_WIDTH := 2.0 * TILE_SIZE
 const TILE_HEIGHT := sqrt(3.0) * TILE_SIZE
-const HEIGHT_OFFSET := 3.0 * TILE_SIZE / 8.0
+const HEIGHT_OFFSET := TILE_SIZE / 4.0
 
 # This leaves 10 z-indices for each tile
 const Z_INDEX_SCALE := 10
