@@ -10,11 +10,20 @@ enum Direction {
 	TOP_RIGHT,
 }
 
+const _DIRECTION_VECTORS: Array[Vector2i] = [
+	Vector2i(1, 0),
+	Vector2i(0, 1),
+	Vector2i(-1, 1),
+	Vector2i(-1, 0),
+	Vector2i(0, -1),
+	Vector2i(1, -1),
+]
+
 # Hexagon tiles with the flat-top orientation
 const TILE_SIZE := 128.0
 const TILE_WIDTH := 2.0 * TILE_SIZE
 const TILE_HEIGHT := sqrt(3.0) * TILE_SIZE
-const HEIGHT_OFFSET := TILE_SIZE / 4.0
+const HEIGHT_OFFSET := TILE_SIZE / 2.0
 
 # This leaves 10 z-indices for each tile
 const Z_INDEX_SCALE := 10
@@ -29,16 +38,10 @@ static func get_direction_turned_right(direction: Direction) -> Direction:
 	return ((direction as int) + 1) % 6 as Direction
 
 static func get_direction_vector(direction: Direction) -> Vector2i:
-	const DIRECTION_VECTORS := [
-		Vector2i(1, 0),
-		Vector2i(0, 1),
-		Vector2i(-1, 1),
-		Vector2i(-1, 0),
-		Vector2i(0, -1),
-		Vector2i(1, -1),
-	]
+	return _DIRECTION_VECTORS[direction as int]
 
-	return DIRECTION_VECTORS[direction as int]
+static func is_direction_vector(vector: Vector2i) -> bool:
+	return _DIRECTION_VECTORS.has(vector)
 
 static func get_direction_rotation(direction: Direction) -> float:
 	return PI / 3.0 * (direction as int) + PI / 6.0

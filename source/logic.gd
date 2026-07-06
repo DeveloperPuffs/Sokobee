@@ -57,6 +57,18 @@ static func try_move_character(state: State, character: Character, direction: He
 
 			moving_entities[connected_entity] = target_tile
 
+			for link in connected_entity.links:
+				if link.type != Link.Type.STICKY:
+					continue
+
+				var other_entity := link.other(connected_entity)
+				if moving_entities.has(other_entity):
+					continue
+
+				var new_offset := target_position - other_entity.current_tile.position
+				if not Hexagon.is_direction_vector(new_offset):
+					queued_entities.append(other_entity)
+
 			# Search for a potential blocker that occupying the target position
 			for other_entity in state.entities:
 				if other_entity == connected_entity or moving_entities.has(other_entity):

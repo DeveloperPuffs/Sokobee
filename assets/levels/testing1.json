@@ -30,6 +30,6 @@
 		{"type": "block", "q": -1, "r": 0, "identifier": 1}
 	],
 	"links": [
-		{"type": "SOLID", "identifier_a": 0, "identifier_b": 1}
+		{"type": "STICKY", "identifier_a": 0, "identifier_b": 1}
 	]
 }
