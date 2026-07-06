@@ -16,38 +16,59 @@ static func win_check(state: State) -> bool:
 
 	return true
 
-static func try_move_entity(state: State, entity: Entity, direction: Hexagon.Direction) -> bool:
-	var current_tile := entity.current_tile
+static func try_move_character(state: State, character: Character, direction: Hexagon.Direction) -> bool:
+	var direction_vector := Hexagon.get_direction_vector(direction)
 
-	var target_position := current_tile.position + Hexagon.get_direction_vector(direction)
-	var target_tile: Tile = state.tiles.get(target_position)
-	if target_tile == null:
-		return false
+	var moving_entities: Dictionary[Entity, Tile] = {}
+	var queued_entities: Array[Entity] = []
 
-	if entity is Block:
-		# Blocks cannot be pushed upwards
-		if target_tile.height > current_tile.height:
-			return false
-
-	if entity is Character:
-		var character := entity as Character
-		if character.asleep:
-			# Sleeping characters cannot be pushed upwards
-			if target_tile.height > current_tile.height:
-				return false
-
-	for other_entity in state.entities:
-		if other_entity == entity:
+	queued_entities.append(character)
+	while not queued_entities.is_empty():
+		var entity = queued_entities.pop_back()
+		if moving_entities.has(entity):
 			continue
 
-		if other_entity.current_tile == target_tile:
-			if try_move_entity(state, other_entity, direction):
-				entity.current_tile = target_tile
-				return true
-			else:
+		var elevation = entity.get_elevation()
+
+		var cluster: Array[Entity] = []
+		if entity is Block:
+			var block := entity as Block
+			cluster.append_array(block.cluster)
+		elif entity is Character:
+			cluster.append(entity)
+
+		for connected_entity in cluster:
+			var target_position := connected_entity.current_tile.position + direction_vector
+			var target_tile: Tile = state.tiles.get(target_position)
+			if target_tile == null:
 				return false
 
-	entity.current_tile = target_tile
+			if connected_entity is Block:
+				# Blocks cannot be pushed upwards
+				if target_tile.height > elevation:
+					return false
+
+			if connected_entity is Character:
+				var connected_character := connected_entity as Character
+				if connected_character.asleep:
+					# Sleeping characters cannot be pushed upwards
+					if target_tile.height > elevation:
+						return false
+
+			moving_entities[connected_entity] = target_tile
+
+			# Search for a potential blocker that occupying the target position
+			for other_entity in state.entities:
+				if other_entity == connected_entity or moving_entities.has(other_entity):
+					continue
+
+				if other_entity.current_tile == target_tile:
+					queued_entities.append(other_entity)
+					break
+
+	for moving_entity in moving_entities:
+		moving_entity.current_tile = moving_entities[moving_entity]
+
 	return true
 
 static func rotate_character_left(character: Character) -> void:

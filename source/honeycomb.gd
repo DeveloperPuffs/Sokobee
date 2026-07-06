@@ -6,15 +6,18 @@ extends Node2D
 @export var _cell_scene: PackedScene
 @export var _bee_scene: PackedScene
 @export var _honey_scene: PackedScene
+@export var _wax_scene: PackedScene
 
 var _state: State
 var _cells: Array[Cell]
 var _entity_nodes: Array[Node2D]
+var _waxes: Array[Wax]
 
 func _ready() -> void:
 	_state = null
 	_cells = []
 	_entity_nodes = []
+	_waxes = []
 	get_tree().root.size_changed.connect(_update_camera)
 
 func load(state: State) -> void:
@@ -26,9 +29,11 @@ func load(state: State) -> void:
 		entity_node.queue_free()
 	_entity_nodes = []
 
-	_state = state
+	for wax in _waxes:
+		wax.queue_free()
+	_waxes = []
 
-	for tile: Tile in _state.tiles.values():
+	for tile: Tile in state.tiles.values():
 		var cell := _cell_scene.instantiate()
 		cell.initialize(tile)
 		_cells.append(cell)
@@ -36,16 +41,24 @@ func load(state: State) -> void:
 
 	for entity in state.entities:
 		if entity is Character:
-			var bee = _bee_scene.instantiate()
+			var bee: Bee = _bee_scene.instantiate()
 			bee.initialize(entity as Character)
 			_entity_nodes.append(bee)
 			add_child(bee)
 
 		elif entity is Block:
-			var honey = _honey_scene.instantiate()
+			var honey: Honey = _honey_scene.instantiate()
 			honey.initialize(entity as Block)
 			_entity_nodes.append(honey)
 			add_child(honey)
+	
+	for link in state.links:
+		var wax: Wax = _wax_scene.instantiate()
+		wax.initialize(link)
+		_waxes.append(wax)
+		add_child(wax)
+
+	_state = state
 
 	_update_camera()
 

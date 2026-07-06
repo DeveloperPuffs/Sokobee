@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://cmv0kkthsgbs" path="res://scenes/Honey.tscn" id="3_kiw3p"]
 [ext_resource type="Script" uid="uid://f13kh8vlymei" path="res://source/inputs.gd" id="4_kiw3p"]
 [ext_resource type="Texture2D" uid="uid://crmgacjrdnpx8" path="res://assets/sprites/character_indicator_placeholder.svg" id="6_400sg"]
+[ext_resource type="PackedScene" uid="uid://b5lf4dpr3p4fu" path="res://scenes/Wax.tscn" id="6_g4kob"]
 
 [node name="Game" type="Node2D" unique_id=1780889916 node_paths=PackedStringArray("_inputs", "_honeycomb", "_character_indicator")]
 script = ExtResource("1_78awf")
@@ -21,6 +22,7 @@ _camera = NodePath("../Camera")
 _cell_scene = ExtResource("3_400sg")
 _bee_scene = ExtResource("2_aug50")
 _honey_scene = ExtResource("3_kiw3p")
+_wax_scene = ExtResource("6_g4kob")
 
 [node name="CharacterIndicator" type="Sprite2D" parent="." unique_id=735838806]
 texture = ExtResource("6_400sg")

@@ -39,7 +39,7 @@ func _load_level() -> void:
 func _on_move_forward() -> void:
 	var snapshot := Snapshot.new(_state)
 	var facing_direction := _state.active_character.facing_direction
-	if Logic.try_move_entity(_state, _state.active_character, facing_direction):
+	if Logic.try_move_character(_state, _state.active_character, facing_direction):
 		if Logic.win_check(_state):
 			_current_level += 1
 			_load_level()
@@ -51,7 +51,7 @@ func _on_move_backward() -> void:
 	var snapshot := Snapshot.new(_state)
 	var facing_direction := _state.active_character.facing_direction
 	var opposite_direction := Hexagon.get_opposite_direction(facing_direction)
-	if Logic.try_move_entity(_state, _state.active_character, opposite_direction):
+	if Logic.try_move_character(_state, _state.active_character, opposite_direction):
 		if Logic.win_check(_state):
 			_current_level += 1
 			_load_level()

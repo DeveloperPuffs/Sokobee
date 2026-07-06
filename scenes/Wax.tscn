@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://b5lf4dpr3p4fu"]
+
+[ext_resource type="Script" uid="uid://c8aoln3clka8k" path="res://source/wax.gd" id="1_kycmt"]
+
+[node name="Wax" type="Node2D" unique_id=595472063 node_paths=PackedStringArray("_sprite")]
+script = ExtResource("1_kycmt")
+_sprite = NodePath("Sprite")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=804942916]
