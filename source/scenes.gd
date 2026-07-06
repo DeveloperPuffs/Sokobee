@@ -4,8 +4,6 @@ extends Node
 
 signal exited_application
 
-@export var scene_container: Node
-
 const MENU_SCENE := preload("res://scenes/Menu.tscn")
 const GAME_SCENE := preload("res://scenes/Game.tscn")
 
@@ -25,7 +23,7 @@ func _set_scene(scene: PackedScene) -> void:
 		active_scene.queue_free()
 
 	active_scene = scene.instantiate()
-	scene_container.add_child(active_scene)
+	add_child(active_scene)
 
 	if active_scene is Menu:
 		active_scene.play_button_pressed.connect(_set_game_scene)

@@ -9,6 +9,4 @@ scenes = NodePath("Scenes")
 
 [node name="Scenes" type="Node" parent="." unique_id=1524859352 node_paths=PackedStringArray("scene_container")]
 script = ExtResource("1_elqb8")
-scene_container = NodePath("Scene")
-
-[node name="Scene" type="Node" parent="Scenes" unique_id=1538843029]
+scene_container = NodePath("")

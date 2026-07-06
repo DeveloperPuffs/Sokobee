@@ -24,12 +24,13 @@
 		{"q": -2, "r": 0}
 	],
 	"entities": [
-		{"type": "character", "q": 0, "r": 0, "facing": "TOP_LEFT"},
+		{"type": "character", "q": 0, "r": 0, "facing": "TOP_LEFT", "identifier": 2},
 		{"type": "character", "q": 1, "r": -1, "facing": "BOTTOM_CENTER", "asleep": true},
 		{"type": "block", "q": -1, "r": 1, "identifier": 0},
 		{"type": "block", "q": -1, "r": 0, "identifier": 1}
 	],
 	"links": [
-		{"type": "STICKY", "identifier_a": 0, "identifier_b": 1}
+		{"type": "SOLID", "identifier_a": 0, "identifier_b": 1},
+		{"type": "STICKY", "identifier_a": 1, "identifier_b": 2}
 	]
 }
