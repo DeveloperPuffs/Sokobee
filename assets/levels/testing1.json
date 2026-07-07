@@ -32,5 +32,6 @@
 	"links": [
 		{"type": "SOLID", "identifier_a": 0, "identifier_b": 1},
 		{"type": "STICKY", "identifier_a": 1, "identifier_b": 2}
-	]
+	],
+	"active": 2
 }

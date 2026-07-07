@@ -2,23 +2,43 @@ class_name Cell
 extends Sprite2D
 
 
-const GOAL_TEXTURE = preload("res://assets/sprites/cell_goal.svg")
-const NORMAL_TEXTURE = preload("res://assets/sprites/cell_normal.svg")
+enum Type {
+	NORMAL,
+	GOAL,
+	PREVIEW
+}
 
-var _tile: Tile
+const NORMAL_TEXTURE := preload("res://assets/sprites/cell_normal.svg")
+const GOAL_TEXTURE := preload("res://assets/sprites/cell_goal.svg")
+const PREVIEW_TEXTURE := preload("res://assets/sprites/cell_preview.svg")
 
-func initialize(tile: Tile) -> void:
-	_tile = tile
+var _type: Type
+var _tile_position: Vector2i
+var _tile_height: int
+
+func display(type: Type, tile_position: Vector2i, tile_height: int = 0) -> void:
+	_type = type
+	_tile_position = tile_position
+	_tile_height = tile_height
 
 	var bounds := get_bounds()
 	position = bounds.get_center()
 
-	z_index = Hexagon.get_tile_z_index(tile.position)
-	texture = GOAL_TEXTURE if tile.goal else NORMAL_TEXTURE
+	z_index = Hexagon.get_tile_z_index(_tile_position)
+
+	match type:
+		Type.NORMAL:
+			texture = NORMAL_TEXTURE
+		Type.GOAL:
+			texture = GOAL_TEXTURE
+		Type.PREVIEW:
+			texture = PREVIEW_TEXTURE
+			z_index += 2 * Hexagon.Z_INDEX_SCALE + 1
 
 func get_bounds() -> Rect2:
 	const TEXTURE_SIZE = Vector2(Hexagon.TILE_WIDTH, Hexagon.TILE_SIZE * 3.0)
-	var top_left := Hexagon.get_tile_world_position(_tile.position, _tile.height)
-	top_left.x -= Hexagon.TILE_WIDTH / 2.0
-	top_left.y -= Hexagon.TILE_HEIGHT / 2.0
-	return Rect2(top_left, TEXTURE_SIZE)
+
+	var center := Hexagon.get_tile_world_position(_tile_position, _tile_height)
+	var x := center.x - Hexagon.TILE_WIDTH / 2.0
+	var y := center.y - Hexagon.TILE_HEIGHT / 2.0
+	return Rect2(Vector2(x, y), TEXTURE_SIZE)

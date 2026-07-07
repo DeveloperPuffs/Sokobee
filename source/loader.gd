@@ -62,7 +62,9 @@ static func load_level_state(level_data_file_path: String) -> Variant:
 
 	_assign_block_clusters(state)
 
-	state.active_character = state.characters[0]
+	var active_character_identifier: int = level_data.get("active", -1)
+	if active_character_identifier != -1:
+		state.active_character = identifiable_entities[active_character_identifier]
 
 	return state
 

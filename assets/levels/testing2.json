@@ -24,8 +24,9 @@
 		{"q": -2, "r": 0}
 	],
 	"entities": [
-		{"type": "character", "q": -1, "r": 1, "facing": "TOP_RIGHT"},
+		{"type": "character", "q": -1, "r": 1, "facing": "TOP_RIGHT", "identifier": 0},
 		{"type": "block", "q": 0, "r": 0}
 	],
-	"links": []
+	"links": [],
+	"active": 0
 }

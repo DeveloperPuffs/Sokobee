@@ -35,7 +35,8 @@ func load(state: State) -> void:
 
 	for tile: Tile in state.tiles.values():
 		var cell := _cell_scene.instantiate()
-		cell.initialize(tile)
+		var cell_type := Cell.Type.GOAL if tile.goal else Cell.Type.NORMAL
+		cell.display(cell_type, tile.position, tile.height)
 		_cells.append(cell)
 		add_child(cell)
 
@@ -73,4 +74,7 @@ func _update_camera() -> void:
 		var cell_bounds := cell.get_bounds()
 		grid_bounds = grid_bounds.merge(cell_bounds)
 
-	_camera.frame(grid_bounds, 1.25)
+	frame_bounds(grid_bounds)
+
+func frame_bounds(bounds: Rect2) -> void:
+	_camera.frame(bounds, 1.25)
