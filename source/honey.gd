@@ -1,5 +1,5 @@
 class_name Honey
-extends Node2D
+extends Sprite2D
 
 
 var _block: Block

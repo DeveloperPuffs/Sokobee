@@ -3,16 +3,12 @@
 [ext_resource type="Script" uid="uid://bbkp0k38byhvc" path="res://source/game.gd" id="1_78awf"]
 [ext_resource type="PackedScene" uid="uid://dqj3nmogbiner" path="res://scenes/Honeycomb.tscn" id="4_78awf"]
 [ext_resource type="Script" uid="uid://f13kh8vlymei" path="res://source/inputs.gd" id="4_kiw3p"]
-[ext_resource type="Texture2D" uid="uid://crmgacjrdnpx8" path="res://assets/sprites/character_indicator_placeholder.svg" id="6_400sg"]
 
 [node name="Game" type="Node2D" unique_id=1780889916 node_paths=PackedStringArray("_inputs", "_honeycomb", "_character_indicator")]
 script = ExtResource("1_78awf")
 _inputs = NodePath("Inputs")
 _honeycomb = NodePath("Honeycomb")
-_character_indicator = NodePath("CharacterIndicator")
-
-[node name="CharacterIndicator" type="Sprite2D" parent="." unique_id=735838806]
-texture = ExtResource("6_400sg")
+_character_indicator = NodePath("")
 
 [node name="Inputs" type="Node" parent="." unique_id=454891763]
 script = ExtResource("4_kiw3p")

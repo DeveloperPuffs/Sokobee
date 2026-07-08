@@ -4,13 +4,10 @@
 [ext_resource type="Texture2D" uid="uid://6i7d4viq873v" path="res://assets/sprites/character_placeholder.svg" id="2_cncwb"]
 [ext_resource type="Texture2D" uid="uid://etinujhfeptf" path="res://assets/sprites/sleeping_indicator_placeholder.svg" id="3_ghu41"]
 
-[node name="Bee" type="Node2D" unique_id=51751001 node_paths=PackedStringArray("_sprite", "_sleeping_indicator")]
-script = ExtResource("1_cncwb")
-_sprite = NodePath("Sprite")
-_sleeping_indicator = NodePath("SleepingIndicator")
-
-[node name="Sprite" type="Sprite2D" parent="." unique_id=650162549]
+[node name="Bee" type="Sprite2D" unique_id=639480441 node_paths=PackedStringArray("_sleeping_indicator")]
 texture = ExtResource("2_cncwb")
+script = ExtResource("1_cncwb")
+_sleeping_indicator = NodePath("SleepingIndicator")
 
 [node name="SleepingIndicator" type="Sprite2D" parent="." unique_id=39220428]
 visible = false

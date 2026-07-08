@@ -7,6 +7,7 @@ extends Node2D
 @export var _bee_scene: PackedScene
 @export var _honey_scene: PackedScene
 @export var _wax_scene: PackedScene
+@export var _character_indicator: Sprite2D
 
 var _state: State
 var _cells: Array[Cell]
@@ -19,6 +20,12 @@ func _ready() -> void:
 	_entity_nodes = []
 	_waxes = []
 	get_tree().root.size_changed.connect(_update_camera)
+
+func _process(_delta: float) -> void:
+	if _state.active_character != null:
+		var tile := _state.active_character.current_tile
+		_character_indicator.position = Hexagon.get_tile_world_position(tile.position, tile.height)
+		_character_indicator.z_index = Hexagon.get_tile_z_index(tile.position) + 1
 
 func load(state: State) -> void:
 	for cell in _cells:

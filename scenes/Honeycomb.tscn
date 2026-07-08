@@ -6,15 +6,20 @@
 [ext_resource type="PackedScene" uid="uid://b68jrnaws4an1" path="res://scenes/Bee.tscn" id="3_y5jdm"]
 [ext_resource type="PackedScene" uid="uid://cmv0kkthsgbs" path="res://scenes/Honey.tscn" id="4_slnha"]
 [ext_resource type="PackedScene" uid="uid://b5lf4dpr3p4fu" path="res://scenes/Wax.tscn" id="5_d8yle"]
+[ext_resource type="Texture2D" uid="uid://crmgacjrdnpx8" path="res://assets/sprites/character_indicator_placeholder.svg" id="7_y5jdm"]
 
-[node name="Honeycomb" type="Node2D" unique_id=1696604743 node_paths=PackedStringArray("_camera")]
+[node name="Honeycomb" type="Node2D" unique_id=1696604743 node_paths=PackedStringArray("_camera", "_character_indicator")]
 script = ExtResource("1_db0fd")
 _camera = NodePath("Camera")
 _cell_scene = ExtResource("2_8gk6n")
 _bee_scene = ExtResource("3_y5jdm")
 _honey_scene = ExtResource("4_slnha")
 _wax_scene = ExtResource("5_d8yle")
+_character_indicator = NodePath("CharacterIndicator")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=1794257236]
 script = ExtResource("2_sf5cg")
 metadata/_custom_type_script = "uid://dgfix7gsximbb"
+
+[node name="CharacterIndicator" type="Sprite2D" parent="." unique_id=1123606768]
+texture = ExtResource("7_y5jdm")

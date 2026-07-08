@@ -4,11 +4,13 @@
 [ext_resource type="PackedScene" uid="uid://dqj3nmogbiner" path="res://scenes/Honeycomb.tscn" id="1_ndpqs"]
 [ext_resource type="PackedScene" uid="uid://b1uvikogqsnhd" path="res://scenes/Cell.tscn" id="2_diyc1"]
 [ext_resource type="Script" uid="uid://x1npinwlthpq" path="res://source/axes.gd" id="2_wmxca"]
+[ext_resource type="Texture2D" uid="uid://bd6h1rc5geql8" path="res://assets/sprites/entity_selected.svg" id="4_j6dse"]
 
-[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_preview_cell", "_selected_cell", "_honeycomb", "_tools_dropdown")]
+[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_tile_preview", "_selected_tile_indicator", "_selected_entity_indicator", "_honeycomb", "_tools_dropdown")]
 script = ExtResource("1_3kl07")
-_preview_cell = NodePath("PreviewCell")
-_selected_cell = NodePath("SelectedCell")
+_tile_preview = NodePath("TilePreview")
+_selected_tile_indicator = NodePath("SelectedTileIndicator")
+_selected_entity_indicator = NodePath("SelectedEntityIndicator")
 _honeycomb = NodePath("Honeycomb")
 _tools_dropdown = NodePath("CanvasLayer/Tools")
 
@@ -23,8 +25,11 @@ offset_bottom = 76.0
 [node name="Axes" type="Node2D" parent="CanvasLayer" unique_id=771309044]
 script = ExtResource("2_wmxca")
 
-[node name="PreviewCell" parent="." unique_id=2068236679 instance=ExtResource("2_diyc1")]
+[node name="TilePreview" parent="." unique_id=2068236679 instance=ExtResource("2_diyc1")]
 
-[node name="SelectedCell" parent="." unique_id=1125067505 instance=ExtResource("2_diyc1")]
+[node name="SelectedTileIndicator" parent="." unique_id=1125067505 instance=ExtResource("2_diyc1")]
+
+[node name="SelectedEntityIndicator" type="Sprite2D" parent="." unique_id=433511809]
+texture = ExtResource("4_j6dse")
 
 [node name="Honeycomb" parent="." unique_id=1696604743 instance=ExtResource("1_ndpqs")]

@@ -3,8 +3,6 @@
 [ext_resource type="Script" uid="uid://vp8ad5qystq8" path="res://source/honey.gd" id="1_24mbs"]
 [ext_resource type="Texture2D" uid="uid://d2wuc85eb88lc" path="res://assets/sprites/block_placeholder.svg" id="2_24mbs"]
 
-[node name="Honey" type="Node2D" unique_id=1527649317]
-script = ExtResource("1_24mbs")
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=369368355]
+[node name="Honey" type="Sprite2D" unique_id=52704376]
 texture = ExtResource("2_24mbs")
+script = ExtResource("1_24mbs")
