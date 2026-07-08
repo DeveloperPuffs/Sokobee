@@ -80,7 +80,7 @@ func _on_restart_level() -> void:
 
 func _on_click_tile() -> void:
 	var world_position := get_global_mouse_position()
-	var clicked_tile := _get_clicked_tile(world_position)
+	var clicked_tile := _honeycomb.get_tile_at(world_position)
 	if clicked_tile == null:
 		return
 
@@ -98,21 +98,6 @@ func _on_click_tile() -> void:
 				_history.save_snapshot(snapshot)
 				_update_character_indicator()
 			return
-
-func _get_clicked_tile(world_position: Vector2) -> Tile:
-	var clicked_tile: Tile = null
-	var clicked_z_index := 0
-
-	for tile: Tile in _state.tiles.values():
-		if not Hexagon.check_point_tile_interesection(world_position, tile.position, tile.height):
-			continue
-
-		var tile_z_index := Hexagon.get_tile_z_index(tile.position)
-		if clicked_tile == null or tile_z_index > clicked_z_index:
-			clicked_z_index = tile_z_index
-			clicked_tile = tile
-
-	return clicked_tile
 
 func _update_character_indicator() -> void:
 	var tile := _state.active_character.current_tile

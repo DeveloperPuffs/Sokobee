@@ -63,6 +63,21 @@ func load(state: State) -> void:
 
 	_update_camera()
 
+func get_tile_at(world_position: Vector2) -> Tile:
+	var frontmost_tile: Tile = null
+	var frontmost_z_index := 0
+
+	for tile: Tile in _state.tiles.values():
+		if not Hexagon.check_point_tile_interesection(world_position, tile.position, tile.height):
+			continue
+
+		var tile_z_index := Hexagon.get_tile_z_index(tile.position)
+		if frontmost_tile == null or tile_z_index > frontmost_z_index:
+			frontmost_z_index = tile_z_index
+			frontmost_tile = tile
+
+	return frontmost_tile
+
 func _update_camera() -> void:
 	if _cells.is_empty():
 		return
@@ -74,7 +89,4 @@ func _update_camera() -> void:
 		var cell_bounds := cell.get_bounds()
 		grid_bounds = grid_bounds.merge(cell_bounds)
 
-	frame_bounds(grid_bounds)
-
-func frame_bounds(bounds: Rect2) -> void:
-	_camera.frame(bounds, 1.25)
+	_camera.frame(grid_bounds, 1.25)

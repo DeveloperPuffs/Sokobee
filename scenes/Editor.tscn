@@ -3,10 +3,12 @@
 [ext_resource type="Script" uid="uid://cahua606tisn8" path="res://source/editor.gd" id="1_3kl07"]
 [ext_resource type="PackedScene" uid="uid://dqj3nmogbiner" path="res://scenes/Honeycomb.tscn" id="1_ndpqs"]
 [ext_resource type="PackedScene" uid="uid://b1uvikogqsnhd" path="res://scenes/Cell.tscn" id="2_diyc1"]
+[ext_resource type="Script" uid="uid://x1npinwlthpq" path="res://source/axes.gd" id="2_wmxca"]
 
-[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_preview_cell", "_honeycomb", "_tools_dropdown")]
+[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_preview_cell", "_selected_cell", "_honeycomb", "_tools_dropdown")]
 script = ExtResource("1_3kl07")
 _preview_cell = NodePath("PreviewCell")
+_selected_cell = NodePath("SelectedCell")
 _honeycomb = NodePath("Honeycomb")
 _tools_dropdown = NodePath("CanvasLayer/Tools")
 
@@ -18,6 +20,11 @@ offset_top = 19.0
 offset_right = 204.0
 offset_bottom = 76.0
 
+[node name="Axes" type="Node2D" parent="CanvasLayer" unique_id=771309044]
+script = ExtResource("2_wmxca")
+
 [node name="PreviewCell" parent="." unique_id=2068236679 instance=ExtResource("2_diyc1")]
+
+[node name="SelectedCell" parent="." unique_id=1125067505 instance=ExtResource("2_diyc1")]
 
 [node name="Honeycomb" parent="." unique_id=1696604743 instance=ExtResource("1_ndpqs")]

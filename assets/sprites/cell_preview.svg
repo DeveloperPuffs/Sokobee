@@ -43,7 +43,7 @@
      id="layer1">
     <path
        sodipodi:type="star"
-       style="fill:#ffffff;fill-opacity:0.13;stroke:#ffffff;stroke-width:61.92161541;stroke-dasharray:none;stroke-opacity:0.60000002"
+       style="fill:none;fill-opacity:0.13;stroke:#00d7ff;stroke-width:30.0926;stroke-dasharray:none;stroke-opacity:0.870588"
        id="path1"
        inkscape:flatsided="true"
        sodipodi:sides="6"
@@ -56,6 +56,6 @@
        inkscape:rounded="0.062"
        inkscape:randomized="0"
        d="m 436.76728,136.31593 c 25.35475,14.31595 238.42845,375.32539 238.70785,404.44123 0.2794,29.11584 -205.8271,394.14779 -230.90246,408.94768 -25.07535,14.79989 -444.25554612,18.8224 -469.610302,4.50645 C -50.392388,939.89534 -263.46608,578.8859 -263.74548,549.77006 -264.02488,520.65422 -57.918385,155.62227 -32.843029,140.82238 -7.7676725,126.02249 411.41252,121.99998 436.76728,136.31593 Z"
-       transform="matrix(2.0536078,0,0,2.0807403,605.21591,-200.70335)" />
+       transform="matrix(2.1128333,0,0,2.1407894,589.04295,-240.56615)" />
   </g>
 </svg>

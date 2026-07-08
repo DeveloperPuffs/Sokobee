@@ -10,7 +10,7 @@
 		{"q": 1, "r": -1},
 		{"q": -1, "r": 1, "height": 1},
 
-		{"q": 2, "r": 0, "height": 2},
+		{"q": 2, "r": 0, "height": 1},
 		{"q": 2, "r": -1, "goal": true},
 		{"q": 2, "r": -2, "height": 1},
 		{"q": 1, "r": 1},
@@ -25,6 +25,7 @@
 	],
 	"entities": [
 		{"type": "character", "q": 0, "r": 0, "facing": "TOP_LEFT", "identifier": 2},
+		{"type": "character", "q": -2, "r": 0, "facing": "TOP_CENTER"},
 		{"type": "character", "q": 1, "r": -1, "facing": "BOTTOM_CENTER", "asleep": true},
 		{"type": "block", "q": -1, "r": 1, "identifier": 0},
 		{"type": "block", "q": -1, "r": 0, "identifier": 1}
