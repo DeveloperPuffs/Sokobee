@@ -6,9 +6,9 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	const _Q_AXIS_COLOR := Color(0.9, 0.35, 0.35)
-	const _R_AXIS_COLOR := Color(0.4, 0.85, 0.45)
-	const _S_AXIS_COLOR := Color(0.4, 0.55, 0.95)
+	const _Q_AXIS_COLOR := Color(0.9, 0.35, 0.35, 0.6)
+	const _R_AXIS_COLOR := Color(0.4, 0.85, 0.45, 0.6)
+	const _S_AXIS_COLOR := Color(0.4, 0.55, 0.95, 0.6)
 
 	var canvas_transform := get_viewport().get_canvas_transform()
 	var center := canvas_transform * Vector2.ZERO
