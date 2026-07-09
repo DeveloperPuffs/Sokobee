@@ -1,11 +1,6 @@
 [gd_scene format=3 uid="uid://drai4rbni5lie"]
 
-[ext_resource type="Script" uid="uid://duhlcc7bl0x8o" path="res://source/scenes.gd" id="1_elqb8"]
 [ext_resource type="Script" uid="uid://b0ausvqps25t0" path="res://source/main.gd" id="1_rvslj"]
 
-[node name="Main" type="Node2D" unique_id=110388656 node_paths=PackedStringArray("scenes")]
+[node name="Main" type="Node2D" unique_id=110388656]
 script = ExtResource("1_rvslj")
-scenes = NodePath("Scenes")
-
-[node name="Scenes" type="Node" parent="." unique_id=1524859352]
-script = ExtResource("1_elqb8")
