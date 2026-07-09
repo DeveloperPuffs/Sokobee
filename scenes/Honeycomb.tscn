@@ -22,4 +22,5 @@ script = ExtResource("2_sf5cg")
 metadata/_custom_type_script = "uid://dgfix7gsximbb"
 
 [node name="CharacterIndicator" type="Sprite2D" parent="." unique_id=1123606768]
+visible = false
 texture = ExtResource("7_y5jdm")

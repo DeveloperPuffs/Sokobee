@@ -4,13 +4,17 @@
 [ext_resource type="PackedScene" uid="uid://dqj3nmogbiner" path="res://scenes/Honeycomb.tscn" id="1_ndpqs"]
 [ext_resource type="PackedScene" uid="uid://b1uvikogqsnhd" path="res://scenes/Cell.tscn" id="2_diyc1"]
 [ext_resource type="Script" uid="uid://x1npinwlthpq" path="res://source/axes.gd" id="2_wmxca"]
+[ext_resource type="Texture2D" uid="uid://d1c1veter3vl1" path="res://assets/sprites/entity_selectable.svg" id="4_6tdr8"]
 [ext_resource type="Texture2D" uid="uid://crxl1uspui0ws" path="res://assets/sprites/entity_selected.svg" id="4_j6dse"]
+[ext_resource type="Texture2D" uid="uid://ccb2348tvo6mu" path="res://assets/sprites/link_selected.svg" id="5_wa12f"]
 
-[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_tile_preview", "_selected_tile_indicator", "_selected_entity_indicator", "_honeycomb", "_tools_dropdown")]
+[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_selectable_tile_indicator", "_selected_tile_indicator", "_selected_entity_indicator", "_selectable_entity_indicator", "_selected_link_indicator", "_honeycomb", "_tools_dropdown")]
 script = ExtResource("1_3kl07")
-_tile_preview = NodePath("TilePreview")
+_selectable_tile_indicator = NodePath("SelectableTileIndicator")
 _selected_tile_indicator = NodePath("SelectedTileIndicator")
 _selected_entity_indicator = NodePath("SelectedEntityIndicator")
+_selectable_entity_indicator = NodePath("SelectableEntityIndicator")
+_selected_link_indicator = NodePath("SelectedLinkIndicator")
 _honeycomb = NodePath("Honeycomb")
 _tools_dropdown = NodePath("CanvasLayer/Tools")
 
@@ -25,11 +29,22 @@ offset_bottom = 76.0
 [node name="Axes" type="Node2D" parent="CanvasLayer" unique_id=771309044]
 script = ExtResource("2_wmxca")
 
-[node name="TilePreview" parent="." unique_id=2068236679 instance=ExtResource("2_diyc1")]
+[node name="SelectableTileIndicator" parent="." unique_id=2068236679 instance=ExtResource("2_diyc1")]
+visible = false
 
 [node name="SelectedTileIndicator" parent="." unique_id=1125067505 instance=ExtResource("2_diyc1")]
+visible = false
+
+[node name="SelectableEntityIndicator" type="Sprite2D" parent="." unique_id=1627716421]
+visible = false
+texture = ExtResource("4_6tdr8")
 
 [node name="SelectedEntityIndicator" type="Sprite2D" parent="." unique_id=433511809]
+visible = false
 texture = ExtResource("4_j6dse")
+
+[node name="SelectedLinkIndicator" type="Sprite2D" parent="." unique_id=2143323386]
+visible = false
+texture = ExtResource("5_wa12f")
 
 [node name="Honeycomb" parent="." unique_id=1696604743 instance=ExtResource("1_ndpqs")]

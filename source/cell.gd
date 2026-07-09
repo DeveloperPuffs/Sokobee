@@ -5,13 +5,13 @@ extends Sprite2D
 enum Type {
 	NORMAL,
 	GOAL,
-	PREVIEW,
+	SELECTABLE,
 	SELECTED,
 }
 
 const NORMAL_TEXTURE := preload("res://assets/sprites/cell_normal.svg")
 const GOAL_TEXTURE := preload("res://assets/sprites/cell_goal.svg")
-const PREVIEW_TEXTURE := preload("res://assets/sprites/cell_preview.svg")
+const SELECTABLE_TEXTURE := preload("res://assets/sprites/cell_selectable.svg")
 const SELECTED_TEXTURE := preload("res://assets/sprites/cell_selected.svg")
 
 var _type: Type
@@ -33,8 +33,8 @@ func display(type: Type, tile_position: Vector2i, tile_height: int = 0) -> void:
 			texture = NORMAL_TEXTURE
 		Type.GOAL:
 			texture = GOAL_TEXTURE
-		Type.PREVIEW:
-			texture = PREVIEW_TEXTURE
+		Type.SELECTABLE:
+			texture = SELECTABLE_TEXTURE
 			z_index += 2 * Hexagon.Z_INDEX_SCALE + 2
 		Type.SELECTED:
 			texture = SELECTED_TEXTURE

@@ -60,39 +60,13 @@ static func load_level_state(level_data_file_path: String) -> Variant:
 		entity_a.links.append(link)
 		entity_b.links.append(link)
 
-	_assign_block_clusters(state)
+	state.assign_block_clusters()
 
 	var active_character_identifier: int = level_data.get("active", -1)
 	if active_character_identifier != -1:
 		state.active_character = identifiable_entities[active_character_identifier]
 
 	return state
-
-static func _assign_block_clusters(state: State) -> void:
-	for entity in state.entities:
-		if not (entity is Block):
-			continue
-
-		var block := entity as Block
-		if not block.cluster.is_empty():
-			continue
-
-		var cluster: Array[Block] = []
-		var queue: Array[Block] = [block]
-
-		while not queue.is_empty():
-			var current: Block = queue.pop_back()
-			if cluster.has(current):
-				continue
-
-			cluster.append(current)
-
-			for link in current.links:
-				if link.type == Link.Type.SOLID:
-					queue.push_back(link.other(current) as Block)
-
-		for member in cluster:
-			member.cluster = cluster
 
 static func _direction_from_string(direction_string: String) -> Variant:
 	match direction_string:
