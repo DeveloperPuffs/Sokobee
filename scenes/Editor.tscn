@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dqj3nmogbiner" path="res://scenes/Honeycomb.tscn" id="1_ndpqs"]
 [ext_resource type="PackedScene" uid="uid://b1uvikogqsnhd" path="res://scenes/Cell.tscn" id="2_diyc1"]
 [ext_resource type="Script" uid="uid://x1npinwlthpq" path="res://source/axes.gd" id="2_wmxca"]
-[ext_resource type="Texture2D" uid="uid://bd6h1rc5geql8" path="res://assets/sprites/entity_selected.svg" id="4_j6dse"]
+[ext_resource type="Texture2D" uid="uid://crxl1uspui0ws" path="res://assets/sprites/entity_selected.svg" id="4_j6dse"]
 
 [node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_tile_preview", "_selected_tile_indicator", "_selected_entity_indicator", "_honeycomb", "_tools_dropdown")]
 script = ExtResource("1_3kl07")

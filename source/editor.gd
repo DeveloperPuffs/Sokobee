@@ -238,10 +238,10 @@ func _remove_tile(world_position: Vector2) -> void:
 		_set_selected_tile(null)
 
 	var entity := _get_entity_at(tile_position)
-	if entity != null:
-		_state.entities.erase(entity)
-		if entity is Character:
-			_state.characters.erase(entity)
+	if entity is Character:
+		_remove_character(world_position)
+	elif entity is Block:
+		_remove_block(world_position)
 
 	_state.tiles.erase(tile_position)
 	_honeycomb.load(_state)
@@ -278,6 +278,9 @@ func _remove_character(world_position: Vector2) -> void:
 	var character := entity as Character
 	if character == _selected_entity:
 		_set_selected_entity(null)
+
+	if character == _state.active_character:
+		_state.active_character = null
 
 	_state.entities.erase(character)
 	_state.characters.erase(character)

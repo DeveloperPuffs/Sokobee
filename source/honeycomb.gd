@@ -22,10 +22,7 @@ func _ready() -> void:
 	get_tree().root.size_changed.connect(_update_camera)
 
 func _process(_delta: float) -> void:
-	if _state.active_character != null:
-		var tile := _state.active_character.current_tile
-		_character_indicator.position = Hexagon.get_tile_world_position(tile.position, tile.height)
-		_character_indicator.z_index = Hexagon.get_tile_z_index(tile.position) + 1
+	_update_character_indicator()
 
 func load(state: State) -> void:
 	for cell in _cells:
@@ -84,6 +81,16 @@ func get_tile_at(world_position: Vector2) -> Tile:
 			frontmost_tile = tile
 
 	return frontmost_tile
+
+func _update_character_indicator() -> void:
+	if _state.active_character == null:
+		_character_indicator.visible = false
+		return
+	
+	var tile := _state.active_character.current_tile
+	_character_indicator.position = Hexagon.get_tile_world_position(tile.position, tile.height)
+	_character_indicator.z_index = Hexagon.get_tile_z_index(tile.position) + 1
+	_character_indicator.visible = true
 
 func _update_camera() -> void:
 	if _cells.is_empty():
