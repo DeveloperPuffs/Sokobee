@@ -6,16 +6,16 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	const _Q_AXIS_COLOR := Color(0.9, 0.35, 0.35, 0.6)
-	const _R_AXIS_COLOR := Color(0.4, 0.85, 0.45, 0.6)
-	const _S_AXIS_COLOR := Color(0.4, 0.55, 0.95, 0.6)
+	const Q_AXIS_COLOR := Color(0.9, 0.35, 0.35, 0.6)
+	const R_AXIS_COLOR := Color(0.4, 0.85, 0.45, 0.6)
+	const S_AXIS_COLOR := Color(0.4, 0.55, 0.95, 0.6)
 
 	var canvas_transform := get_viewport().get_canvas_transform()
 	var center := canvas_transform * Vector2.ZERO
 
-	_draw_axis(canvas_transform, center, Hexagon.Direction.BOTTOM_RIGHT, _Q_AXIS_COLOR)
-	_draw_axis(canvas_transform, center, Hexagon.Direction.BOTTOM_CENTER, _R_AXIS_COLOR)
-	_draw_axis(canvas_transform, center, Hexagon.Direction.TOP_RIGHT, _S_AXIS_COLOR)
+	_draw_axis(canvas_transform, center, Hexagon.Direction.BOTTOM_RIGHT, Q_AXIS_COLOR)
+	_draw_axis(canvas_transform, center, Hexagon.Direction.BOTTOM_CENTER, R_AXIS_COLOR)
+	_draw_axis(canvas_transform, center, Hexagon.Direction.TOP_RIGHT, S_AXIS_COLOR)
 
 func _draw_axis(canvas_transform: Transform2D, center: Vector2, direction: Hexagon.Direction, color: Color) -> void:
 	const _AXIS_WIDTH := 3.0
