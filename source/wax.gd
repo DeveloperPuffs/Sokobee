@@ -8,6 +8,20 @@ const STICKY_TEXTURE = preload("res://assets/sprites/link_sticky_placeholder.svg
 var _link: Link
 
 func _process(_delta: float) -> void:
+	_refresh()
+
+func initialize(link: Link) -> void:
+	_link = link
+
+	match link.type:
+		Link.Type.SOLID:
+			texture = SOLID_TEXTURE
+		Link.Type.STICKY:
+			texture = STICKY_TEXTURE
+
+	_refresh()
+
+func _refresh() -> void:
 	var entity_a := _link.entity_a
 	var entity_b := _link.entity_b
 
@@ -28,12 +42,3 @@ func _process(_delta: float) -> void:
 	var z_index_a = Hexagon.get_tile_z_index(tile_position_a)
 	var z_index_b = Hexagon.get_tile_z_index(tile_position_b)
 	z_index = max(z_index_a, z_index_b) + 3
-
-func initialize(link: Link) -> void:
-	_link = link
-
-	match link.type:
-		Link.Type.SOLID:
-			texture = SOLID_TEXTURE
-		Link.Type.STICKY:
-			texture = STICKY_TEXTURE

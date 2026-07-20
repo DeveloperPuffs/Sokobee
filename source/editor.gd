@@ -7,8 +7,8 @@ extends Node2D
 Editor Controls
 
 Tile Tool:
-Left Click (and Drag) to Place Tiles
-Right Click (and Drag) to Remove Tiles
+Left Click to Place Tile
+Right Click to Remove Tile
 	[G] Toggle Tile 'goal' Property
 	[+] Increase Tile Height
 	[-] Decrease Tile Height
@@ -48,11 +48,9 @@ enum Tool {
 
 var _state: State
 var _selected_tool: Tool
-var _selected_tile: Tile
-var _selected_entity: Entity
-var _selected_link: Link
-
-var _place_tile_drag_button: MouseButton = MOUSE_BUTTON_NONE
+var _selected_element: Variant = null # Tile, Entity, Link, or null
+var _clusters_are_dirty: bool = false
+var _honeycomb_is_dirty: bool = false
 
 func _ready() -> void:
 	_state = Loader.load_level_state("res://assets/levels/default.json")
@@ -72,151 +70,201 @@ func _ready() -> void:
 
 	_on_tool_option_item_selected(Tool.TILE as int)
 
+func _process(_delta: float) -> void:
+	if _clusters_are_dirty:
+		_state.assign_block_clusters()
+		_clusters_are_dirty = false
+
+	if _honeycomb_is_dirty:
+		_honeycomb.load(_state)
+		_honeycomb_is_dirty = false
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
-		var world_position := get_global_mouse_position()
-
-		if _place_tile_drag_button == MOUSE_BUTTON_LEFT:
-			_place_tile(world_position)
-		elif _place_tile_drag_button == MOUSE_BUTTON_RIGHT:
-			_remove_tile(world_position)
-
 		_refresh_selectable_indicator()
-		return
 
-	if event is InputEventMouseButton and not event.is_pressed():
-		if event.button_index == _place_tile_drag_button:
-			_place_tile_drag_button = MOUSE_BUTTON_NONE
-		return
-
-	if not event.is_pressed():
-		return
-
-	if event is InputEventMouseButton:
-		var world_position := get_global_mouse_position()
+	if event is InputEventMouseButton and event.is_pressed():
 		var input_event := event as InputEventMouseButton
-		var mouse_button := input_event.button_index
+		_handle_mouse_click(input_event.button_index)
 
-		match _selected_tool:
-			Tool.TILE:
-				if mouse_button == MOUSE_BUTTON_LEFT:
-					_place_tile_drag_button = mouse_button
-					_place_tile(world_position)
-				elif mouse_button == MOUSE_BUTTON_RIGHT:
-					_place_tile_drag_button = mouse_button
-					_remove_tile(world_position)
-
-			Tool.CHARACTER:
-				if mouse_button == MOUSE_BUTTON_LEFT:
-					_place_character(world_position)
-				elif mouse_button == MOUSE_BUTTON_RIGHT:
-					_remove_character(world_position)
-
-			Tool.BLOCK:
-				if mouse_button == MOUSE_BUTTON_LEFT:
-					_place_block(world_position)
-				elif mouse_button == MOUSE_BUTTON_RIGHT:
-					_remove_block(world_position)
-
-			Tool.LINK:
-				_on_link_tool_use(world_position, mouse_button)
-
-	elif event is InputEventKey and not event.is_echo():
+	elif event is InputEventKey and event.is_pressed() and not event.is_echo():
 		var input_key_event := event as InputEventKey
-		var key := input_key_event.keycode
+		_handle_key_press(input_key_event.keycode)
 
-		if _selected_tile != null:
-			_handle_tile_keybinds(_selected_tile, key)
+func _handle_mouse_click(mouse_button: MouseButton) -> void:
+	var world_position := get_global_mouse_position()
+	var tile_position := _get_tile_position_at(world_position)
+	var tile: Tile = _state.tiles.get(tile_position)
 
-		elif _selected_entity is Character:
-			var selected_character := _selected_entity as Character
-			_handle_character_keybinds(selected_character, key)
+	if _selected_tool == Tool.TILE:
+		if mouse_button == MOUSE_BUTTON_LEFT:
+			if tile == null:
+				tile = Tile.new(tile_position, false, 0)
+				_state.tiles[tile_position] = tile
+				_honeycomb_is_dirty = true
 
-		elif _selected_entity is Block:
-			var selected_block := _selected_entity as Block
-			_handle_block_keybinds(selected_block, key)
+			_set_selected_element(tile)
 
-		elif _selected_link != null:
-			_handle_link_keybinds(_selected_link, key)
+		elif mouse_button == MOUSE_BUTTON_RIGHT and tile != null:
+			_remove_tile(tile)
 
-func _handle_tile_keybinds(tile: Tile, key: Key) -> void:
-	match key:
-		KEY_G:
-			tile.goal = not tile.goal
-			_honeycomb.load(_state)
+		return
 
-		KEY_PLUS, KEY_EQUAL:
-			tile.height = min(max(tile.height + 1, -1), 1)
-			_honeycomb.load(_state)
-			_set_selected_tile(tile)
-			_refresh_selectable_indicator()
+	var entity := _get_entity_at(tile_position)
 
-		KEY_MINUS, KEY_UNDERSCORE:
-			tile.height = min(max(tile.height - 1, -1), 1)
-			_honeycomb.load(_state)
-			_set_selected_tile(tile)
-			_refresh_selectable_indicator()
+	if _selected_tool == Tool.LINK:
+		if entity == null or entity == _selected_element:
+			_set_selected_element(null)
+			return
 
-		KEY_DELETE, KEY_BACKSPACE:
-			var world_position := Hexagon.get_tile_world_position(tile.position, tile.height)
-			_remove_tile(world_position)
+		if _selected_element is not Entity:
+			_set_selected_element(entity)
+			return
 
-func _handle_character_keybinds(character: Character, key: Key) -> void:
-	match key:
-		KEY_C:
-			_state.active_character = character
+		var selected_entity := _selected_element as Entity
 
-		KEY_A, KEY_LEFT:
-			var new_direction := Hexagon.get_direction_turned_left(character.facing_direction)
-			character.facing_direction = new_direction
+		var tile_position_a := selected_entity.current_tile.position
+		var tile_position_b := entity.current_tile.position
+		if not Hexagon.is_direction_vector(tile_position_b - tile_position_a):
+			_set_selected_element(entity)
+			return
 
-		KEY_D, KEY_RIGHT:
-			var new_direction := Hexagon.get_direction_turned_right(character.facing_direction)
-			character.facing_direction = new_direction
+		var existing_link: Link = null
+		for link in _state.links:
+			if (link.entity_a == selected_entity and link.entity_b == entity) \
+			or (link.entity_b == selected_entity and link.entity_a == entity):
+				existing_link = link
+				break
 
-		KEY_S:
-			character.asleep = not character.asleep
-			_honeycomb.load(_state)
+		if mouse_button == MOUSE_BUTTON_LEFT:
+			if existing_link == null:
+				existing_link = Link.new(Link.Type.STICKY, selected_entity, entity)
+				_state.links.append(existing_link)
+				selected_entity.links.append(existing_link)
+				entity.links.append(existing_link)
+				_honeycomb_is_dirty = true
 
-		KEY_DELETE, KEY_BACKSPACE:
-			var tile := character.current_tile
-			var world_position := Hexagon.get_tile_world_position(tile.position, tile.height)
-			_remove_character(world_position)
+			_set_selected_element(existing_link)
+			return
 
-func _handle_block_keybinds(block: Block, key: Key) -> void:
-	match key:
-		KEY_DELETE, KEY_BACKSPACE:
-			var tile := block.current_tile
-			var world_position := Hexagon.get_tile_world_position(tile.position, tile.height)
-			_remove_block(world_position)
+		elif mouse_button == MOUSE_BUTTON_RIGHT and existing_link != null:
+			_remove_link(existing_link)
 
-func _handle_link_keybinds(link: Link, key: Key) -> void:
-	match key:
-		KEY_T:
-			if link.entity_a is Character or link.entity_b is Character:
-				return
+		_set_selected_element(null)
+		return
 
-			match link.type:
-				Link.Type.SOLID:
-					link.type = Link.Type.STICKY
-				Link.Type.STICKY:
-					link.type = Link.Type.SOLID
+	if tile == null:
+		return
 
-			_state.assign_block_clusters()
-			_honeycomb.load(_state)
+	if _selected_tool == Tool.CHARACTER:
+		if entity is Block:
+			return
 
-		KEY_DELETE, KEY_BACKSPACE:
-			if link == _selected_link:
-				_set_selected_link(null)
+		var character := entity as Character
 
-			_state.links.erase(link)
-			link.entity_a.links.erase(link)
-			link.entity_b.links.erase(link)
+		if mouse_button == MOUSE_BUTTON_LEFT:
+			if character == null:
+				character = Character.new(tile, Hexagon.Direction.TOP_CENTER, false)
+				_state.entities.append(character)
+				_state.characters.append(character)
+				_honeycomb_is_dirty = true
 
-			if link.type == Link.Type.SOLID:
-				_state.assign_block_clusters()
+			_set_selected_element(character)
 
-			_honeycomb.load(_state)
+		elif mouse_button == MOUSE_BUTTON_RIGHT and character != null:
+			_remove_character(character)
+	
+		return
+
+	if _selected_tool == Tool.BLOCK:
+		if entity is Character:
+			return
+
+		var block := entity as Block
+
+		if mouse_button == MOUSE_BUTTON_LEFT:
+			if block == null:
+				block = Block.new(tile)
+				_state.entities.append(block)
+				_honeycomb_is_dirty = true
+
+			_set_selected_element(block)
+
+		elif mouse_button == MOUSE_BUTTON_RIGHT and block != null:
+			_remove_block(block)
+
+		return
+
+func _handle_key_press(key: Key) -> void:
+	if _selected_element is Tile:
+		var selected_tile := _selected_element as Tile
+
+		match key:
+			KEY_G:
+				selected_tile.goal = not selected_tile.goal
+				_honeycomb_is_dirty = true
+
+			KEY_PLUS, KEY_EQUAL:
+				selected_tile.height = min(max(selected_tile.height + 1, -1), 1)
+				_honeycomb_is_dirty = true
+				_set_selected_element(selected_tile)
+				_refresh_selectable_indicator()
+
+			KEY_MINUS, KEY_UNDERSCORE:
+				selected_tile.height = min(max(selected_tile.height - 1, -1), 1)
+				_honeycomb_is_dirty = true
+				_set_selected_element(selected_tile)
+				_refresh_selectable_indicator()
+
+			KEY_DELETE, KEY_BACKSPACE:
+				_remove_tile(selected_tile)
+
+	elif _selected_element is Character:
+		var selected_character := _selected_element as Character
+		match key:
+			KEY_C:
+				_state.active_character = selected_character
+
+			KEY_A, KEY_LEFT:
+				var new_direction := Hexagon.get_direction_turned_left(selected_character.facing_direction)
+				selected_character.facing_direction = new_direction
+
+			KEY_D, KEY_RIGHT:
+				var new_direction := Hexagon.get_direction_turned_right(selected_character.facing_direction)
+				selected_character.facing_direction = new_direction
+
+			KEY_S:
+				selected_character.asleep = not selected_character.asleep
+				_honeycomb_is_dirty = true
+
+			KEY_DELETE, KEY_BACKSPACE:
+				_remove_character(selected_character)
+
+	elif _selected_element is Block:
+		var selected_block := _selected_element as Block
+		match key:
+			KEY_DELETE, KEY_BACKSPACE:
+				_remove_block(selected_block)
+
+	elif _selected_element is Link:
+		var selected_link := _selected_element as Link
+		match key:
+			KEY_T:
+				if selected_link.entity_a is Character or selected_link.entity_b is Character:
+					return
+
+				match selected_link.type:
+					Link.Type.SOLID:
+						selected_link.type = Link.Type.STICKY
+					Link.Type.STICKY:
+						selected_link.type = Link.Type.SOLID
+
+				_clusters_are_dirty = true
+				_honeycomb_is_dirty = true
+
+			KEY_DELETE, KEY_BACKSPACE:
+				_set_selected_element(null)
+				_remove_link(selected_link)
 
 func _refresh_selectable_indicator() -> void:
 	var world_position := get_global_mouse_position()
@@ -261,248 +309,99 @@ func _get_tile_position_at(world_position: Vector2) -> Vector2i:
 		return tile.position
 	return Hexagon.get_world_tile_position(world_position)
 
-func _set_selected_tile(selected_tile: Tile) -> void:
-	_selected_tile = selected_tile
+func _set_selected_element(selected_element: Variant) -> void:
+	_selected_element = selected_element
 
-	if _selected_tile == null:
-		_selected_tile_indicator.visible = false
-		return
+	_selected_tile_indicator.visible = selected_element is Tile
+	_selected_entity_indicator.visible = selected_element is Entity
+	_selected_link_indicator.visible = selected_element is Link
 
-	var cell_position := _selected_tile.position
-	var cell_height := _selected_tile.height
-	_selected_tile_indicator.display(Cell.Type.SELECTED, cell_position, cell_height)
-	_selected_tile_indicator.visible = true
+	if selected_element is Tile:
+		var selected_tile := selected_element as Tile
+		var cell_position := selected_tile.position
+		var cell_height := selected_tile.height
+		_selected_tile_indicator.display(Cell.Type.SELECTED, cell_position, cell_height)
 
-func _set_selected_entity(selected_entity: Entity) -> void:
-	_selected_entity = selected_entity
+	elif selected_element is Entity:
+		var selected_entity := selected_element as Entity
+		var tile_position := selected_entity.current_tile.position
+		var elevation := selected_entity.get_elevation()
+		_selected_entity_indicator.position = Hexagon.get_tile_world_position(tile_position, elevation)
+		_selected_entity_indicator.z_index = Hexagon.get_tile_z_index(tile_position) + 3
 
-	if _selected_entity == null:
-		_selected_entity_indicator.visible = false
-		return
+	elif selected_element is Link:
+		var selected_link := selected_element as Link
 
-	var tile_position := _selected_entity.current_tile.position
-	var elevation := _selected_entity.get_elevation()
+		var tile_position_a := selected_link.entity_a.current_tile.position
+		var tile_position_b := selected_link.entity_b.current_tile.position
 
-	_selected_entity_indicator.position = Hexagon.get_tile_world_position(tile_position, elevation)
-	_selected_entity_indicator.z_index = Hexagon.get_tile_z_index(tile_position) + 3
-	_selected_entity_indicator.visible = true
+		var elevation_a := selected_link.entity_a.get_elevation()
+		var elevation_b := selected_link.entity_b.get_elevation()
+
+		var world_position_a := Hexagon.get_tile_world_position(tile_position_a, elevation_a)
+		var world_position_b := Hexagon.get_tile_world_position(tile_position_b, elevation_b)
+
+		var z_index_a := Hexagon.get_tile_z_index(tile_position_a)
+		var z_index_b := Hexagon.get_tile_z_index(tile_position_b)
+
+		_selected_link_indicator.position = (world_position_a + world_position_b) / 2.0
+		_selected_link_indicator.rotation = (world_position_b - world_position_a).angle()
+		_selected_link_indicator.z_index = max(z_index_a, z_index_b) + 4
 
 func _on_tool_option_item_selected(index: int) -> void:
 	_selected_tool = _tools_dropdown.get_item_id(index) as Tool
-	_place_tile_drag_button = MOUSE_BUTTON_NONE
-	_set_selected_tile(null)
-	_set_selected_entity(null)
-	_set_selected_link(null)
+	_set_selected_element(null)
 	_refresh_selectable_indicator()
 
-func _place_tile(world_position: Vector2) -> void:
-	var tile_position := _get_tile_position_at(world_position)
-	var tile: Tile = _state.tiles.get(tile_position)
+func _remove_tile(tile: Tile) -> void:
+	if tile == _selected_element:
+		_set_selected_element(null)
 
-	if tile == null:
-		tile = Tile.new(tile_position, false, 0)
-		_state.tiles[tile_position] = tile
-		_honeycomb.load(_state)
-
-	_set_selected_tile(tile)
-
-func _remove_tile(world_position: Vector2) -> void:
-	var tile_position := _get_tile_position_at(world_position)
-	var tile: Tile = _state.tiles.get(tile_position)
-
-	if tile == null:
-		return
-	
-	if tile == _selected_tile:
-		_set_selected_tile(null)
-
-	var entity := _get_entity_at(tile_position)
+	var entity := _get_entity_at(tile.position)
 	if entity is Character:
-		_remove_character(world_position)
+		_remove_character(entity as Character)
 	elif entity is Block:
-		_remove_block(world_position)
+		_remove_block(entity as Block)
 
-	_state.tiles.erase(tile_position)
-	_honeycomb.load(_state)
+	_state.tiles.erase(tile.position)
+	_honeycomb_is_dirty = true
 
-func _place_character(world_position: Vector2) -> void:
-	var tile_position := _get_tile_position_at(world_position)
-	var tile: Tile = _state.tiles.get(tile_position)
-	if tile == null:
-		return
-
-	var entity := _get_entity_at(tile_position)
-	if entity is Block:
-		return
-
-	var character := entity as Character
-	if character == null:
-		character = Character.new(tile, Hexagon.Direction.TOP_CENTER, false)
-		_state.entities.append(character)
-		_state.characters.append(character)
-		_honeycomb.load(_state)
-
-	_set_selected_entity(character)
-
-func _remove_character(world_position: Vector2) -> void:
-	var tile_position := _get_tile_position_at(world_position)
-	var tile: Tile = _state.tiles.get(tile_position)
-	if tile == null:
-		return
-
-	var entity := _get_entity_at(tile_position)
-	if entity is Block:
-		return
-
-	var character := entity as Character
-	if character == _selected_entity:
-		_set_selected_entity(null)
+func _remove_character(character: Character) -> void:
+	if character == _selected_element:
+		_set_selected_element(null)
 
 	if character == _state.active_character:
 		_state.active_character = null
 
-	for link in character.links:
-		_state.links.erase(link)
-
-		var other_entity := link.other(character)
-		other_entity.links.erase(link)
-
-		if link.type == Link.Type.SOLID:
-			_state.assign_block_clusters()
+	for link in character.links.duplicate():
+		_remove_link(link)
 
 	_state.entities.erase(character)
 	_state.characters.erase(character)
-	_honeycomb.load(_state)
+	_honeycomb_is_dirty = true
 
-func _place_block(world_position: Vector2) -> void:
-	var tile_position := _get_tile_position_at(world_position)
-	var tile: Tile = _state.tiles.get(tile_position)
-	if tile == null:
-		return
+func _remove_block(block: Block) -> void:
+	if block == _selected_element:
+		_set_selected_element(null)
 
-	var entity := _get_entity_at(tile_position)
-	if entity is Character:
-		return
-
-	var block := entity as Block
-	if block == null:
-		block = Block.new(tile)
-		_state.entities.append(block)
-		_honeycomb.load(_state)
-
-	_set_selected_entity(block)
-
-func _remove_block(world_position: Vector2) -> void:
-	var tile_position := _get_tile_position_at(world_position)
-	var tile: Tile = _state.tiles.get(tile_position)
-	if tile == null:
-		return
-
-	var entity := _get_entity_at(tile_position)
-	if entity is Character:
-		return
-
-	var block := entity as Block
-	if block == _selected_entity:
-		_set_selected_entity(null)
-
-	for link in block.links:
-		_state.links.erase(link)
-
-		var other_entity := link.other(block)
-		other_entity.links.erase(link)
-
-		if link.type == Link.Type.SOLID:
-			_state.assign_block_clusters()
+	for link in block.links.duplicate():
+		_remove_link(link)
 
 	_state.entities.erase(block)
-	_honeycomb.load(_state)
+	_honeycomb_is_dirty = true
+
+func _remove_link(link: Link) -> void:
+	_state.links.erase(link)
+	link.entity_a.links.erase(link)
+	link.entity_b.links.erase(link)
+
+	if link.type == Link.Type.SOLID:
+		_clusters_are_dirty = true
+
+	_honeycomb_is_dirty = true
 
 func _get_entity_at(tile_position: Vector2i) -> Entity:
 	for entity in _state.entities:
 		if entity.current_tile.position == tile_position:
 			return entity
 	return null
-
-func _on_link_tool_use(world_position: Vector2, mouse_button: MouseButton) -> void:
-	var tile_position := _get_tile_position_at(world_position)
-	var entity := _get_entity_at(tile_position)
-
-	if entity == null or entity == _selected_entity:
-		_set_selected_entity(null)
-		_set_selected_link(null)
-		return
-
-	if _selected_entity == null:
-		_set_selected_entity(entity)
-		_set_selected_link(null)
-		return
-
-	var tile_position_a := _selected_entity.current_tile.position
-	var tile_position_b := entity.current_tile.position
-	if not Hexagon.is_direction_vector(tile_position_b - tile_position_a):
-		_set_selected_entity(entity)
-		_set_selected_link(null)
-		return
-
-	var existing_link: Link = null
-	for link in _state.links:
-		if (link.entity_a == _selected_entity and link.entity_b == entity) \
-		or (link.entity_b == _selected_entity and link.entity_a == entity):
-			existing_link = link
-			break
-
-	if mouse_button == MOUSE_BUTTON_LEFT:
-		if existing_link == null:
-			existing_link = Link.new(Link.Type.STICKY, _selected_entity, entity)
-			_state.links.append(existing_link)
-			_selected_entity.links.append(existing_link)
-			entity.links.append(existing_link)
-			_honeycomb.load(_state)
-
-		_set_selected_entity(null)
-		_set_selected_link(existing_link)
-
-	elif mouse_button == MOUSE_BUTTON_RIGHT and existing_link != null:
-		if existing_link == _selected_link:
-			_set_selected_link(null)
-
-		_state.links.erase(existing_link)
-		existing_link.entity_a.links.erase(existing_link)
-		existing_link.entity_b.links.erase(existing_link)
-
-		if existing_link.type == Link.Type.SOLID:
-			_state.assign_block_clusters()
-
-		_honeycomb.load(_state)
-
-	_set_selected_entity(null)
-
-func _set_selected_link(selected_link: Link) -> void:
-	_selected_link = selected_link
-
-	if _selected_link == null:
-		_selected_link_indicator.visible = false
-		return
-
-	_selected_link_indicator.visible = true
-
-	var entity_a := _selected_link.entity_a
-	var entity_b := _selected_link.entity_b
-
-	var tile_position_a := entity_a.current_tile.position
-	var tile_position_b := entity_b.current_tile.position
-
-	var elevation_a := entity_a.get_elevation()
-	var elevation_b := entity_b.get_elevation()
-
-	var world_position_a := Hexagon.get_tile_world_position(tile_position_a, elevation_a)
-	var world_position_b := Hexagon.get_tile_world_position(tile_position_b, elevation_b)
-
-	_selected_link_indicator.position = (world_position_a + world_position_b) / 2.0
-	_selected_link_indicator.rotation = (world_position_b - world_position_a).angle()
-
-	var z_index_a := Hexagon.get_tile_z_index(tile_position_a)
-	var z_index_b := Hexagon.get_tile_z_index(tile_position_b)
-
-	_selected_link_indicator.z_index = max(z_index_a, z_index_b) + 4
