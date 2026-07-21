@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://bywmv4jan3kfq" path="res://source/honeycomb.gd" id="1_db0fd"]
 [ext_resource type="PackedScene" uid="uid://b1uvikogqsnhd" path="res://scenes/Cell.tscn" id="2_8gk6n"]
-[ext_resource type="Script" uid="uid://dgfix7gsximbb" path="res://source/camera.gd" id="2_sf5cg"]
 [ext_resource type="PackedScene" uid="uid://b68jrnaws4an1" path="res://scenes/Bee.tscn" id="3_y5jdm"]
 [ext_resource type="PackedScene" uid="uid://cmv0kkthsgbs" path="res://scenes/Honey.tscn" id="4_slnha"]
 [ext_resource type="PackedScene" uid="uid://b5lf4dpr3p4fu" path="res://scenes/Wax.tscn" id="5_d8yle"]
@@ -17,9 +16,7 @@ _honey_scene = ExtResource("4_slnha")
 _wax_scene = ExtResource("5_d8yle")
 _character_indicator = NodePath("CharacterIndicator")
 
-[node name="Camera" type="Camera2D" parent="." unique_id=1794257236]
-script = ExtResource("2_sf5cg")
-metadata/_custom_type_script = "uid://dgfix7gsximbb"
+[node name="Camera" type="Camera2D" parent="." unique_id=2045152548]
 
 [node name="CharacterIndicator" type="Sprite2D" parent="." unique_id=1123606768]
 visible = false

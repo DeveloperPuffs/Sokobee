@@ -2,7 +2,7 @@ class_name Honeycomb
 extends Node2D
 
 
-@export var _camera: Camera
+@export var _camera: Camera2D
 @export var _cell_scene: PackedScene
 @export var _bee_scene: PackedScene
 @export var _honey_scene: PackedScene
@@ -109,4 +109,10 @@ func _update_camera() -> void:
 		var cell_bounds := cell.get_bounds()
 		grid_bounds = grid_bounds.merge(cell_bounds)
 
-	_camera.frame(grid_bounds, 1.25)
+	var screen_size := get_viewport_rect().size
+	var zoom_x := screen_size.x / grid_bounds.size.x
+	var zoom_y := screen_size.y / grid_bounds.size.y
+	var zoom_value := (min(zoom_x, zoom_y) as float) / 1.25 # 1.25 camera padding
+
+	_camera.zoom = Vector2(zoom_value, zoom_value)
+	_camera.position = grid_bounds.position + grid_bounds.size / 2.0

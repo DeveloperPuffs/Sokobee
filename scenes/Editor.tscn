@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://crxl1uspui0ws" path="res://assets/sprites/entity_selected.svg" id="4_j6dse"]
 [ext_resource type="Texture2D" uid="uid://ccb2348tvo6mu" path="res://assets/sprites/link_selected.svg" id="5_wa12f"]
 
-[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_selectable_tile_indicator", "_selected_tile_indicator", "_selected_entity_indicator", "_selectable_entity_indicator", "_selected_link_indicator", "_honeycomb", "_tools_dropdown")]
+[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_selectable_tile_indicator", "_selected_tile_indicator", "_selected_entity_indicator", "_selectable_entity_indicator", "_selected_link_indicator", "_honeycomb", "_tools_dropdown", "_axes")]
 script = ExtResource("1_3kl07")
 _selectable_tile_indicator = NodePath("SelectableTileIndicator")
 _selected_tile_indicator = NodePath("SelectedTileIndicator")
@@ -17,6 +17,7 @@ _selectable_entity_indicator = NodePath("SelectableEntityIndicator")
 _selected_link_indicator = NodePath("SelectedLinkIndicator")
 _honeycomb = NodePath("Honeycomb")
 _tools_dropdown = NodePath("CanvasLayer/Tools")
+_axes = NodePath("CanvasLayer/Axes")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1706670417]
 
