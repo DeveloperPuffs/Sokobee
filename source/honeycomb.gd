@@ -9,17 +9,13 @@ extends Node2D
 @export var _wax_scene: PackedScene
 @export var _character_indicator: Sprite2D
 
-var _state: State
-var _cells: Array[Cell]
-var _entity_nodes: Array[Node2D]
-var _waxes: Array[Wax]
+var _state: State = null
+var _cells: Array[Cell] = []
+var _entity_nodes: Array[Node2D] = []
+var _waxes: Array[Wax] = []
 
 
 func _ready() -> void:
-	_state = null
-	_cells = []
-	_entity_nodes = []
-	_waxes = []
 	get_tree().root.size_changed.connect(_update_camera)
 
 

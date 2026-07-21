@@ -8,8 +8,8 @@ signal exited_game
 @export var _honeycomb: Honeycomb
 
 var _state: State
-var _history: History
-var _current_level: int
+var _history: History = History.new()
+var _current_level: int = 1
 
 
 func _ready() -> void:
@@ -22,7 +22,6 @@ func _ready() -> void:
 	_inputs.restarted_level.connect(_on_restart_level)
 	_inputs.clicked_tile.connect(_on_click_tile)
 
-	_current_level = 1
 	_load_level()
 
 
@@ -33,7 +32,6 @@ func _load_level() -> void:
 		exited_game.emit()
 		return
 
-	_history = History.new()
 	_honeycomb.load(_state)
 
 

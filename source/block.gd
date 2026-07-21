@@ -2,12 +2,11 @@ class_name Block
 extends Entity
 
 
-var cluster: Array[Block]
+var cluster: Array[Block] = []
 
 
 func _init(_current_tile: Tile) -> void:
 	super._init(_current_tile)
-	cluster = []
 
 
 func get_elevation() -> int:

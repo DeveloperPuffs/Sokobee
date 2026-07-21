@@ -6,7 +6,7 @@ const MENU_SCENE := preload("res://scenes/Menu.tscn")
 const EDIT_SCENE := preload("res://scenes/Editor.tscn")
 const GAME_SCENE := preload("res://scenes/Game.tscn")
 
-var active_scene: Node
+var active_scene: Node = null
 
 
 func _ready() -> void:

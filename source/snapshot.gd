@@ -3,7 +3,7 @@ class_name Snapshot
 
 var _active_character: Character
 var _active_character_direction: Hexagon.Direction
-var _entity_tiles: Dictionary[Entity, Tile]
+var _entity_tiles: Dictionary[Entity, Tile] = {}
 
 
 func _init(state: State) -> void:

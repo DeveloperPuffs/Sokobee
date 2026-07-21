@@ -1,21 +1,12 @@
 class_name State
 
 
-var tiles: Dictionary[Vector2i, Tile]
-var entities: Array[Entity]
-var links: Array[Link]
+var tiles: Dictionary[Vector2i, Tile] = {}
+var entities: Array[Entity] = []
+var links: Array[Link] = []
 
-var characters: Array[Character]
-var active_character: Character
-
-
-func _init() -> void:
-	tiles = {}
-	entities = []
-	links = []
-
-	characters = []
-	active_character = null
+var characters: Array[Character] = []
+var active_character: Character = null
 
 
 func assign_block_clusters() -> void:
