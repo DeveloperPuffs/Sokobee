@@ -7,8 +7,10 @@ const STICKY_TEXTURE = preload("res://assets/sprites/link_sticky_placeholder.svg
 
 var _link: Link
 
+
 func _process(_delta: float) -> void:
 	_refresh()
+
 
 func initialize(link: Link) -> void:
 	_link = link
@@ -20,6 +22,7 @@ func initialize(link: Link) -> void:
 			texture = STICKY_TEXTURE
 
 	_refresh()
+
 
 func _refresh() -> void:
 	var entity_a := _link.entity_a

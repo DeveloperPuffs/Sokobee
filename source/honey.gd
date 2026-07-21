@@ -4,12 +4,15 @@ extends Sprite2D
 
 var _block: Block
 
+
 func _process(_delta: float) -> void:
 	_refresh()
+
 
 func initialize(block: Block) -> void:
 	_block = block
 	_refresh()
+
 
 func _refresh() -> void:
 	var current_tile := _block.current_tile

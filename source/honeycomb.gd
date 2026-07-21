@@ -14,6 +14,7 @@ var _cells: Array[Cell]
 var _entity_nodes: Array[Node2D]
 var _waxes: Array[Wax]
 
+
 func _ready() -> void:
 	_state = null
 	_cells = []
@@ -21,8 +22,10 @@ func _ready() -> void:
 	_waxes = []
 	get_tree().root.size_changed.connect(_update_camera)
 
+
 func _process(_delta: float) -> void:
 	_update_character_indicator()
+
 
 func load(state: State) -> void:
 	for cell in _cells:
@@ -67,6 +70,7 @@ func load(state: State) -> void:
 
 	_update_camera()
 
+
 func get_tile_at(world_position: Vector2) -> Tile:
 	var frontmost_tile: Tile = null
 	var frontmost_z_index := 0
@@ -82,6 +86,7 @@ func get_tile_at(world_position: Vector2) -> Tile:
 
 	return frontmost_tile
 
+
 func _update_character_indicator() -> void:
 	if _state.active_character == null:
 		_character_indicator.visible = false
@@ -91,6 +96,7 @@ func _update_character_indicator() -> void:
 	_character_indicator.position = Hexagon.get_tile_world_position(tile.position, tile.height)
 	_character_indicator.z_index = Hexagon.get_tile_z_index(tile.position) + 1
 	_character_indicator.visible = true
+
 
 func _update_camera() -> void:
 	if _cells.is_empty():

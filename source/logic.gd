@@ -16,6 +16,7 @@ static func win_check(state: State) -> bool:
 
 	return true
 
+
 static func try_move_character(state: State, character: Character, direction: Hexagon.Direction) -> bool:
 	var direction_vector := Hexagon.get_direction_vector(direction)
 
@@ -83,11 +84,14 @@ static func try_move_character(state: State, character: Character, direction: He
 
 	return true
 
+
 static func rotate_character_left(character: Character) -> void:
 	character.facing_direction = Hexagon.get_direction_turned_left(character.facing_direction)
 
+
 static func rotate_character_right(character: Character) -> void:
 	character.facing_direction = Hexagon.get_direction_turned_right(character.facing_direction)
+
 
 static func select_character(state: State, character: Character) -> bool:
 	if character == state.active_character:

@@ -5,6 +5,7 @@ extends Node2D
 func _process(_delta: float) -> void:
 	queue_redraw()
 
+
 func _draw() -> void:
 	const Q_AXIS_COLOR_R := Color(0.9, 0.35, 0.35, 0.6)
 	const R_AXIS_COLOR_G := Color(0.4, 0.85, 0.45, 0.6)
@@ -16,6 +17,7 @@ func _draw() -> void:
 	_draw_axis(canvas_transform, center, Hexagon.Direction.BOTTOM_RIGHT, Q_AXIS_COLOR_R)
 	_draw_axis(canvas_transform, center, Hexagon.Direction.BOTTOM_CENTER, R_AXIS_COLOR_G)
 	_draw_axis(canvas_transform, center, Hexagon.Direction.TOP_RIGHT, S_AXIS_COLOR_B)
+
 
 func _draw_axis(canvas_transform: Transform2D, center: Vector2, direction: Hexagon.Direction, color: Color) -> void:
 	var direction_vector := Hexagon.get_direction_vector(direction)

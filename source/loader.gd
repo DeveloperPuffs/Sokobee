@@ -68,6 +68,7 @@ static func load_level_state(level_data_file_path: String) -> Variant:
 
 	return state
 
+
 static func _direction_from_string(direction_string: String) -> Variant:
 	match direction_string:
 		"BOTTOM_RIGHT":
@@ -84,6 +85,7 @@ static func _direction_from_string(direction_string: String) -> Variant:
 			return Hexagon.Direction.TOP_RIGHT
 		_:
 			return null
+
 
 static func _link_type_from_string(link_type_string: String) -> Variant:
 	match link_type_string:

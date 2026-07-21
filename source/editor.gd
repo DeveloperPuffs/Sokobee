@@ -52,6 +52,7 @@ var _selected_element: Variant = null # Tile, Entity, Link, or null
 var _clusters_are_dirty: bool = false
 var _honeycomb_is_dirty: bool = false
 
+
 func _ready() -> void:
 	_state = Loader.load_level_state("res://assets/levels/default.json")
 	if _state == null:
@@ -70,6 +71,7 @@ func _ready() -> void:
 
 	_on_tool_option_item_selected(Tool.TILE as int)
 
+
 func _process(_delta: float) -> void:
 	if _clusters_are_dirty:
 		_state.assign_block_clusters()
@@ -78,6 +80,7 @@ func _process(_delta: float) -> void:
 	if _honeycomb_is_dirty:
 		_honeycomb.load(_state)
 		_honeycomb_is_dirty = false
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
@@ -90,6 +93,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.is_pressed() and not event.is_echo():
 		var input_key_event := event as InputEventKey
 		_handle_key_press(input_key_event.keycode)
+
 
 func _handle_mouse_click(mouse_button: MouseButton) -> void:
 	var world_position := get_global_mouse_position()
@@ -195,6 +199,7 @@ func _handle_mouse_click(mouse_button: MouseButton) -> void:
 
 		return
 
+
 func _handle_key_press(key: Key) -> void:
 	if _selected_element is Tile:
 		var selected_tile := _selected_element as Tile
@@ -266,6 +271,7 @@ func _handle_key_press(key: Key) -> void:
 				_set_selected_element(null)
 				_remove_link(selected_link)
 
+
 func _refresh_selectable_indicator() -> void:
 	var world_position := get_global_mouse_position()
 	var tile_position := _get_tile_position_at(world_position)
@@ -302,12 +308,14 @@ func _refresh_selectable_indicator() -> void:
 
 			_selectable_entity_indicator.z_index = Hexagon.get_tile_z_index(tile_position) + 4
 
+
 func _get_tile_position_at(world_position: Vector2) -> Vector2i:
 	# Prefer the cell the mouse is visually over
 	var tile := _honeycomb.get_tile_at(world_position)
 	if tile != null:
 		return tile.position
 	return Hexagon.get_world_tile_position(world_position)
+
 
 func _set_selected_element(selected_element: Variant) -> void:
 	_selected_element = selected_element
@@ -348,10 +356,12 @@ func _set_selected_element(selected_element: Variant) -> void:
 		_selected_link_indicator.rotation = (world_position_b - world_position_a).angle()
 		_selected_link_indicator.z_index = max(z_index_a, z_index_b) + 4
 
+
 func _on_tool_option_item_selected(index: int) -> void:
 	_selected_tool = _tools_dropdown.get_item_id(index) as Tool
 	_set_selected_element(null)
 	_refresh_selectable_indicator()
+
 
 func _remove_tile(tile: Tile) -> void:
 	if tile == _selected_element:
@@ -365,6 +375,7 @@ func _remove_tile(tile: Tile) -> void:
 
 	_state.tiles.erase(tile.position)
 	_honeycomb_is_dirty = true
+
 
 func _remove_character(character: Character) -> void:
 	if character == _selected_element:
@@ -380,6 +391,7 @@ func _remove_character(character: Character) -> void:
 	_state.characters.erase(character)
 	_honeycomb_is_dirty = true
 
+
 func _remove_block(block: Block) -> void:
 	if block == _selected_element:
 		_set_selected_element(null)
@@ -390,6 +402,7 @@ func _remove_block(block: Block) -> void:
 	_state.entities.erase(block)
 	_honeycomb_is_dirty = true
 
+
 func _remove_link(link: Link) -> void:
 	_state.links.erase(link)
 	link.entity_a.links.erase(link)
@@ -399,6 +412,7 @@ func _remove_link(link: Link) -> void:
 		_clusters_are_dirty = true
 
 	_honeycomb_is_dirty = true
+
 
 func _get_entity_at(tile_position: Vector2i) -> Entity:
 	for entity in _state.entities:

@@ -18,6 +18,7 @@ var _type: Type
 var _tile_position: Vector2i
 var _tile_height: int
 
+
 func display(type: Type, tile_position: Vector2i, tile_height: int = 0) -> void:
 	_type = type
 	_tile_position = tile_position
@@ -39,6 +40,7 @@ func display(type: Type, tile_position: Vector2i, tile_height: int = 0) -> void:
 		Type.SELECTED:
 			texture = SELECTED_TEXTURE
 			z_index += 2 * Hexagon.Z_INDEX_SCALE + 1
+
 
 func get_bounds() -> Rect2:
 	const TEXTURE_SIZE = Vector2(Hexagon.TILE_WIDTH, Hexagon.TILE_SIZE * 3.0)

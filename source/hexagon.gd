@@ -28,29 +28,37 @@ const HEIGHT_OFFSET := TILE_SIZE / 2.0
 # This leaves 10 z-indices for each tile
 const Z_INDEX_SCALE := 10
 
+
 static func get_opposite_direction(direction: Direction) -> Direction:
 	return ((direction as int + 3) % 6) as Direction
+
 
 static func get_direction_turned_left(direction: Direction) -> Direction:
 	return ((direction as int) + 5) % 6 as Direction
 
+
 static func get_direction_turned_right(direction: Direction) -> Direction:
 	return ((direction as int) + 1) % 6 as Direction
+
 
 static func get_direction_vector(direction: Direction) -> Vector2i:
 	return _DIRECTION_VECTORS[direction as int]
 
+
 static func is_direction_vector(vector: Vector2i) -> bool:
 	return _DIRECTION_VECTORS.has(vector)
 
+
 static func get_direction_rotation(direction: Direction) -> float:
 	return PI / 3.0 * (direction as int) + PI / 6.0
+
 
 static func get_tile_world_position(tile_position: Vector2i, tile_height: int) -> Vector2:
 	var x := 1.5 * tile_position.x * TILE_SIZE
 	var y := (sqrt(3.0) / 2.0 * tile_position.x + sqrt(3.0) * tile_position.y) * TILE_SIZE
 	y -= tile_height * HEIGHT_OFFSET
 	return Vector2(x, y)
+
 
 static func get_world_tile_position(world_position: Vector2) -> Vector2i:
 	var q := world_position.x / (1.5 * TILE_SIZE)
@@ -72,8 +80,10 @@ static func get_world_tile_position(world_position: Vector2) -> Vector2i:
 
 	return Vector2i(q_rounded, r_rounded)
 
+
 static func get_tile_z_index(tile_position: Vector2i) -> int:
 	return (tile_position.x + 2 * tile_position.y) * Z_INDEX_SCALE
+
 
 static func check_point_tile_interesection(point: Vector2, tile_position: Vector2i, tile_height: int) -> bool:
 	var tile_center := get_tile_world_position(tile_position, tile_height)

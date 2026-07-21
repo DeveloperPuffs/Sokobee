@@ -6,13 +6,16 @@ extends Sprite2D
 
 var _character: Character
 
+
 func _process(_delta: float) -> void:
 	_refresh()
+
 
 func initialize(character: Character) -> void:
 	_character = character
 	_sleeping_indicator.visible = _character.asleep
 	_refresh()
+
 
 func _refresh() -> void:
 	var current_tile := _character.current_tile

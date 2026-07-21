@@ -8,6 +8,7 @@ var links: Array[Link]
 var characters: Array[Character]
 var active_character: Character
 
+
 func _init() -> void:
 	tiles = {}
 	entities = []
@@ -15,6 +16,7 @@ func _init() -> void:
 
 	characters = []
 	active_character = null
+
 
 func assign_block_clusters() -> void:
 	for entity in entities:
