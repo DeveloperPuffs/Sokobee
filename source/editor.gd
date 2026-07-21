@@ -43,14 +43,20 @@ enum Tool {
 @export var _selectable_entity_indicator: Sprite2D
 @export var _selected_link_indicator: Sprite2D
 
+@export var _controller: Controller
 @export var _honeycomb: Honeycomb
-@export var _tools_dropdown: OptionButton
+@export var _playtest_button: Button
+@export var _tool_selector_dropdown: OptionButton
+@export var _edit_button: Button
+@export var _keep_layout_button: Button
 
 var _state: State
 var _selected_tool: Tool
 var _selected_element: Variant = null # Tile, Entity, Link, or null
 var _clusters_are_dirty: bool = false
 var _honeycomb_is_dirty: bool = false
+var _playtesting: bool = false
+var _snapshot: Snapshot = null
 
 
 func _ready() -> void:
@@ -61,14 +67,21 @@ func _ready() -> void:
 
 	_honeycomb.load(_state)
 
-	_tools_dropdown.add_item("Tile", Tool.TILE)
-	_tools_dropdown.add_item("Character", Tool.CHARACTER)
-	_tools_dropdown.add_item("Block", Tool.BLOCK)
-	_tools_dropdown.add_item("Link", Tool.LINK)
+	_controller.restart_requested.connect(_on_restart_requested)
 
-	_tools_dropdown.item_selected.connect(_on_tool_option_item_selected)
-	_tools_dropdown.select(Tool.TILE)
+	_tool_selector_dropdown.add_item("Tile", Tool.TILE)
+	_tool_selector_dropdown.add_item("Character", Tool.CHARACTER)
+	_tool_selector_dropdown.add_item("Block", Tool.BLOCK)
+	_tool_selector_dropdown.add_item("Link", Tool.LINK)
 
+	_tool_selector_dropdown.item_selected.connect(_on_tool_option_item_selected)
+
+	_playtest_button.pressed.connect(_toggle_playtesting)
+	_edit_button.pressed.connect(_toggle_playtesting)
+	_keep_layout_button.pressed.connect(_on_keep_layout)
+
+	_toggle_playtesting(false)
+	_tool_selector_dropdown.select(Tool.TILE)
 	_on_tool_option_item_selected(Tool.TILE as int)
 
 
@@ -83,6 +96,9 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _playtesting:
+		return
+
 	if event is InputEventMouseMotion:
 		_refresh_selectable_indicator()
 
@@ -93,6 +109,41 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.is_pressed() and not event.is_echo():
 		var input_key_event := event as InputEventKey
 		_handle_key_press(input_key_event.keycode)
+
+
+func _toggle_playtesting(playtesting: bool = not _playtesting) -> void:
+	_playtesting = playtesting
+
+	_playtest_button.visible = not playtesting
+	_tool_selector_dropdown.visible = not playtesting
+	_edit_button.visible = playtesting
+	_keep_layout_button.visible = playtesting
+
+	if playtesting:
+		_refresh_selectable_indicator()
+		_set_selected_element(null)
+
+		_snapshot = Snapshot.new(_state)
+		_controller.load(_state)
+
+	else:
+		if _snapshot != null:
+			_snapshot.apply(_state)
+			_snapshot = null
+
+		_refresh_selectable_indicator()
+
+	_controller.set_active(playtesting)
+
+
+func _on_restart_requested() -> void:
+	_snapshot.apply(_state)
+	_controller.load(_state)
+
+
+func _on_keep_layout() -> void:
+	_snapshot = null
+	_toggle_playtesting(false)
 
 
 func _handle_mouse_click(mouse_button: MouseButton) -> void:
@@ -273,6 +324,11 @@ func _handle_key_press(key: Key) -> void:
 
 
 func _refresh_selectable_indicator() -> void:
+	if _playtesting:
+		_selectable_tile_indicator.visible = false
+		_selectable_entity_indicator.visible = false
+		return
+
 	var world_position := get_global_mouse_position()
 	var tile_position := _get_tile_position_at(world_position)
 
@@ -311,7 +367,7 @@ func _refresh_selectable_indicator() -> void:
 
 func _get_tile_position_at(world_position: Vector2) -> Vector2i:
 	# Prefer the cell the mouse is visually over
-	var tile := _honeycomb.get_tile_at(world_position)
+	var tile := _state.get_tile_at(world_position)
 	if tile != null:
 		return tile.position
 	return Hexagon.get_world_tile_position(world_position)
@@ -358,7 +414,7 @@ func _set_selected_element(selected_element: Variant) -> void:
 
 
 func _on_tool_option_item_selected(index: int) -> void:
-	_selected_tool = _tools_dropdown.get_item_id(index) as Tool
+	_selected_tool = _tool_selector_dropdown.get_item_id(index) as Tool
 	_set_selected_element(null)
 	_refresh_selectable_indicator()
 

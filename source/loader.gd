@@ -1,7 +1,7 @@
 class_name Loader
 
 
-static func load_level_state(level_data_file_path: String) -> Variant:
+static func load_level_state(level_data_file_path: String) -> State:
 	var level_data_string := FileAccess.get_file_as_string(level_data_file_path)
 
 	var json := JSON.new()

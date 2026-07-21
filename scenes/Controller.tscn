@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://cl821nsxaarwo"]
+
+[ext_resource type="Script" uid="uid://7yc3t41qrhfs" path="res://source/controller.gd" id="1_eaq4k"]
+[ext_resource type="Script" uid="uid://f13kh8vlymei" path="res://source/inputs.gd" id="2_tgeaa"]
+
+[node name="Node" type="Node2D" unique_id=1341100839 node_paths=PackedStringArray("_inputs")]
+script = ExtResource("1_eaq4k")
+_inputs = NodePath("Inputs")
+
+[node name="Inputs" type="Node" parent="." unique_id=1884730142]
+script = ExtResource("2_tgeaa")
+metadata/_custom_type_script = "uid://f13kh8vlymei"

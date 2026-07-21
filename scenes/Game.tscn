@@ -1,16 +1,14 @@
 [gd_scene format=3 uid="uid://tjcm5lekc0od"]
 
 [ext_resource type="Script" uid="uid://bbkp0k38byhvc" path="res://source/game.gd" id="1_78awf"]
+[ext_resource type="PackedScene" uid="uid://cl821nsxaarwo" path="res://scenes/Controller.tscn" id="3_cpr0p"]
 [ext_resource type="PackedScene" uid="uid://dqj3nmogbiner" path="res://scenes/Honeycomb.tscn" id="4_78awf"]
-[ext_resource type="Script" uid="uid://f13kh8vlymei" path="res://source/inputs.gd" id="4_kiw3p"]
 
-[node name="Game" type="Node2D" unique_id=1780889916 node_paths=PackedStringArray("_inputs", "_honeycomb", "_character_indicator")]
+[node name="Game" type="Node2D" unique_id=1780889916 node_paths=PackedStringArray("_controller", "_honeycomb")]
 script = ExtResource("1_78awf")
-_inputs = NodePath("Inputs")
+_controller = NodePath("Controller")
 _honeycomb = NodePath("Honeycomb")
-_character_indicator = NodePath("")
 
-[node name="Inputs" type="Node" parent="." unique_id=454891763]
-script = ExtResource("4_kiw3p")
+[node name="Controller" parent="." unique_id=1951775412 instance=ExtResource("3_cpr0p")]
 
 [node name="Honeycomb" parent="." unique_id=1696604743 instance=ExtResource("4_78awf")]

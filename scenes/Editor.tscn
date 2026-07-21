@@ -7,25 +7,56 @@
 [ext_resource type="Texture2D" uid="uid://d1c1veter3vl1" path="res://assets/sprites/entity_selectable.svg" id="4_6tdr8"]
 [ext_resource type="Texture2D" uid="uid://crxl1uspui0ws" path="res://assets/sprites/entity_selected.svg" id="4_j6dse"]
 [ext_resource type="Texture2D" uid="uid://ccb2348tvo6mu" path="res://assets/sprites/link_selected.svg" id="5_wa12f"]
+[ext_resource type="PackedScene" uid="uid://cl821nsxaarwo" path="res://scenes/Controller.tscn" id="7_mwer8"]
 
-[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_selectable_tile_indicator", "_selected_tile_indicator", "_selected_entity_indicator", "_selectable_entity_indicator", "_selected_link_indicator", "_honeycomb", "_tools_dropdown", "_axes")]
+[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_selectable_tile_indicator", "_selected_tile_indicator", "_selected_entity_indicator", "_selectable_entity_indicator", "_selected_link_indicator", "_controller", "_honeycomb", "_playtest_button", "_tool_selector_dropdown", "_edit_button", "_keep_layout_button")]
 script = ExtResource("1_3kl07")
 _selectable_tile_indicator = NodePath("SelectableTileIndicator")
 _selected_tile_indicator = NodePath("SelectedTileIndicator")
 _selected_entity_indicator = NodePath("SelectedEntityIndicator")
 _selectable_entity_indicator = NodePath("SelectableEntityIndicator")
 _selected_link_indicator = NodePath("SelectedLinkIndicator")
+_controller = NodePath("Controller")
 _honeycomb = NodePath("Honeycomb")
-_tools_dropdown = NodePath("CanvasLayer/Tools")
-_axes = NodePath("CanvasLayer/Axes")
+_playtest_button = NodePath("CanvasLayer/PlaytestButton")
+_tool_selector_dropdown = NodePath("CanvasLayer/ToolSelectorDropdown")
+_edit_button = NodePath("CanvasLayer/EditButton")
+_keep_layout_button = NodePath("CanvasLayer/KeepLayoutButton")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1706670417]
 
-[node name="Tools" type="OptionButton" parent="CanvasLayer" unique_id=613198431]
-offset_left = 20.0
-offset_top = 19.0
-offset_right = 204.0
-offset_bottom = 76.0
+[node name="ToolSelectorDropdown" type="OptionButton" parent="CanvasLayer" unique_id=613198431]
+visible = false
+offset_left = 14.0
+offset_top = 76.0
+offset_right = 198.0
+offset_bottom = 133.0
+
+[node name="PlaytestButton" type="Button" parent="CanvasLayer" unique_id=347463144]
+visible = false
+offset_left = 14.0
+offset_top = 14.0
+offset_right = 198.0
+offset_bottom = 66.0
+text = "Playtest"
+
+[node name="EditButton" type="Button" parent="CanvasLayer" unique_id=1408342012]
+visible = false
+offset_left = 14.0
+offset_top = 14.0
+offset_right = 197.0
+offset_bottom = 66.0
+text = "Edit
+"
+
+[node name="KeepLayoutButton" type="Button" parent="CanvasLayer" unique_id=742934377]
+visible = false
+offset_left = 16.0
+offset_top = 76.0
+offset_right = 198.0
+offset_bottom = 134.0
+theme_override_colors/font_color = Color(0.98039216, 0.39215687, 0.39215687, 1)
+text = "Keep Layout"
 
 [node name="Axes" type="Node2D" parent="CanvasLayer" unique_id=771309044]
 script = ExtResource("2_wmxca")
@@ -47,5 +78,7 @@ texture = ExtResource("4_j6dse")
 [node name="SelectedLinkIndicator" type="Sprite2D" parent="." unique_id=2143323386]
 visible = false
 texture = ExtResource("5_wa12f")
+
+[node name="Controller" parent="." unique_id=1341100839 instance=ExtResource("7_mwer8")]
 
 [node name="Honeycomb" parent="." unique_id=1696604743 instance=ExtResource("1_ndpqs")]
