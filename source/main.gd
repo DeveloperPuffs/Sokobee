@@ -35,7 +35,6 @@ func _set_scene(scene: PackedScene) -> void:
 		active_scene.queue_free()
 
 	active_scene = scene.instantiate()
-	add_child(active_scene)
 
 	if active_scene is Menu:
 		active_scene.play_button_pressed.connect(_set_game_scene)
@@ -45,6 +44,8 @@ func _set_scene(scene: PackedScene) -> void:
 		active_scene.exited_game.connect(_set_menu_scene)
 	elif active_scene is Editor:
 		active_scene.exited_editor.connect(_set_menu_scene)
+
+	add_child(active_scene)
 
 
 func _on_quit() -> void:

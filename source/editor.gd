@@ -49,6 +49,8 @@ enum Tool {
 @export var _tool_selector_dropdown: OptionButton
 @export var _edit_button: Button
 @export var _keep_layout_button: Button
+@export var _title_input: LineEdit
+@export var _export_button: Button
 
 var _state: State
 var _selected_tool: Tool
@@ -60,7 +62,27 @@ var _snapshot: Snapshot = null
 
 
 func _ready() -> void:
-	_state = Loader.load_level_state("res://assets/levels/default.json")
+	var level_data_file_path := "res://assets/levels/default.json"
+	var level_data_string := FileAccess.get_file_as_string(level_data_file_path)
+	if level_data_string == "":
+		exited_editor.emit()
+		return
+
+	var json_parser := JSON.new()
+	var json_parsing_result := json_parser.parse(level_data_string)
+	if json_parsing_result != OK:
+		print("JSON Parsing Error {error} at {path}:{line} - {message}".format({
+			"error": json_parsing_result,
+			"path": level_data_file_path,
+			"line": json_parser.get_error_line(),
+			"message": json_parser.get_error_message()
+		}))
+
+		exited_editor.emit()
+		return
+
+	var level_data := json_parser.data as Dictionary
+	_state = Serializer.load_level(level_data)
 	if _state == null:
 		exited_editor.emit()
 		return
@@ -79,6 +101,8 @@ func _ready() -> void:
 	_playtest_button.pressed.connect(_toggle_playtesting)
 	_edit_button.pressed.connect(_toggle_playtesting)
 	_keep_layout_button.pressed.connect(_on_keep_layout)
+
+	_export_button.pressed.connect(_on_export)
 
 	_toggle_playtesting(false)
 	_tool_selector_dropdown.select(Tool.TILE)
@@ -144,6 +168,22 @@ func _on_restart_requested() -> void:
 func _on_keep_layout() -> void:
 	_snapshot = null
 	_toggle_playtesting(false)
+
+
+func _on_export() -> void:
+	_toggle_playtesting(false)
+
+	var level_data := Serializer._save_level(_state)
+
+	var level_data_string := JSON.stringify(level_data, "\t")
+	var file := FileAccess.open("res://assets/levels/testing3.json", FileAccess.WRITE)
+	if file == null:
+		return
+
+	file.store_string(level_data_string)
+	file.close()
+
+	exited_editor.emit()
 
 
 func _handle_mouse_click(mouse_button: MouseButton) -> void:

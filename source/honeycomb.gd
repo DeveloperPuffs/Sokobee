@@ -20,7 +20,17 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	_update_character_indicator()
+	if _state == null:
+		return
+
+	if _state.active_character == null:
+		_character_indicator.visible = false
+		return
+	
+	var tile := _state.active_character.current_tile
+	_character_indicator.position = Hexagon.get_tile_world_position(tile.position, tile.height)
+	_character_indicator.z_index = Hexagon.get_tile_z_index(tile.position) + 1
+	_character_indicator.visible = true
 
 
 func load(state: State) -> void:
@@ -65,17 +75,6 @@ func load(state: State) -> void:
 	_state = state
 
 	_update_camera()
-
-
-func _update_character_indicator() -> void:
-	if _state.active_character == null:
-		_character_indicator.visible = false
-		return
-	
-	var tile := _state.active_character.current_tile
-	_character_indicator.position = Hexagon.get_tile_world_position(tile.position, tile.height)
-	_character_indicator.z_index = Hexagon.get_tile_z_index(tile.position) + 1
-	_character_indicator.visible = true
 
 
 func _update_camera() -> void:
