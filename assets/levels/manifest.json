@@ -1,0 +1,28 @@
+{
+	"editor_level": {
+		"filepath": "editor.json",
+		"title": "Unnamed Level"
+	},
+	"levels": [
+		{
+			"filepath": "testing1.json",
+			"title": "Testing"
+		},
+		{
+			"filepath": "testing2.json",
+			"title": "Testing 2"
+		},
+		{
+			"filepath": "Unnamed_Level.json",
+			"title": "Unnamed Level"
+		},
+		{
+			"filepath": "Unnamed_Level.json",
+			"title": "Unnamed Level"
+		},
+		{
+			"filepath": "unnamed_level.json",
+			"title": "Unnamed Level"
+		}
+	]
+}

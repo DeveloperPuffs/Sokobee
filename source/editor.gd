@@ -52,6 +52,7 @@ enum Tool {
 @export var _title_input: LineEdit
 @export var _export_button: Button
 
+var _manifest: Manifest
 var _state: State
 var _selected_tool: Tool
 var _selected_element: Variant = null # Tile, Entity, Link, or null
@@ -62,27 +63,12 @@ var _snapshot: Snapshot = null
 
 
 func _ready() -> void:
-	var level_data_file_path := "res://assets/levels/default.json"
-	var level_data_string := FileAccess.get_file_as_string(level_data_file_path)
-	if level_data_string == "":
+	_manifest = Manifest.new("res://assets/levels/manifest.json")
+	if _manifest == null:
 		exited_editor.emit()
 		return
 
-	var json_parser := JSON.new()
-	var json_parsing_result := json_parser.parse(level_data_string)
-	if json_parsing_result != OK:
-		print("JSON Parsing Error {error} at {path}:{line} - {message}".format({
-			"error": json_parsing_result,
-			"path": level_data_file_path,
-			"line": json_parser.get_error_line(),
-			"message": json_parser.get_error_message()
-		}))
-
-		exited_editor.emit()
-		return
-
-	var level_data := json_parser.data as Dictionary
-	_state = Serializer.load_level(level_data)
+	_state = _manifest.editor_level.load_state()
 	if _state == null:
 		exited_editor.emit()
 		return
@@ -101,6 +87,8 @@ func _ready() -> void:
 	_playtest_button.pressed.connect(_toggle_playtesting)
 	_edit_button.pressed.connect(_toggle_playtesting)
 	_keep_layout_button.pressed.connect(_on_keep_layout)
+
+	_title_input.text = _manifest.editor_level.title
 
 	_export_button.pressed.connect(_on_export)
 
@@ -173,15 +161,16 @@ func _on_keep_layout() -> void:
 func _on_export() -> void:
 	_toggle_playtesting(false)
 
-	var level_data := Serializer._save_level(_state)
+	var title := _title_input.text
+	var filepath := title.to_lower().replace(" ", "_") + ".json"
+	_manifest.save_level(Level.new(filepath, title))
 
+	var level_data := Serializer.save_level_state(_state)
 	var level_data_string := JSON.stringify(level_data, "\t")
-	var file := FileAccess.open("res://assets/levels/testing3.json", FileAccess.WRITE)
-	if file == null:
-		return
-
-	file.store_string(level_data_string)
-	file.close()
+	var file := FileAccess.open("res://assets/levels/" + filepath, FileAccess.WRITE)
+	if file != null:
+		file.store_string(level_data_string)
+		file.close()
 
 	exited_editor.emit()
 

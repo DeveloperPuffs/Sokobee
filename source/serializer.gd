@@ -1,7 +1,7 @@
 class_name Serializer
 
 
-static func load_level(level_data: Dictionary) -> State:
+static func load_level_state(level_data: Dictionary) -> State:
 	var state := State.new()
 
 	for tile: Dictionary in level_data["tiles"]:
@@ -62,7 +62,7 @@ static func load_level(level_data: Dictionary) -> State:
 	return state
 
 
-static func _save_level(state: State) -> Dictionary:
+static func save_level_state(state: State) -> Dictionary:
 	var identifiers: Dictionary[Entity, int] = {}
 	var next_identifier := 0
 
@@ -75,10 +75,10 @@ static func _save_level(state: State) -> Dictionary:
 
 	var tiles_data: Array[Dictionary] = []
 	for tile: Tile in state.tiles.values():
-		var tile_data := {}
-
-		tile_data["q"] = tile.position.x
-		tile_data["r"] = tile.position.y
+		var tile_data := {
+			"q": tile.position.x,
+			"r": tile.position.y
+		}
 
 		if tile.goal:
 			tile_data["goal"] = true
@@ -115,19 +115,17 @@ static func _save_level(state: State) -> Dictionary:
 
 	var links_data: Array[Dictionary] = []
 	for link in state.links:
-		var link_data := {}
+		links_data.append({
+			"type": _link_type_to_string(link.type),
+			"identifier_a": identifiers[link.entity_a],
+			"identifier_b": identifiers[link.entity_b]
+		})
 
-		link_data["type"] = _link_type_to_string(link.type)
-		link_data["identifier_a"] = identifiers[link.entity_a]
-		link_data["identifier_b"] = identifiers[link.entity_b]
-
-		links_data.append(link_data)
-
-	var level_data := {}
-
-	level_data["tiles"] = tiles_data
-	level_data["entities"] = entities_data
-	level_data["links"] = links_data
+	var level_data := {
+		"tiles": tiles_data,
+		"entities": entities_data,
+		"links": links_data
+	}
 
 	if state.active_character != null:
 		level_data["active"] = identifiers[state.active_character]
