@@ -45,56 +45,63 @@ enum Tool {
 
 @export var _controller: Controller
 @export var _honeycomb: Honeycomb
+@export var _level_selector_dropdown: OptionButton
+@export var _save_button: Button
+@export var _save_new_button: Button
+@export var _exit_button: Button
+@export var _title_input: LineEdit
 @export var _playtest_button: Button
 @export var _tool_selector_dropdown: OptionButton
 @export var _edit_button: Button
 @export var _keep_layout_button: Button
-@export var _title_input: LineEdit
-@export var _export_button: Button
+
+static var NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER := 0
 
 var _manifest: Manifest
-var _state: State
+var _level: Level = null
+var _state: State = null
 var _selected_tool: Tool
 var _selected_element: Variant = null # Tile, Entity, Link, or null
-var _clusters_are_dirty: bool = false
-var _honeycomb_is_dirty: bool = false
-var _playtesting: bool = false
+var _clusters_are_dirty := false
+var _honeycomb_is_dirty := false
+var _playtesting := false
 var _snapshot: Snapshot = null
 
 
 func _ready() -> void:
 	_manifest = Manifest.new("res://assets/levels/manifest.json")
-	if _manifest == null:
+	if _manifest.editor_level == null:
 		exited_editor.emit()
 		return
-
-	_state = _manifest.editor_level.load_state()
-	if _state == null:
-		exited_editor.emit()
-		return
-
-	_honeycomb.load(_state)
 
 	_controller.restart_requested.connect(_on_restart_requested)
+
+	_level_selector_dropdown.add_item("New Level", NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER)
+
+	for index in _manifest.levels.size():
+		_level_selector_dropdown.add_item(_manifest.levels[index].title, index + 1)
+
+	_level_selector_dropdown.select(0)
+	_level_selector_dropdown.item_selected.connect(_on_level_option_item_selected)
+	_on_level_option_item_selected(0)
+
+	_save_button.pressed.connect(_on_save)
+	_save_new_button.pressed.connect(_on_save_new)
+	_exit_button.pressed.connect(exited_editor.emit)
+
+	_playtest_button.pressed.connect(_toggle_playtesting)
 
 	_tool_selector_dropdown.add_item("Tile", Tool.TILE)
 	_tool_selector_dropdown.add_item("Character", Tool.CHARACTER)
 	_tool_selector_dropdown.add_item("Block", Tool.BLOCK)
 	_tool_selector_dropdown.add_item("Link", Tool.LINK)
 
+	_tool_selector_dropdown.select(Tool.TILE)
 	_tool_selector_dropdown.item_selected.connect(_on_tool_option_item_selected)
+	_on_tool_option_item_selected(Tool.TILE as int)
 
-	_playtest_button.pressed.connect(_toggle_playtesting)
 	_edit_button.pressed.connect(_toggle_playtesting)
 	_keep_layout_button.pressed.connect(_on_keep_layout)
-
-	_title_input.text = _manifest.editor_level.title
-
-	_export_button.pressed.connect(_on_export)
-
-	_toggle_playtesting(false)
-	_tool_selector_dropdown.select(Tool.TILE)
-	_on_tool_option_item_selected(Tool.TILE as int)
 
 
 func _process(_delta: float) -> void:
@@ -158,21 +165,66 @@ func _on_keep_layout() -> void:
 	_toggle_playtesting(false)
 
 
-func _on_export() -> void:
+func _on_level_option_item_selected(index: int) -> void:
+	var selected_level := _manifest.editor_level
+	var item_identifier := _level_selector_dropdown.get_item_id(index)
+	if item_identifier != NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER:
+		selected_level = _manifest.levels[item_identifier - 1]
+
+	if selected_level == _level:
+		return
+
+	var state := selected_level.load_state()
+	if state == null:
+		print("Failed to load level state: " + selected_level.get_full_filepath())
+		exited_editor.emit()
+		return
+
+	_level = selected_level
+	_state = state
+	_snapshot = null
+	_clusters_are_dirty = false
+	_honeycomb_is_dirty = false
+
+	_toggle_playtesting(false)
+	_set_selected_element(null)
+
+	_honeycomb.load(_state)
+	_title_input.text = selected_level.title
+
+
+func _on_save() -> void:
 	_toggle_playtesting(false)
 
-	var title := _title_input.text
-	var filepath := title.to_lower().replace(" ", "_") + ".json"
-	_manifest.save_level(Level.new(filepath, title))
+	if _level == _manifest.editor_level:
+		_on_save_new()
+		return
 
-	var level_data := Serializer.save_level_state(_state)
-	var level_data_string := JSON.stringify(level_data, "\t")
-	var file := FileAccess.open("res://assets/levels/" + filepath, FileAccess.WRITE)
-	if file != null:
-		file.store_string(level_data_string)
-		file.close()
+	_level.title = _title_input.text
+	if not _level.save_state(_state):
+		return
 
-	exited_editor.emit()
+	_manifest.register_level(_level)
+
+	var level_dropdown_item_index = _level_selector_dropdown.get_item_index(_manifest.levels.find(_level) - 1)
+	_level_selector_dropdown.set_item_text(level_dropdown_item_index, _level.title)
+
+
+func _on_save_new() -> void:
+	_toggle_playtesting(false)
+
+	var level := _manifest.create_level(_title_input.text)
+	if not level.save_state(_state):
+		return
+
+	_manifest.register_level(level)
+
+	_level = level
+	_title_input.text = level.title
+
+	var level_dropdown_item_identifier = _manifest.levels.size()
+	_level_selector_dropdown.add_item(level.title, level_dropdown_item_identifier)
+	_level_selector_dropdown.select(_level_selector_dropdown.get_item_index(level_dropdown_item_identifier))
 
 
 func _handle_mouse_click(mouse_button: MouseButton) -> void:

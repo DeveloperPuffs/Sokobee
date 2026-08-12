@@ -1,5 +1,32 @@
 {
-	"entities": [],
+	"entities": [
+		{
+			"facing": "TOP_CENTER",
+			"q": 0,
+			"r": 0,
+			"type": "character"
+		},
+		{
+			"q": 0,
+			"r": -1,
+			"type": "block"
+		},
+		{
+			"q": -1,
+			"r": 0,
+			"type": "block"
+		},
+		{
+			"q": -2,
+			"r": 1,
+			"type": "block"
+		},
+		{
+			"q": 1,
+			"r": -2,
+			"type": "block"
+		}
+	],
 	"links": [],
 	"tiles": [
 		{
@@ -79,16 +106,14 @@
 			"r": 0
 		},
 		{
+			"goal": true,
 			"q": -3,
+			"r": 1
+		},
+		{
+			"goal": true,
+			"q": 3,
 			"r": -1
-		},
-		{
-			"q": -7,
-			"r": 3
-		},
-		{
-			"q": -4,
-			"r": 3
 		}
 	]
 }
