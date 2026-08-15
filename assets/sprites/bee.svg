@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="2048"
+   height="2048"
+   viewBox="0 0 2048 2048"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   sodipodi:docname="Bee.svg"
+   inkscape:export-filename="Normal Tile.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="0.076369402"
+     inkscape:cx="2618.8499"
+     inkscape:cy="530.3171"
+     inkscape:window-width="1920"
+     inkscape:window-height="1094"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Bee"
+     transform="matrix(0.79207104,0,0,1,90.927777,7.6210039)"
+     style="stroke-width:1.12362">
+    <g
+       id="g3"
+       inkscape:label="Body"
+       transform="matrix(0.87037206,0,0,0.81338113,237.29967,184.35018)"
+       style="stroke-width:1.33543">
+      <path
+         style="opacity:1;fill:#221100;fill-opacity:1;stroke:none;stroke-width:128.201;stroke-dasharray:none;stroke-opacity:1"
+         d="M 318.68316,734.43666 C 194.0971,842.50383 192.34176,959.82762 -54.494151,975.77142 184.8507,1000.4228 183.21979,1125.43 316.04897,1262.313"
+         id="path3"
+         sodipodi:nodetypes="ccc"
+         inkscape:label="Stinger" />
+      <rect
+         style="opacity:1;fill:#eeaa22;fill-opacity:1;stroke:#221100;stroke-width:128.201;stroke-dasharray:none;stroke-opacity:1"
+         id="rect1"
+         width="1557.8958"
+         height="697.23511"
+         x="261.50394"
+         y="650.31299"
+         ry="403.99689"
+         rx="476.65375"
+         inkscape:label="Capsule" />
+      <rect
+         style="opacity:1;fill:#221100;fill-opacity:1;stroke:none;stroke-width:128.201;stroke-dasharray:none;stroke-opacity:1"
+         id="rect3"
+         width="823.45929"
+         height="734.43665"
+         x="617.59442"
+         y="623.15839"
+         rx="0"
+         ry="0"
+         inkscape:label="Stripe" />
+    </g>
+    <g
+       id="g6"
+       inkscape:label="Left Antenna"
+       transform="matrix(0.81906562,0,0,0.81338113,340.50358,189.67549)"
+       style="stroke-width:1.37662">
+      <path
+         style="opacity:1;fill:none;fill-opacity:1;stroke:#221100;stroke-width:132.155;stroke-dasharray:none;stroke-opacity:1"
+         d="m 1721.374,766.63091 c 419.3003,34.20964 544.2283,-180.0466 417.905,-432.85977"
+         id="path4"
+         sodipodi:nodetypes="cc" />
+      <ellipse
+         style="opacity:1;fill:#221100;fill-opacity:1;stroke:none;stroke-width:132.155;stroke-dasharray:none;stroke-opacity:1"
+         id="path5"
+         cx="2126.0491"
+         cy="325.60703"
+         rx="121.20125"
+         ry="96" />
+    </g>
+    <g
+       id="g7"
+       inkscape:label="Right Antenna"
+       transform="matrix(0.81906562,0,0,0.81338113,340.50358,189.67549)"
+       style="stroke-width:1.37662">
+      <path
+         style="fill:none;fill-opacity:1;stroke:#221100;stroke-width:132.155;stroke-dasharray:none;stroke-opacity:1"
+         d="m 1732.7634,1210.0905 c 419.3003,-34.2097 544.2283,180.0466 417.905,432.8598"
+         id="path4-2"
+         sodipodi:nodetypes="cc" />
+      <ellipse
+         style="fill:#221100;fill-opacity:1;stroke:none;stroke-width:132.155;stroke-dasharray:none;stroke-opacity:1"
+         id="path5-2"
+         cx="2136.1802"
+         cy="1649.5752"
+         rx="121.20125"
+         ry="96" />
+    </g>
+    <ellipse
+       style="fill:#ffdd77;fill-opacity:1;stroke:#221100;stroke-width:109.092;stroke-dasharray:none;stroke-opacity:1"
+       id="path6-6"
+       cx="-117.36262"
+       cy="1535.8948"
+       rx="642.33691"
+       ry="289.8761"
+       transform="matrix(0.90249594,-0.43069836,0.61076218,0.7918141,0,0)"
+       inkscape:label="Right Wing" />
+    <ellipse
+       style="fill:#ffdd77;fill-opacity:1;stroke:#221100;stroke-width:109.092;stroke-dasharray:none;stroke-opacity:1"
+       id="path6-6-1"
+       cx="1149.3215"
+       cy="-342.32285"
+       rx="642.33691"
+       ry="289.8761"
+       transform="matrix(0.90249594,0.43069836,0.61076218,-0.7918141,0,0)"
+       inkscape:label="Left Wing" />
+  </g>
+</svg>

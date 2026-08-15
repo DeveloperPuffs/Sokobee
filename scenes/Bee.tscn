@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://b68jrnaws4an1"]
 
 [ext_resource type="Script" uid="uid://bg0sgpjuhbi8" path="res://source/bee.gd" id="1_cncwb"]
-[ext_resource type="Texture2D" uid="uid://6i7d4viq873v" path="res://assets/sprites/character_placeholder.svg" id="2_cncwb"]
+[ext_resource type="Texture2D" uid="uid://dxehbqgmwn6k7" path="res://assets/sprites/Bee.svg" id="1_ghu41"]
 [ext_resource type="Texture2D" uid="uid://etinujhfeptf" path="res://assets/sprites/sleeping_indicator_placeholder.svg" id="3_ghu41"]
 
 [node name="Bee" type="Sprite2D" unique_id=639480441 node_paths=PackedStringArray("_sleeping_indicator")]
-texture = ExtResource("2_cncwb")
+texture = ExtResource("1_ghu41")
 script = ExtResource("1_cncwb")
 _sleeping_indicator = NodePath("SleepingIndicator")
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://6i7d4viq873v"
-path="res://.godot/imported/character_placeholder.svg-194996238eb39315698d15b3627b1152.ctex"
+uid="uid://dxehbqgmwn6k7"
+path="res://.godot/imported/Bee.svg-3a348095b8fda2c42b8f4c64bff0ba9d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/character_placeholder.svg"
-dest_files=["res://.godot/imported/character_placeholder.svg-194996238eb39315698d15b3627b1152.ctex"]
+source_file="res://assets/sprites/Bee.svg"
+dest_files=["res://.godot/imported/Bee.svg-3a348095b8fda2c42b8f4c64bff0ba9d.ctex"]
 
 [params]
 
@@ -38,6 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=4.0
+svg/scale=0.125
 editor/scale_with_editor_scale=false
 editor/convert_colors_with_editor_theme=false

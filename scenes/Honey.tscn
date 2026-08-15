@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://cmv0kkthsgbs"]
 
 [ext_resource type="Script" uid="uid://vp8ad5qystq8" path="res://source/honey.gd" id="1_24mbs"]
-[ext_resource type="Texture2D" uid="uid://d2wuc85eb88lc" path="res://assets/sprites/block_placeholder.svg" id="2_24mbs"]
+[ext_resource type="Texture2D" uid="uid://ca40dtv5fqov1" path="res://assets/sprites/Honey.svg" id="1_uqqcw"]
 
 [node name="Honey" type="Sprite2D" unique_id=52704376]
-texture = ExtResource("2_24mbs")
+texture = ExtResource("1_uqqcw")
 script = ExtResource("1_24mbs")
