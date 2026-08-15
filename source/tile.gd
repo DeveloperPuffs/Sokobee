@@ -1,6 +1,9 @@
 class_name Tile
 
 
+const MINIMUM_HEIGHT := -1
+const MAXIMUM_HEIGHT := 1
+
 var position: Vector2i
 var goal: bool
 var height: int

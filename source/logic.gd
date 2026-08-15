@@ -18,6 +18,9 @@ static func win_check(state: State) -> bool:
 
 
 static func try_move_character(state: State, character: Character, direction: Hexagon.Direction) -> bool:
+	if character.asleep:
+		return false
+
 	var direction_vector := Hexagon.get_direction_vector(direction)
 
 	var moving_entities: Dictionary[Entity, Tile] = {}
@@ -86,10 +89,16 @@ static func try_move_character(state: State, character: Character, direction: He
 
 
 static func rotate_character_left(character: Character) -> void:
+	if character.asleep:
+		return
+
 	character.facing_direction = Hexagon.get_direction_turned_left(character.facing_direction)
 
 
 static func rotate_character_right(character: Character) -> void:
+	if character.asleep:
+		return
+
 	character.facing_direction = Hexagon.get_direction_turned_right(character.facing_direction)
 
 

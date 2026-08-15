@@ -14,30 +14,29 @@ func get_absolute_filepath() -> String:
 	return "res://assets/levels/" + filepath
 
 
-func load_state() -> State:
+func load_state() -> LoadResult:
+	var result := LoadResult.new()
+
 	var level_data_filepath := get_absolute_filepath()
 	var level_data_string := FileAccess.get_file_as_string(level_data_filepath)
 	if level_data_string == "":
-		return null
+		result.add_fatal("Failed to read " + filepath)
+		return result
 
 	var json_parser := JSON.new()
 	var json_parsing_result := json_parser.parse(level_data_string)
 	if json_parsing_result != OK:
-		print("JSON Parsing Error {error} at {path}:{line} - {message}".format({
+		result.add_fatal("JSON Parsing Error {error} at {path}:{line} - {message}".format({
 			"error": json_parsing_result,
 			"filepath": level_data_filepath,
 			"line": json_parser.get_error_line(),
 			"message": json_parser.get_error_message()
 		}))
 
-		return null
+		return result
 
-	var level_data := json_parser.data as Dictionary
-	var state := Serializer.load_level_state(level_data)
-	if state == null:
-		return null
-
-	return state
+	Serializer.load_level_state(json_parser.data, result)
+	return result
 
 
 func save_state(state: State) -> bool:
@@ -58,3 +57,36 @@ func save_state(state: State) -> bool:
 	file.close()
 
 	return true
+
+
+class LoadResult:
+	var state: State = State.new()
+	var issues: Array[Issue] = []
+
+
+	func add_warning(message: String) -> void:
+		issues.append(Issue.warning(message))
+
+
+	func add_error(message: String) -> void:
+		issues.append(Issue.error(message))
+
+
+	func add_fatal(message: String) -> void:
+		issues.append(Issue.fatal(message))
+
+
+	func has_errors() -> bool:
+		return _has_issue_severity(Issue.Severity.ERROR)
+
+
+	func has_fatal_errors() -> bool:
+		return _has_issue_severity(Issue.Severity.FATAL)
+
+
+	func _has_issue_severity(minimum_severity: Issue.Severity) -> bool:
+		for issue in issues:
+			if issue.severity >= minimum_severity:
+				return true
+
+		return false

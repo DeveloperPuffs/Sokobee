@@ -30,13 +30,13 @@ func _load_level() -> void:
 		exited_game.emit()
 		return
 
-	var state := level.load_state()
-	if state == null:
+	var result := level.load_state()
+	if result.has_errors():
 		exited_game.emit()
 		return
 
-	_controller.load(state)
-	_honeycomb.load(state)
+	_controller.load(result.state)
+	_honeycomb.load(result.state)
 
 
 func _on_level_completed() -> void:

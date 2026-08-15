@@ -55,7 +55,7 @@ enum Tool {
 @export var _edit_button: Button
 @export var _keep_layout_button: Button
 
-static var NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER := 0
+static var _NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER := 0
 
 var _manifest: Manifest
 var _level: Level = null
@@ -67,8 +67,25 @@ var _honeycomb_is_dirty := false
 var _playtesting := false
 var _snapshot: Snapshot = null
 
+var _issue_dialog: AcceptDialog
+var _confirmation_dialog: ConfirmationDialog
+var _save_pending_is_as_new_level := false
+
 
 func _ready() -> void:
+	_issue_dialog = AcceptDialog.new()
+	_issue_dialog.title = "Level Issues"
+	_issue_dialog.exclusive = true
+	add_child(_issue_dialog)
+
+	_confirmation_dialog = ConfirmationDialog.new()
+	_confirmation_dialog.title = "Save Level With Warnings"
+	_confirmation_dialog.exclusive = true
+	_confirmation_dialog.ok_button_text = "Save"
+	_confirmation_dialog.cancel_button_text = "Cancel"
+	_confirmation_dialog.confirmed.connect(_on_save_confirmed)
+	add_child(_confirmation_dialog)
+
 	_manifest = Manifest.new("res://assets/levels/manifest.json")
 	if _manifest.editor_level == null:
 		exited_editor.emit()
@@ -76,7 +93,7 @@ func _ready() -> void:
 
 	_controller.restart_requested.connect(_on_restart_requested)
 
-	_level_selector_dropdown.add_item("New Level", NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER)
+	_level_selector_dropdown.add_item("New Level", _NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER)
 
 	for index in _manifest.levels.size():
 		_level_selector_dropdown.add_item(_manifest.levels[index].title, index + 1)
@@ -168,20 +185,22 @@ func _on_keep_layout() -> void:
 func _on_level_option_item_selected(index: int) -> void:
 	var selected_level := _manifest.editor_level
 	var item_identifier := _level_selector_dropdown.get_item_id(index)
-	if item_identifier != NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER:
+	if item_identifier != _NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER:
 		selected_level = _manifest.levels[item_identifier - 1]
 
 	if selected_level == _level:
 		return
 
-	var state := selected_level.load_state()
-	if state == null:
-		print("Failed to load level state: " + selected_level.get_full_filepath())
+	var result := selected_level.load_state()
+	for issue in result.issues:
+		print(issue)
+
+	if result.has_fatal_errors():
 		exited_editor.emit()
 		return
 
 	_level = selected_level
-	_state = state
+	_state = result.state
 	_snapshot = null
 	_clusters_are_dirty = false
 	_honeycomb_is_dirty = false
@@ -192,12 +211,62 @@ func _on_level_option_item_selected(index: int) -> void:
 	_honeycomb.load(_state)
 	_title_input.text = selected_level.title
 
+	if not result.issues.is_empty():
+		_issue_dialog.title = "Level Issues"
+		_issue_dialog.dialog_text = "This level loaded with {issue_count} issue(s).\nCheck the output log before saving over it.".format({
+			"issue_count": result.issues.size()
+		})
+
+		_issue_dialog.popup_centered.call_deferred()
+
 
 func _on_save() -> void:
+	_request_save(_level == _manifest.editor_level)
+
+
+func _on_save_new() -> void:
+	_request_save(true)
+
+
+func _request_save(as_new_level: bool) -> void:
 	_toggle_playtesting(false)
 
-	if _level == _manifest.editor_level:
-		_on_save_new()
+	var issues := _validate_level_state()
+	var has_errors := false
+	for issue in issues:
+		print(issue)
+
+		if issue.severity >= Issue.Severity.ERROR:
+			has_errors = true
+
+	if has_errors:
+		_issue_dialog.title = "Cannot Save Level"
+		_issue_dialog.dialog_text = "This level has {issue_count} issue(s) that must be fixed before it can be saved.\nCheck the output log.".format({
+			"issue_count": issues.size()
+		})
+
+		_issue_dialog.popup_centered.call_deferred()
+		return
+
+	if issues.is_empty():
+		_save_level(as_new_level)
+		return
+
+	_save_pending_is_as_new_level = as_new_level
+	_confirmation_dialog.dialog_text = "This level has {issue_count} warning(s).\nCheck the output log before saving.".format({
+		"issue_count": issues.size()
+	})
+
+	_confirmation_dialog.popup_centered.call_deferred()
+
+
+func _on_save_confirmed() -> void:
+	_save_level(_save_pending_is_as_new_level)
+
+
+func _save_level(as_new_level: bool) -> void:
+	if as_new_level:
+		_save_new_level()
 		return
 
 	_level.title = _title_input.text
@@ -206,13 +275,11 @@ func _on_save() -> void:
 
 	_manifest.register_level(_level)
 
-	var level_dropdown_item_index = _level_selector_dropdown.get_item_index(_manifest.levels.find(_level) - 1)
+	var level_dropdown_item_index = _level_selector_dropdown.get_item_index(_manifest.levels.find(_level) + 1)
 	_level_selector_dropdown.set_item_text(level_dropdown_item_index, _level.title)
 
 
-func _on_save_new() -> void:
-	_toggle_playtesting(false)
-
+func _save_new_level() -> void:
 	var level := _manifest.create_level(_title_input.text)
 	if not level.save_state(_state):
 		return
@@ -225,6 +292,51 @@ func _on_save_new() -> void:
 	var level_dropdown_item_identifier = _manifest.levels.size()
 	_level_selector_dropdown.add_item(level.title, level_dropdown_item_identifier)
 	_level_selector_dropdown.select(_level_selector_dropdown.get_item_index(level_dropdown_item_identifier))
+
+
+func _validate_level_state() -> Array[Issue]:
+	var issues: Array[Issue] = []
+
+	var has_playable_character = false
+	for character in _state.characters:
+		if not character.asleep:
+			has_playable_character = true
+			break
+
+	if not has_playable_character:
+		issues.append(Issue.error("The level has no playable characters"))
+
+	if _state.active_character == null:
+		issues.append(Issue.warning("No active character is initially selected"))
+
+	var goal_tiles: Array[Tile] = []
+	for tile: Tile in _state.tiles.values():
+		if tile.goal:
+			goal_tiles.append(tile)
+
+	if goal_tiles.is_empty():
+		issues.append(Issue.error("The level has no goal tiles"))
+	else:
+		var block_count := 0
+		for entity in _state.entities:
+			if entity is Block:
+				block_count += 1
+
+		if block_count < goal_tiles.size():
+			issues.append(Issue.error("The level has more goal tiles ({goals}) than blocks ({blocks}), so it cannot be completed".format({
+				"goals": goal_tiles.size(),
+				"blocks": block_count
+			})))
+		elif block_count > goal_tiles.size():
+			issues.append(Issue.warning("The level has more blocks ({blocks}) than goal tiles ({goals})".format({
+				"blocks": block_count,
+				"goals": goal_tiles.size()
+			})))
+
+		if Logic.win_check(_state):
+			issues.append(Issue.error("Every goal tile already has a block on it, so the level starts completed"))
+
+	return issues
 
 
 func _handle_mouse_click(mouse_button: MouseButton) -> void:
@@ -360,7 +472,8 @@ func _handle_key_press(key: Key) -> void:
 		var selected_character := _selected_element as Character
 		match key:
 			KEY_C:
-				_state.active_character = selected_character
+				if not selected_character.asleep:
+					_state.active_character = selected_character
 
 			KEY_A, KEY_LEFT:
 				var new_direction := Hexagon.get_direction_turned_left(selected_character.facing_direction)

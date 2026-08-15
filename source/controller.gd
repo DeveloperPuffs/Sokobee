@@ -35,7 +35,7 @@ func set_active(active: bool) -> void:
 
 
 func _on_move_forward() -> void:
-	if _state.active_character == null:
+	if _state.active_character == null or _state.active_character.asleep:
 		return
 
 	var snapshot := Snapshot.new(_state)
@@ -47,7 +47,7 @@ func _on_move_forward() -> void:
 
 
 func _on_move_backward() -> void:
-	if _state.active_character == null:
+	if _state.active_character == null or _state.active_character.asleep:
 		return
 
 	var snapshot := Snapshot.new(_state)
@@ -60,7 +60,7 @@ func _on_move_backward() -> void:
 
 
 func _on_turn_left() -> void:
-	if _state.active_character == null:
+	if _state.active_character == null or _state.active_character.asleep:
 		return
 
 	_history.take_snapshot(_state)
@@ -68,7 +68,7 @@ func _on_turn_left() -> void:
 
 
 func _on_turn_right() -> void:
-	if _state.active_character == null:
+	if _state.active_character == null or _state.active_character.asleep:
 		return
 
 	_history.take_snapshot(_state)
