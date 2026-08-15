@@ -25,11 +25,11 @@ func _ready() -> void:
 
 
 func _load_level() -> void:
-	var level: Level = _manifest.levels.get(_level_number - 1)
-	if level == null:
+	if _level_number > _manifest.levels.size():
 		exited_game.emit()
 		return
 
+	var level: Level = _manifest.levels[_level_number - 1]
 	var result := level.load_state()
 	if result.has_errors():
 		exited_game.emit()
