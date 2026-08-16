@@ -54,8 +54,11 @@ enum Tool {
 @export var _tool_selector_dropdown: OptionButton
 @export var _edit_button: Button
 @export var _keep_layout_button: Button
+@export var _open_level_dialog: AcceptDialog
+@export var _save_level_confirmation_dialog: ConfirmationDialog
+@export var _cannot_save_level_dialog: AcceptDialog
 
-static var _NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER := 0
+const _NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER := 0
 
 var _manifest: Manifest
 var _level: Level = null
@@ -66,30 +69,11 @@ var _clusters_are_dirty := false
 var _honeycomb_is_dirty := false
 var _playtesting := false
 var _snapshot: Snapshot = null
-
-var _issue_dialog: AcceptDialog
-var _confirmation_dialog: ConfirmationDialog
 var _save_pending_is_as_new_level := false
 
 
 func _ready() -> void:
-	_issue_dialog = AcceptDialog.new()
-	_issue_dialog.title = "Level Issues"
-	_issue_dialog.exclusive = true
-	add_child(_issue_dialog)
-
-	_confirmation_dialog = ConfirmationDialog.new()
-	_confirmation_dialog.title = "Save Level With Warnings"
-	_confirmation_dialog.exclusive = true
-	_confirmation_dialog.ok_button_text = "Save"
-	_confirmation_dialog.cancel_button_text = "Cancel"
-	_confirmation_dialog.confirmed.connect(_on_save_confirmed)
-	add_child(_confirmation_dialog)
-
 	_manifest = Manifest.new("res://assets/levels/manifest.json")
-	if _manifest.editor_level == null:
-		exited_editor.emit()
-		return
 
 	_controller.restart_requested.connect(_on_restart_requested)
 
@@ -115,10 +99,12 @@ func _ready() -> void:
 
 	_tool_selector_dropdown.select(Tool.TILE)
 	_tool_selector_dropdown.item_selected.connect(_on_tool_option_item_selected)
-	_on_tool_option_item_selected(Tool.TILE as int)
+	_on_tool_option_item_selected(Tool.TILE)
 
 	_edit_button.pressed.connect(_toggle_playtesting)
 	_keep_layout_button.pressed.connect(_on_keep_layout)
+
+	_save_level_confirmation_dialog.confirmed.connect(_on_save_confirmed)
 
 
 func _process(_delta: float) -> void:
@@ -212,12 +198,7 @@ func _on_level_option_item_selected(index: int) -> void:
 	_title_input.text = selected_level.title
 
 	if not result.issues.is_empty():
-		_issue_dialog.title = "Level Issues"
-		_issue_dialog.dialog_text = "This level loaded with {issue_count} issue(s).\nCheck the output log before saving over it.".format({
-			"issue_count": result.issues.size()
-		})
-
-		_issue_dialog.popup_centered.call_deferred()
+		_open_level_dialog.popup_centered.call_deferred()
 
 
 func _on_save() -> void:
@@ -240,12 +221,7 @@ func _request_save(as_new_level: bool) -> void:
 			has_errors = true
 
 	if has_errors:
-		_issue_dialog.title = "Cannot Save Level"
-		_issue_dialog.dialog_text = "This level has {issue_count} issue(s) that must be fixed before it can be saved.\nCheck the output log.".format({
-			"issue_count": issues.size()
-		})
-
-		_issue_dialog.popup_centered.call_deferred()
+		_cannot_save_level_dialog.popup_centered.call_deferred()
 		return
 
 	if issues.is_empty():
@@ -253,11 +229,7 @@ func _request_save(as_new_level: bool) -> void:
 		return
 
 	_save_pending_is_as_new_level = as_new_level
-	_confirmation_dialog.dialog_text = "This level has {issue_count} warning(s).\nCheck the output log before saving.".format({
-		"issue_count": issues.size()
-	})
-
-	_confirmation_dialog.popup_centered.call_deferred()
+	_save_level_confirmation_dialog.popup_centered.call_deferred()
 
 
 func _on_save_confirmed() -> void:

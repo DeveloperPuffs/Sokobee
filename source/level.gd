@@ -26,7 +26,7 @@ func load_state() -> LoadResult:
 	var json_parser := JSON.new()
 	var json_parsing_result := json_parser.parse(level_data_string)
 	if json_parsing_result != OK:
-		result.add_fatal("JSON Parsing Error {error} at {path}:{line} - {message}".format({
+		result.add_fatal("JSON Parsing Error {error} at {filepath}:{line} - {message}".format({
 			"error": json_parsing_result,
 			"filepath": level_data_filepath,
 			"line": json_parser.get_error_line(),
