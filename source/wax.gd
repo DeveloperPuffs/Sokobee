@@ -42,6 +42,6 @@ func _refresh() -> void:
 	position = (world_position_a + world_position_b) / 2.0
 	rotation = delta.angle()
 
-	var z_index_a = Hexagon.get_tile_z_index(tile_position_a)
-	var z_index_b = Hexagon.get_tile_z_index(tile_position_b)
+	var z_index_a := Hexagon.get_tile_z_index(tile_position_a)
+	var z_index_b := Hexagon.get_tile_z_index(tile_position_b)
 	z_index = max(z_index_a, z_index_b) + 3

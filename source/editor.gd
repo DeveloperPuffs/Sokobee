@@ -275,7 +275,7 @@ func _save_level(as_new_level: bool) -> void:
 
 	_manifest.register_level(_level)
 
-	var level_dropdown_item_index = _level_selector_dropdown.get_item_index(_manifest.levels.find(_level) + 1)
+	var level_dropdown_item_index := _level_selector_dropdown.get_item_index(_manifest.levels.find(_level) + 1)
 	_level_selector_dropdown.set_item_text(level_dropdown_item_index, _level.title)
 
 
@@ -289,7 +289,7 @@ func _save_new_level() -> void:
 	_level = level
 	_title_input.text = level.title
 
-	var level_dropdown_item_identifier = _manifest.levels.size()
+	var level_dropdown_item_identifier := _manifest.levels.size()
 	_level_selector_dropdown.add_item(level.title, level_dropdown_item_identifier)
 	_level_selector_dropdown.select(_level_selector_dropdown.get_item_index(level_dropdown_item_identifier))
 
@@ -297,7 +297,7 @@ func _save_new_level() -> void:
 func _validate_level_state() -> Array[Issue]:
 	var issues: Array[Issue] = []
 
-	var has_playable_character = false
+	var has_playable_character := false
 	for character in _state.characters:
 		if not character.asleep:
 			has_playable_character = true
@@ -369,7 +369,7 @@ func _handle_mouse_click(mouse_button: MouseButton) -> void:
 			_set_selected_element(entity)
 			return
 
-		var selected_entity := _selected_element as Entity
+		var selected_entity: Entity = _selected_element
 
 		var tile_position_a := selected_entity.current_tile.position
 		var tile_position_b := entity.current_tile.position
@@ -446,7 +446,7 @@ func _handle_mouse_click(mouse_button: MouseButton) -> void:
 
 func _handle_key_press(key: Key) -> void:
 	if _selected_element is Tile:
-		var selected_tile := _selected_element as Tile
+		var selected_tile: Tile = _selected_element
 
 		match key:
 			KEY_G:
@@ -469,7 +469,7 @@ func _handle_key_press(key: Key) -> void:
 				_remove_tile(selected_tile)
 
 	elif _selected_element is Character:
-		var selected_character := _selected_element as Character
+		var selected_character: Character = _selected_element
 		match key:
 			KEY_C:
 				if not selected_character.asleep:
@@ -491,13 +491,13 @@ func _handle_key_press(key: Key) -> void:
 				_remove_character(selected_character)
 
 	elif _selected_element is Block:
-		var selected_block := _selected_element as Block
+		var selected_block: Block = _selected_element
 		match key:
 			KEY_DELETE, KEY_BACKSPACE:
 				_remove_block(selected_block)
 
 	elif _selected_element is Link:
-		var selected_link := _selected_element as Link
+		var selected_link: Link = _selected_element
 		match key:
 			KEY_T:
 				if selected_link.entity_a is Character or selected_link.entity_b is Character:
@@ -575,20 +575,20 @@ func _set_selected_element(selected_element: Variant) -> void:
 	_selected_link_indicator.visible = selected_element is Link
 
 	if selected_element is Tile:
-		var selected_tile := selected_element as Tile
+		var selected_tile: Tile = selected_element
 		var cell_position := selected_tile.position
 		var cell_height := selected_tile.height
 		_selected_tile_indicator.display(Cell.Type.SELECTED, cell_position, cell_height)
 
 	elif selected_element is Entity:
-		var selected_entity := selected_element as Entity
+		var selected_entity: Entity = selected_element
 		var tile_position := selected_entity.current_tile.position
 		var elevation := selected_entity.get_elevation()
 		_selected_entity_indicator.position = Hexagon.get_tile_world_position(tile_position, elevation)
 		_selected_entity_indicator.z_index = Hexagon.get_tile_z_index(tile_position) + 3
 
 	elif selected_element is Link:
-		var selected_link := selected_element as Link
+		var selected_link: Link = selected_element
 
 		var tile_position_a := selected_link.entity_a.current_tile.position
 		var tile_position_b := selected_link.entity_b.current_tile.position
@@ -634,7 +634,7 @@ func _remove_character(character: Character) -> void:
 	if character == _state.active_character:
 		_state.active_character = null
 
-	for link in character.links.duplicate():
+	for link: Link in character.links.duplicate():
 		_remove_link(link)
 
 	_state.entities.erase(character)
@@ -646,7 +646,7 @@ func _remove_block(block: Block) -> void:
 	if block == _selected_element:
 		_set_selected_element(null)
 
-	for link in block.links.duplicate():
+	for link: Link in block.links.duplicate():
 		_remove_link(link)
 
 	_state.entities.erase(block)

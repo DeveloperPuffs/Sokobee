@@ -37,13 +37,16 @@ func _set_scene(scene: PackedScene) -> void:
 	active_scene = scene.instantiate()
 
 	if active_scene is Menu:
-		active_scene.play_button_pressed.connect(_set_game_scene)
-		active_scene.edit_button_pressed.connect(_set_edit_scene)
-		active_scene.quit_button_pressed.connect(_on_quit)
+		var menu_scene: Menu = active_scene
+		menu_scene.play_button_pressed.connect(_set_game_scene)
+		menu_scene.edit_button_pressed.connect(_set_edit_scene)
+		menu_scene.quit_button_pressed.connect(_on_quit)
 	elif active_scene is Game:
-		active_scene.exited_game.connect(_set_menu_scene)
+		var game_scene: Game = active_scene
+		game_scene.exited_game.connect(_set_menu_scene)
 	elif active_scene is Editor:
-		active_scene.exited_editor.connect(_set_menu_scene)
+		var editor_scene: Editor = active_scene
+		editor_scene.exited_editor.connect(_set_menu_scene)
 
 	add_child(active_scene)
 

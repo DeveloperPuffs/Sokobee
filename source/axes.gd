@@ -25,6 +25,6 @@ func _draw_axis(canvas_transform: Transform2D, center: Vector2, direction: Hexag
 	var screen_direction := canvas_transform.basis_xform(world_direction).normalized()
 
 	var distance := get_viewport_rect().size.length() + center.length()
-	var endpoint_a = center - screen_direction * distance
-	var endpoint_b = center + screen_direction * distance
+	var endpoint_a := center - screen_direction * distance
+	var endpoint_b := center + screen_direction * distance
 	draw_line(endpoint_a, endpoint_b, color, 1.0)

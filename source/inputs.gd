@@ -27,6 +27,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		redid_step.emit()
 	elif event.is_action_pressed("restart_level"):
 		restarted_level.emit()
-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed:
+	elif event is InputEventMouseButton:
+		var mouse_button_event: InputEventMouseButton = event
+		if mouse_button_event.button_index == MOUSE_BUTTON_LEFT and mouse_button_event.pressed:
 			clicked_tile.emit()

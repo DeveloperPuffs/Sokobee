@@ -8,32 +8,36 @@ const _BLOCK_KEYS: Array[String] = ["type", "q", "r", "identifier"]
 const _LINK_KEYS: Array[String] = ["type", "identifier_a", "identifier_b"]
 
 
-static func load_level_state(level_data: Variant, result: Level.LoadResult) -> void:
+static func load_level_state(level_data_value: Variant, result: Level.LoadResult) -> void:
 	var context := _LoadContext.new(result)
 
-	if level_data is not Dictionary:
+	if level_data_value is not Dictionary:
 		context.add_fatal("The level data is not an object")
 		return
 
+	var level_data: Dictionary = level_data_value
 	_check_keys(level_data, _LEVEL_KEYS, "The level", context)
 
 	var tiles_value: Variant = level_data.get("tiles")
 	if tiles_value is Array:
-		_load_tiles(tiles_value as Array, context)
+		var tiles_array: Array = tiles_value
+		_load_tiles(tiles_array, context)
 		context.tiles_are_loaded = true
 	else:
 		context.add_fatal("Missing or invalid \"tiles\" array")
 
 	var entities_value: Variant = level_data.get("entities")
 	if entities_value is Array:
-		_load_entities(entities_value as Array, context)
+		var entities_array: Array = entities_value
+		_load_entities(entities_array, context)
 		context.entities_are_loaded = true
 	else:
 		context.add_fatal("Missing or invalid \"entities\" array")
 
 	var links_value: Variant = level_data.get("links")
 	if links_value is Array:
-		_load_links(links_value as Array, context)
+		var links_array: Array = links_value
+		_load_links(links_array, context)
 		context.links_are_loaded = true
 	else:
 		context.add_fatal("Missing or invalid \"links\" array")
@@ -120,15 +124,16 @@ static func _load_tiles(tiles_data: Array, context: _LoadContext) -> void:
 	var tile_indices: Dictionary[Vector2i, int] = {}
 
 	for tile_index in tiles_data.size():
-		var tile_value: Variant = tiles_data[tile_index]
-		if tile_value is not Dictionary:
+		var tile_data_value: Variant = tiles_data[tile_index]
+		if tile_data_value is not Dictionary:
 			context.add_error("Tile {index} is not an object".format({
 				"index": tile_index
 			}))
 
 			continue
 
-		var tile := _load_tile(tile_value as Dictionary, tile_index, context)
+		var tile_data: Dictionary = tile_data_value
+		var tile := _load_tile(tile_data, tile_index, context)
 		if tile == null:
 			continue
 
@@ -191,15 +196,16 @@ static func _load_tile(tile_data: Dictionary, tile_index: int, context: _LoadCon
 
 static func _load_entities(entities_data: Array, context: _LoadContext) -> void:
 	for entity_index in entities_data.size():
-		var entity_value: Variant = entities_data[entity_index]
-		if entity_value is not Dictionary:
+		var entity_data_value: Variant = entities_data[entity_index]
+		if entity_data_value is not Dictionary:
 			context.add_error("Entity {index} is not an object".format({
 				"index": entity_index
 			}))
 
 			continue
 
-		var entity := _load_entity(entity_value as Dictionary, entity_index, context)
+		var entity_data: Dictionary = entity_data_value
+		var entity := _load_entity(entity_data, entity_index, context)
 		if entity == null:
 			continue
 
@@ -255,7 +261,8 @@ static func _load_entity(entity_data: Dictionary, entity_index: int, context: _L
 			context.add_error(description + " has a missing or invalid \"facing\"")
 			return null
 
-		var direction_value: Variant = _direction_from_string(facing_value)
+		var facing: String = facing_value
+		var direction_value: Variant = _direction_from_string(facing)
 		if direction_value == null:
 			context.add_error(description + " has an unknown \"facing\": \"{facing}\"".format({
 				"facing": facing_value
@@ -312,15 +319,16 @@ static func _load_entity(entity_data: Dictionary, entity_index: int, context: _L
 
 static func _load_links(links_data: Array, context: _LoadContext) -> void:
 	for link_index in links_data.size():
-		var link_value: Variant = links_data[link_index]
-		if link_value is not Dictionary:
+		var link_data_value: Variant = links_data[link_index]
+		if link_data_value is not Dictionary:
 			context.add_error("Link {index} is not an object".format({
 				"index": link_index
 			}))
 
 			continue
 
-		var link := _load_link(link_value as Dictionary, link_index, context)
+		var link_data: Dictionary = link_data_value
+		var link := _load_link(link_data, link_index, context)
 		if link == null:
 			continue
 
@@ -341,7 +349,8 @@ static func _load_link(link_data: Dictionary, link_index: int, context: _LoadCon
 
 		return null
 
-	var link_type_value: Variant = _link_type_from_string(type_value)
+	var type: String = type_value
+	var link_type_value: Variant = _link_type_from_string(type)
 	if link_type_value == null:
 		context.add_error("Link {index} has an unknown \"type\": \"{type}\"".format({
 			"index": link_index,
@@ -518,7 +527,9 @@ static func _read_position(data: Dictionary) -> Variant:
 	if q_value is not int or r_value is not int:
 		return null
 
-	return Vector2i(q_value as int, r_value as int)
+	var q: int = q_value
+	var r: int = r_value
+	return Vector2i(q, r)
 
 
 static func _describe_position(tile_position: Vector2i) -> String:

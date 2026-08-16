@@ -28,11 +28,11 @@ static func try_move_character(state: State, character: Character, direction: He
 
 	queued_entities.append(character)
 	while not queued_entities.is_empty():
-		var entity = queued_entities.pop_back()
+		var entity: Entity = queued_entities.pop_back()
 		if moving_entities.has(entity):
 			continue
 
-		var elevation = entity.get_elevation()
+		var elevation := entity.get_elevation()
 
 		var cluster: Array[Entity] = []
 		if entity is Block:

@@ -47,7 +47,7 @@ func load(state: State) -> void:
 	_waxes = []
 
 	for tile: Tile in state.tiles.values():
-		var cell := _cell_scene.instantiate()
+		var cell: Cell = _cell_scene.instantiate()
 		var cell_type := Cell.Type.GOAL if tile.goal else Cell.Type.NORMAL
 		cell.display(cell_type, tile.position, tile.height)
 		_cells.append(cell)
@@ -91,7 +91,7 @@ func _update_camera() -> void:
 	var screen_size := get_viewport_rect().size
 	var zoom_x := screen_size.x / grid_bounds.size.x
 	var zoom_y := screen_size.y / grid_bounds.size.y
-	var zoom_value := (min(zoom_x, zoom_y) as float) / 1.25 # 1.25 camera padding
+	var zoom_value := minf(zoom_x, zoom_y) / 1.25 # 1.25 camera padding
 
 	_camera.zoom = Vector2(zoom_value, zoom_value)
 	_camera.position = grid_bounds.position + grid_bounds.size / 2.0
