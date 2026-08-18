@@ -27,14 +27,14 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      inkscape:zoom="2.774755"
-     inkscape:cx="198.93648"
+     inkscape:cx="199.11668"
      inkscape:cy="140.01236"
      inkscape:window-width="3840"
      inkscape:window-height="1514"
      inkscape:window-x="2869"
      inkscape:window-y="-11"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="layer3"
      showgrid="false"
      labelstyle="default" />
   <defs
@@ -90,7 +90,7 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="Honey"
-     transform="translate(0,185.70219)">
+     transform="translate(-19.951476,197.5957)">
     <path
        style="opacity:1;fill:#bb8822;fill-opacity:1;stroke:none;stroke-width:96;stroke-dasharray:none;stroke-opacity:1"
        d="m 465.92152,681.06739 1156.56788,-10.33832 -0.4698,301.32034 -1156.72767,9.96358 z"
