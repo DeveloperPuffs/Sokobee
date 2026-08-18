@@ -1,0 +1,154 @@
+[gd_scene format=3 uid="uid://boc2xc2hwd5s0"]
+
+[ext_resource type="Script" uid="uid://cahua606tisn8" path="res://source/editor.gd" id="1_3kl07"]
+[ext_resource type="PackedScene" uid="uid://dqj3nmogbiner" path="res://scenes/Honeycomb.tscn" id="1_ndpqs"]
+[ext_resource type="PackedScene" uid="uid://b1uvikogqsnhd" path="res://scenes/Cell.tscn" id="2_diyc1"]
+[ext_resource type="Script" uid="uid://x1npinwlthpq" path="res://source/axes.gd" id="2_wmxca"]
+[ext_resource type="Texture2D" uid="uid://nmd5h2abqrvv" path="res://assets/sprites/editor/cell_selectable.svg" id="4_5x8yu"]
+[ext_resource type="Texture2D" uid="uid://d1c1veter3vl1" path="res://assets/sprites/editor/entity_selectable.svg" id="4_6tdr8"]
+[ext_resource type="Texture2D" uid="uid://crxl1uspui0ws" path="res://assets/sprites/editor/entity_selected.svg" id="4_j6dse"]
+[ext_resource type="Texture2D" uid="uid://7guquhydt7wy" path="res://assets/sprites/editor/cell_selected.svg" id="5_e4056"]
+[ext_resource type="Texture2D" uid="uid://ccb2348tvo6mu" path="res://assets/sprites/editor/link_selected.svg" id="5_wa12f"]
+[ext_resource type="PackedScene" uid="uid://cl821nsxaarwo" path="res://scenes/Controller.tscn" id="7_mwer8"]
+
+[node name="Editor" type="Node2D" unique_id=2004529548 node_paths=PackedStringArray("_selectable_tile_indicator", "_selected_tile_indicator", "_selected_entity_indicator", "_selectable_entity_indicator", "_selected_link_indicator", "_controller", "_honeycomb", "_level_selector_dropdown", "_save_button", "_save_new_button", "_exit_button", "_title_input", "_playtest_button", "_tool_selector_dropdown", "_edit_button", "_keep_layout_button", "_open_level_dialog", "_save_level_confirmation_dialog", "_cannot_save_level_dialog")]
+script = ExtResource("1_3kl07")
+_selectable_tile_indicator = NodePath("SelectableTileIndicator")
+_selected_tile_indicator = NodePath("SelectedTileIndicator")
+_selected_entity_indicator = NodePath("SelectedEntityIndicator")
+_selectable_entity_indicator = NodePath("SelectableEntityIndicator")
+_selected_link_indicator = NodePath("SelectedLinkIndicator")
+_controller = NodePath("Controller")
+_honeycomb = NodePath("Honeycomb")
+_level_selector_dropdown = NodePath("CanvasLayer/LevelSelectorDropdown")
+_save_button = NodePath("CanvasLayer/SaveButton")
+_save_new_button = NodePath("CanvasLayer/SaveNewButton")
+_exit_button = NodePath("CanvasLayer/ExitButton")
+_title_input = NodePath("CanvasLayer/TitleInput")
+_playtest_button = NodePath("CanvasLayer/PlaytestButton")
+_tool_selector_dropdown = NodePath("CanvasLayer/ToolSelectorDropdown")
+_edit_button = NodePath("CanvasLayer/EditButton")
+_keep_layout_button = NodePath("CanvasLayer/KeepLayoutButton")
+_open_level_dialog = NodePath("CanvasLayer/OpenLevelDialog")
+_save_level_confirmation_dialog = NodePath("CanvasLayer/SaveLevelConfirmationDialog")
+_cannot_save_level_dialog = NodePath("CanvasLayer/CannotSaveLevelDialog")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1706670417]
+
+[node name="OpenLevelDialog" type="AcceptDialog" parent="CanvasLayer" unique_id=813330455]
+oversampling_override = 1.0
+title = "Open Level with Issues"
+position = Vector2i(0, 36)
+size = Vector2i(598, 100)
+ok_button_text = "Open"
+dialog_text = "This level has issues. Check the output log before saving over it."
+
+[node name="SaveLevelConfirmationDialog" type="ConfirmationDialog" parent="CanvasLayer" unique_id=357314150]
+oversampling_override = 1.0
+title = "Save Level with Warnings"
+position = Vector2i(0, 36)
+size = Vector2i(290, 132)
+ok_button_text = "Save"
+dialog_text = "This level has warnings.
+Check the output log before saving."
+
+[node name="CannotSaveLevelDialog" type="AcceptDialog" parent="CanvasLayer" unique_id=391580034]
+oversampling_override = 1.0
+title = "Cannot Save Level"
+position = Vector2i(0, 36)
+size = Vector2i(495, 106)
+dialog_text = "This level has issues that must be fixed before it can be saved.
+Check the output log."
+
+[node name="LevelSelectorDropdown" type="OptionButton" parent="CanvasLayer" unique_id=1284995073]
+offset_left = 23.0
+offset_top = 16.0
+offset_right = 208.0
+offset_bottom = 68.0
+
+[node name="SaveButton" type="Button" parent="CanvasLayer" unique_id=2133996297]
+offset_left = 23.0
+offset_top = 81.0
+offset_right = 208.0
+offset_bottom = 133.0
+text = "Save"
+
+[node name="SaveNewButton" type="Button" parent="CanvasLayer" unique_id=1434468422]
+offset_left = 22.0
+offset_top = 148.0
+offset_right = 206.0
+offset_bottom = 199.0
+text = "Save New"
+
+[node name="ExitButton" type="Button" parent="CanvasLayer" unique_id=1908455310]
+offset_left = 23.0
+offset_top = 220.0
+offset_right = 207.0
+offset_bottom = 272.0
+theme_override_colors/font_color = Color(0.98039216, 0.39215687, 0.39215687, 1)
+text = "Exit"
+
+[node name="TitleInput" type="LineEdit" parent="CanvasLayer" unique_id=988604382]
+offset_left = 937.0
+offset_top = 16.0
+offset_right = 1122.0
+offset_bottom = 68.0
+text = "Unnamed Level"
+placeholder_text = "Title"
+
+[node name="PlaytestButton" type="Button" parent="CanvasLayer" unique_id=347463144]
+offset_left = 937.0
+offset_top = 81.0
+offset_right = 1121.0
+offset_bottom = 133.0
+text = "Playtest"
+
+[node name="ToolSelectorDropdown" type="OptionButton" parent="CanvasLayer" unique_id=613198431]
+offset_left = 934.0
+offset_top = 147.0
+offset_right = 1120.0
+offset_bottom = 199.0
+
+[node name="EditButton" type="Button" parent="CanvasLayer" unique_id=1408342012]
+visible = false
+offset_left = 936.0
+offset_top = 83.0
+offset_right = 1119.0
+offset_bottom = 135.0
+text = "Edit
+"
+
+[node name="KeepLayoutButton" type="Button" parent="CanvasLayer" unique_id=742934377]
+visible = false
+offset_left = 936.0
+offset_top = 148.0
+offset_right = 1121.0
+offset_bottom = 201.0
+text = "Keep Layout"
+
+[node name="Axes" type="Node2D" parent="CanvasLayer" unique_id=771309044]
+script = ExtResource("2_wmxca")
+
+[node name="SelectableTileIndicator" parent="." unique_id=2068236679 instance=ExtResource("2_diyc1")]
+visible = false
+texture = ExtResource("4_5x8yu")
+
+[node name="SelectedTileIndicator" parent="." unique_id=1125067505 instance=ExtResource("2_diyc1")]
+visible = false
+texture = ExtResource("5_e4056")
+
+[node name="SelectableEntityIndicator" type="Sprite2D" parent="." unique_id=1627716421]
+visible = false
+texture = ExtResource("4_6tdr8")
+
+[node name="SelectedEntityIndicator" type="Sprite2D" parent="." unique_id=433511809]
+visible = false
+texture = ExtResource("4_j6dse")
+
+[node name="SelectedLinkIndicator" type="Sprite2D" parent="." unique_id=2143323386]
+visible = false
+texture = ExtResource("5_wa12f")
+
+[node name="Controller" parent="." unique_id=1341100839 instance=ExtResource("7_mwer8")]
+
+[node name="Honeycomb" parent="." unique_id=1696604743 instance=ExtResource("1_ndpqs")]

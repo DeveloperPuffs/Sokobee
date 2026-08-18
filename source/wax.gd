@@ -2,8 +2,8 @@ class_name Wax
 extends Sprite2D
 
 
-const SOLID_TEXTURE = preload("res://assets/sprites/link_solid_placeholder.svg")
-const STICKY_TEXTURE = preload("res://assets/sprites/link_sticky_placeholder.svg")
+const SOLID_TEXTURE = preload("res://assets/sprites/links/solid/link_solid_placeholder.svg")
+const STICKY_TEXTURE = preload("res://assets/sprites/links/sticky/link_sticky_placeholder.svg")
 
 var _link: Link
 

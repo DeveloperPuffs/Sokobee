@@ -9,10 +9,10 @@ enum Type {
 	SELECTED,
 }
 
-const NORMAL_TEXTURE := preload("res://assets/sprites/cell_normal.svg")
-const GOAL_TEXTURE := preload("res://assets/sprites/cell_goal.svg")
-const SELECTABLE_TEXTURE := preload("res://assets/sprites/cell_selectable.svg")
-const SELECTED_TEXTURE := preload("res://assets/sprites/cell_selected.svg")
+const NORMAL_TEXTURE := preload("res://assets/sprites/tiles/cell_normal.svg")
+const GOAL_TEXTURE := preload("res://assets/sprites/tiles/cell_goal.svg")
+const SELECTABLE_TEXTURE := preload("res://assets/sprites/editor/cell_selectable.svg")
+const SELECTED_TEXTURE := preload("res://assets/sprites/editor/cell_selected.svg")
 
 var _type: Type
 var _tile_position: Vector2i

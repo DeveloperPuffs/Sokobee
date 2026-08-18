@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://nmd5h2abqrvv"
-path="res://.godot/imported/cell_selectable.svg-1841761eeffc0a900e40026d8b2b0a6d.ctex"
+uid="uid://7guquhydt7wy"
+path="res://.godot/imported/cell_selected.svg-1fcf779083df0b3117b699feecfb3ddc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/cell_selectable.svg"
-dest_files=["res://.godot/imported/cell_selectable.svg-1841761eeffc0a900e40026d8b2b0a6d.ctex"]
+source_file="res://assets/sprites/editor/cell_selected.svg"
+dest_files=["res://.godot/imported/cell_selected.svg-1fcf779083df0b3117b699feecfb3ddc.ctex"]
 
 [params]
 

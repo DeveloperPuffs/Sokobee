@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ca40dtv5fqov1"
-path="res://.godot/imported/honey.svg-9e9f983f91d366bcaf1815b2facbcafd.ctex"
+uid="uid://nmd5h2abqrvv"
+path="res://.godot/imported/cell_selectable.svg-9f79ac2e98873671dfe0a4778b1d2fe6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/honey.svg"
-dest_files=["res://.godot/imported/honey.svg-9e9f983f91d366bcaf1815b2facbcafd.ctex"]
+source_file="res://assets/sprites/editor/cell_selectable.svg"
+dest_files=["res://.godot/imported/cell_selectable.svg-9f79ac2e98873671dfe0a4778b1d2fe6.ctex"]
 
 [params]
 

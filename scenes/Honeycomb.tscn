@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://b68jrnaws4an1" path="res://scenes/Bee.tscn" id="3_y5jdm"]
 [ext_resource type="PackedScene" uid="uid://cmv0kkthsgbs" path="res://scenes/Honey.tscn" id="4_slnha"]
 [ext_resource type="PackedScene" uid="uid://b5lf4dpr3p4fu" path="res://scenes/Wax.tscn" id="5_d8yle"]
-[ext_resource type="Texture2D" uid="uid://crmgacjrdnpx8" path="res://assets/sprites/character_indicator_placeholder.svg" id="7_y5jdm"]
+[ext_resource type="Texture2D" uid="uid://crmgacjrdnpx8" path="res://assets/sprites/characters/character_indicator_placeholder.svg" id="7_y5jdm"]
 
 [node name="Honeycomb" type="Node2D" unique_id=1696604743 node_paths=PackedStringArray("_camera", "_character_indicator")]
 script = ExtResource("1_db0fd")

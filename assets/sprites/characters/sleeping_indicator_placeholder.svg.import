@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccb2348tvo6mu"
-path="res://.godot/imported/link_selected.svg-ef29b6aacd7a01c490a58409ea9b3d47.ctex"
+uid="uid://etinujhfeptf"
+path="res://.godot/imported/sleeping_indicator_placeholder.svg-57af98c9d76751e971346d195abb8717.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/link_selected.svg"
-dest_files=["res://.godot/imported/link_selected.svg-ef29b6aacd7a01c490a58409ea9b3d47.ctex"]
+source_file="res://assets/sprites/characters/sleeping_indicator_placeholder.svg"
+dest_files=["res://.godot/imported/sleeping_indicator_placeholder.svg-57af98c9d76751e971346d195abb8717.ctex"]
 
 [params]
 
@@ -38,6 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=0.125
+svg/scale=4.0
 editor/scale_with_editor_scale=false
 editor/convert_colors_with_editor_theme=false
