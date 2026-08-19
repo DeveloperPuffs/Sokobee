@@ -2,8 +2,19 @@ class_name Wax
 extends Sprite2D
 
 
-const SOLID_TEXTURE = preload("res://assets/sprites/links/solid/link_solid_placeholder.svg")
-const STICKY_TEXTURE = preload("res://assets/sprites/links/sticky/link_sticky_placeholder.svg")
+# Every link sprite is drawn on the same canvas, a tile surrounded by its six
+# neighbours with a single link left visible, so anchoring that canvas by its
+# center tile places any of them correctly
+const _SOLID_TEXTURES: Array[Texture2D] = [
+	preload("res://assets/sprites/links/solid_bottom_right_link.svg"),
+	preload("res://assets/sprites/links/solid_bottom_link.svg"),
+	preload("res://assets/sprites/links/solid_bottom_left_link.svg"),
+	preload("res://assets/sprites/links/solid_top_left_link.svg"),
+	preload("res://assets/sprites/links/solid_top_link.svg"),
+	preload("res://assets/sprites/links/solid_top_right_link.svg"),
+]
+
+const _STICKY_TEXTURE := preload("res://assets/sprites/links/sticky_link.svg")
 
 var _link: Link
 
@@ -15,11 +26,8 @@ func _process(_delta: float) -> void:
 func initialize(link: Link) -> void:
 	_link = link
 
-	match link.type:
-		Link.Type.SOLID:
-			texture = SOLID_TEXTURE
-		Link.Type.STICKY:
-			texture = STICKY_TEXTURE
+	centered = false
+	offset = -Vector2(319.5023, 315.3215)
 
 	_refresh()
 
@@ -31,16 +39,20 @@ func _refresh() -> void:
 	var tile_position_a := entity_a.current_tile.position
 	var tile_position_b := entity_b.current_tile.position
 
-	var elevation_a := entity_a.get_elevation()
-	var elevation_b := entity_b.get_elevation()
+	position = Hexagon.get_tile_world_position(tile_position_a, entity_a.get_elevation())
 
-	var world_position_a := Hexagon.get_tile_world_position(tile_position_a, elevation_a)
-	var world_position_b := Hexagon.get_tile_world_position(tile_position_b, elevation_b)
+	match _link.type:
+		Link.Type.SOLID:
+			var direction := Hexagon.get_vector_direction(tile_position_b - tile_position_a)
+			texture = _SOLID_TEXTURES[direction as int]
 
-	var delta := world_position_b - world_position_a
-	scale = Vector2(delta.length() / texture.get_width(), 1.0)
-	position = (world_position_a + world_position_b) / 2.0
-	rotation = delta.angle()
+		Link.Type.STICKY:
+			var world_position_b := Hexagon.get_tile_world_position(tile_position_b, entity_b.get_elevation())
+			var delta := world_position_b - position
+
+			texture = _STICKY_TEXTURE
+			rotation = delta.angle() + PI / 2.0
+			scale = Vector2(1.0, delta.length() / 222.5685)
 
 	var z_index_a := Hexagon.get_tile_z_index(tile_position_a)
 	var z_index_b := Hexagon.get_tile_z_index(tile_position_b)

@@ -1,0 +1,6 @@
+#FFDD77 - Light Yellow
+#EEAA22 - Yellow
+#BB8822 - Gold
+#332211 - Brown
+#221100 - Dark Brown
+#EE6622 - Saturated Orange

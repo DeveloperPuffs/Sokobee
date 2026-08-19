@@ -45,6 +45,10 @@ static func get_direction_vector(direction: Direction) -> Vector2i:
 	return _DIRECTION_VECTORS[direction as int]
 
 
+static func get_vector_direction(vector: Vector2i) -> Direction:
+	return _DIRECTION_VECTORS.find(vector) as Direction
+
+
 static func is_direction_vector(vector: Vector2i) -> bool:
 	return _DIRECTION_VECTORS.has(vector)
 

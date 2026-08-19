@@ -1,37 +1,126 @@
 {
-	"tiles": [
-		{"q": 0, "r": 0},
-
-		{"q": 1, "r": 0},
-		{"q": -1, "r": 0, "height": 1},
-		{"q": 0, "r": 1, "height": 1},
-		{"q": 0, "r": -1},
-		{"q": 1, "r": -1},
-		{"q": -1, "r": 1, "height": 1},
-
-		{"q": 2, "r": 0},
-		{"q": 2, "r": -1, "goal": true},
-		{"q": 2, "r": -2, "height": 1},
-		{"q": 1, "r": 1},
-		{"q": 1, "r": -2},
-		{"q": 0, "r": 2},
-		{"q": 0, "r": -2},
-		{"q": -1, "r": 2},
-		{"q": -1, "r": -1},
-		{"q": -2, "r": 2},
-		{"q": -2, "r": 1},
-		{"q": -2, "r": 0}
-	],
+	"active": 0,
 	"entities": [
-		{"type": "character", "q": 0, "r": 0, "facing": "TOP_LEFT", "identifier": 2},
-		{"type": "character", "q": -2, "r": 0, "facing": "TOP_CENTER"},
-		{"type": "character", "q": 1, "r": -1, "facing": "BOTTOM_CENTER", "asleep": true},
-		{"type": "block", "q": -1, "r": 1, "identifier": 0},
-		{"type": "block", "q": -1, "r": 0, "identifier": 1}
+		{
+			"facing": "TOP_LEFT",
+			"identifier": 0,
+			"q": 0,
+			"r": 0,
+			"type": "character"
+		},
+		{
+			"facing": "TOP_CENTER",
+			"q": -2,
+			"r": 0,
+			"type": "character"
+		},
+		{
+			"asleep": true,
+			"facing": "BOTTOM_CENTER",
+			"q": 1,
+			"r": -1,
+			"type": "character"
+		},
+		{
+			"q": -1,
+			"r": 1,
+			"type": "block"
+		},
+		{
+			"identifier": 1,
+			"q": -1,
+			"r": 0,
+			"type": "block"
+		}
 	],
 	"links": [
-		{"type": "SOLID", "identifier_a": 0, "identifier_b": 1},
-		{"type": "STICKY", "identifier_a": 1, "identifier_b": 2}
+		{
+			"identifier_a": 1,
+			"identifier_b": 0,
+			"type": "STICKY"
+		}
 	],
-	"active": 2
+	"tiles": [
+		{
+			"q": 0,
+			"r": 0
+		},
+		{
+			"q": 1,
+			"r": 0
+		},
+		{
+			"height": 1,
+			"q": -1,
+			"r": 0
+		},
+		{
+			"height": 1,
+			"q": 0,
+			"r": 1
+		},
+		{
+			"q": 0,
+			"r": -1
+		},
+		{
+			"q": 1,
+			"r": -1
+		},
+		{
+			"height": 1,
+			"q": -1,
+			"r": 1
+		},
+		{
+			"q": 2,
+			"r": 0
+		},
+		{
+			"goal": true,
+			"q": 2,
+			"r": -1
+		},
+		{
+			"height": 1,
+			"q": 2,
+			"r": -2
+		},
+		{
+			"q": 1,
+			"r": 1
+		},
+		{
+			"q": 1,
+			"r": -2
+		},
+		{
+			"q": 0,
+			"r": 2
+		},
+		{
+			"q": 0,
+			"r": -2
+		},
+		{
+			"q": -1,
+			"r": 2
+		},
+		{
+			"q": -1,
+			"r": -1
+		},
+		{
+			"q": -2,
+			"r": 2
+		},
+		{
+			"q": -2,
+			"r": 1
+		},
+		{
+			"q": -2,
+			"r": 0
+		}
+	]
 }
