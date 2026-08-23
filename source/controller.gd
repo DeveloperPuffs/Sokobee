@@ -9,19 +9,49 @@ signal restart_requested
 
 var _state: State
 var _history: History
-var _is_active: bool
+
+var active: bool:
+	set(_active):
+		active = _active
+		_inputs.set_process_unhandled_input(_active)
 
 
 func _ready() -> void:
-	_inputs.moved_forward.connect(_on_move_forward)
-	_inputs.moved_backward.connect(_on_move_backward)
-	_inputs.turned_left.connect(_on_turn_left)
-	_inputs.turned_right.connect(_on_turn_right)
-	_inputs.undid_step.connect(_on_undo_step)
-	_inputs.redid_step.connect(_on_redo_step)
-	_inputs.restarted_level.connect(_on_restart_level)
-	_inputs.clicked_tile.connect(_on_click_tile)
-	set_active(false)
+	active = false
+
+	_inputs.moved_forward.connect(func() -> void:
+		if _can_control_character():
+			_move_character(_state.active_character.facing_direction)
+	)
+
+	_inputs.moved_backward.connect(func() -> void:
+		if _can_control_character():
+			var facing_direction := _state.active_character.facing_direction
+			_move_character(Hexagon.get_opposite_direction(facing_direction))
+	)
+
+	_inputs.turned_left.connect(func() -> void:
+		if _can_control_character():
+			_history.take_snapshot(_state)
+			Logic.rotate_character_left(_state.active_character)
+	)
+
+	_inputs.turned_right.connect(func() -> void:
+		if _can_control_character():
+			_history.take_snapshot(_state)
+			Logic.rotate_character_right(_state.active_character)
+	)
+
+	_inputs.undid_step.connect(func() -> void:
+		_history.undo_snapshot(_state)
+	)
+
+	_inputs.redid_step.connect(func() -> void:
+		_history.redo_snapshot(_state)
+	)
+
+	_inputs.restarted_level.connect(restart_requested.emit)
+	_inputs.clicked_tile.connect(_on_clicked_tile)
 
 
 func load(state: State) -> void:
@@ -29,65 +59,19 @@ func load(state: State) -> void:
 	_history = History.new()
 
 
-func set_active(active: bool) -> void:
-	_is_active = active
-	_inputs.set_process_unhandled_input(active)
+func _can_control_character() -> bool:
+	return _state.active_character != null and not _state.active_character.asleep
 
 
-func _on_move_forward() -> void:
-	if _state.active_character == null or _state.active_character.asleep:
-		return
-
+func _move_character(direction: Hexagon.Direction) -> void:
 	var snapshot := Snapshot.new(_state)
-	var facing_direction := _state.active_character.facing_direction
-	if Logic.try_move_character(_state, _state.active_character, facing_direction):
+	if Logic.try_move_character(_state, _state.active_character, direction):
 		_history.save_snapshot(snapshot)
 		if Logic.win_check(_state):
 			level_completed.emit()
 
 
-func _on_move_backward() -> void:
-	if _state.active_character == null or _state.active_character.asleep:
-		return
-
-	var snapshot := Snapshot.new(_state)
-	var facing_direction := _state.active_character.facing_direction
-	var opposite_direction := Hexagon.get_opposite_direction(facing_direction)
-	if Logic.try_move_character(_state, _state.active_character, opposite_direction):
-		_history.save_snapshot(snapshot)
-		if Logic.win_check(_state):
-			level_completed.emit()
-
-
-func _on_turn_left() -> void:
-	if _state.active_character == null or _state.active_character.asleep:
-		return
-
-	_history.take_snapshot(_state)
-	Logic.rotate_character_left(_state.active_character)
-
-
-func _on_turn_right() -> void:
-	if _state.active_character == null or _state.active_character.asleep:
-		return
-
-	_history.take_snapshot(_state)
-	Logic.rotate_character_right(_state.active_character)
-
-
-func _on_undo_step() -> void:
-	_history.undo_snapshot(_state)
-
-
-func _on_redo_step() -> void:
-	_history.redo_snapshot(_state)
-
-
-func _on_restart_level() -> void:
-	restart_requested.emit()
-
-
-func _on_click_tile() -> void:
+func _on_clicked_tile() -> void:
 	var world_position := get_global_mouse_position()
 	var clicked_tile := _state.get_tile_at(world_position)
 	if clicked_tile == null:

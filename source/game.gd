@@ -17,9 +17,11 @@ func _ready() -> void:
 		exited_game.emit()
 		return
 
-	_controller.restart_requested.connect(_on_restart_requested)
-	_controller.level_completed.connect(_on_level_completed)
-	_controller.set_active(true)
+	_controller.restart_requested.connect(_load_level)
+	_controller.level_completed.connect(func() -> void:
+		_level_number += 1
+		_load_level()
+	)
 
 	_load_level()
 
@@ -37,12 +39,4 @@ func _load_level() -> void:
 
 	_controller.load(result.state)
 	_honeycomb.load(result.state)
-
-
-func _on_level_completed() -> void:
-	_level_number += 1
-	_load_level()
-
-
-func _on_restart_requested() -> void:
-	_load_level()
+	_controller.active = true

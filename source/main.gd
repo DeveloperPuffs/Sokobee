@@ -10,24 +10,12 @@ var active_scene: Node = null
 
 
 func _ready() -> void:
-	_set_menu_scene()
+	_set_scene(MENU_SCENE)
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		get_tree().quit()
-
-
-func _set_menu_scene() -> void:
-	_set_scene(MENU_SCENE)
-
-
-func _set_edit_scene() -> void:
-	_set_scene(EDIT_SCENE)
-
-
-func _set_game_scene() -> void:
-	_set_scene(GAME_SCENE)
 
 
 func _set_scene(scene: PackedScene) -> void:
@@ -38,18 +26,18 @@ func _set_scene(scene: PackedScene) -> void:
 
 	if active_scene is Menu:
 		var menu_scene: Menu = active_scene
-		menu_scene.play_button_pressed.connect(_set_game_scene)
-		menu_scene.edit_button_pressed.connect(_set_edit_scene)
-		menu_scene.quit_button_pressed.connect(_on_quit)
+		menu_scene.play_button_pressed.connect(_set_scene.bind(GAME_SCENE))
+		menu_scene.edit_button_pressed.connect(_set_scene.bind(EDIT_SCENE))
+		menu_scene.quit_button_pressed.connect(func() -> void:
+			get_tree().root.propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST)
+		)
+
 	elif active_scene is Game:
 		var game_scene: Game = active_scene
-		game_scene.exited_game.connect(_set_menu_scene)
+		game_scene.exited_game.connect(_set_scene.bind(MENU_SCENE))
+
 	elif active_scene is Editor:
 		var editor_scene: Editor = active_scene
-		editor_scene.exited_editor.connect(_set_menu_scene)
+		editor_scene.exited_editor.connect(_set_scene.bind(MENU_SCENE))
 
 	add_child(active_scene)
-
-
-func _on_quit() -> void:
-	get_tree().root.propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST)

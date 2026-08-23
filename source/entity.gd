@@ -1,13 +1,14 @@
 class_name Entity
 
 
-signal tile_changed(previous_tile, current_tile)
+signal tile_changed(previous_tile: Tile, current_tile: Tile)
 
-var current_tile: Tile:
+var current_tile: Tile = null:
 	set(_current_tile):
 		var previous_tile := current_tile
 		current_tile = _current_tile
-		tile_changed.emit(previous_tile, current_tile)
+		if previous_tile != null:
+			tile_changed.emit(previous_tile, current_tile)
 
 var links: Array[Link] = []
 

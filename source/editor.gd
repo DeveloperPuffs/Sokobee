@@ -64,18 +64,25 @@ var _manifest: Manifest
 var _level: Level = null
 var _state: State = null
 var _selected_tool: Tool
-var _selected_element: Variant = null # Tile, Entity, Link, or null
 var _clusters_are_dirty := false
 var _honeycomb_is_dirty := false
 var _playtesting := false
 var _snapshot: Snapshot = null
-var _save_pending_is_as_new_level := false
+var _pending_save_is_as_new_level := false
+
+var _selected_element: Variant = null: # Tile, Entity, Link, or null
+	set(selected_element):
+		_selected_element = selected_element
+		_display_selection_indicator()
 
 
 func _ready() -> void:
 	_manifest = Manifest.new("res://assets/levels/manifest.json")
 
-	_controller.restart_requested.connect(_on_restart_requested)
+	_controller.restart_requested.connect(func() -> void:
+		_snapshot.apply(_state)
+		_controller.load(_state)
+	)
 
 	_level_selector_dropdown.add_item("New Level", _NEW_LEVEL_DROPDOWN_ITEM_IDENTIFIER)
 
@@ -86,8 +93,14 @@ func _ready() -> void:
 	_level_selector_dropdown.item_selected.connect(_on_level_option_item_selected)
 	_on_level_option_item_selected(0)
 
-	_save_button.pressed.connect(_on_save)
-	_save_new_button.pressed.connect(_on_save_new)
+	_save_button.pressed.connect(func() -> void:
+		_request_save(_level == _manifest.editor_level)
+	)
+
+	_save_new_button.pressed.connect(func() -> void:
+		_request_save(true)
+	)
+
 	_exit_button.pressed.connect(exited_editor.emit)
 
 	_playtest_button.pressed.connect(_toggle_playtesting)
@@ -102,9 +115,14 @@ func _ready() -> void:
 	_on_tool_option_item_selected(Tool.TILE)
 
 	_edit_button.pressed.connect(_toggle_playtesting)
-	_keep_layout_button.pressed.connect(_on_keep_layout)
+	_keep_layout_button.pressed.connect(func() -> void:
+		_snapshot = null
+		_toggle_playtesting(false)
+	)
 
-	_save_level_confirmation_dialog.confirmed.connect(_on_save_confirmed)
+	_save_level_confirmation_dialog.confirmed.connect(func() -> void:
+		_save_level(_pending_save_is_as_new_level)
+	)
 
 
 func _process(_delta: float) -> void:
@@ -143,7 +161,7 @@ func _toggle_playtesting(playtesting: bool = not _playtesting) -> void:
 
 	if playtesting:
 		_refresh_selectable_indicator()
-		_set_selected_element(null)
+		_selected_element = null
 
 		_snapshot = Snapshot.new(_state)
 		_controller.load(_state)
@@ -155,17 +173,7 @@ func _toggle_playtesting(playtesting: bool = not _playtesting) -> void:
 
 		_refresh_selectable_indicator()
 
-	_controller.set_active(playtesting)
-
-
-func _on_restart_requested() -> void:
-	_snapshot.apply(_state)
-	_controller.load(_state)
-
-
-func _on_keep_layout() -> void:
-	_snapshot = null
-	_toggle_playtesting(false)
+	_controller.active = playtesting
 
 
 func _on_level_option_item_selected(index: int) -> void:
@@ -192,21 +200,13 @@ func _on_level_option_item_selected(index: int) -> void:
 	_honeycomb_is_dirty = false
 
 	_toggle_playtesting(false)
-	_set_selected_element(null)
+	_selected_element = null
 
 	_honeycomb.load(_state)
 	_title_input.text = selected_level.title
 
 	if not result.issues.is_empty():
 		_open_level_dialog.popup_centered.call_deferred()
-
-
-func _on_save() -> void:
-	_request_save(_level == _manifest.editor_level)
-
-
-func _on_save_new() -> void:
-	_request_save(true)
 
 
 func _request_save(as_new_level: bool) -> void:
@@ -228,12 +228,8 @@ func _request_save(as_new_level: bool) -> void:
 		_save_level(as_new_level)
 		return
 
-	_save_pending_is_as_new_level = as_new_level
+	_pending_save_is_as_new_level = as_new_level
 	_save_level_confirmation_dialog.popup_centered.call_deferred()
-
-
-func _on_save_confirmed() -> void:
-	_save_level(_save_pending_is_as_new_level)
 
 
 func _save_level(as_new_level: bool) -> void:
@@ -323,7 +319,7 @@ func _handle_mouse_click(mouse_button: MouseButton) -> void:
 				_state.tiles[tile_position] = tile
 				_honeycomb_is_dirty = true
 
-			_set_selected_element(tile)
+			_selected_element = tile
 
 		elif mouse_button == MOUSE_BUTTON_RIGHT and tile != null:
 			_remove_tile(tile)
@@ -334,11 +330,11 @@ func _handle_mouse_click(mouse_button: MouseButton) -> void:
 
 	if _selected_tool == Tool.LINK:
 		if entity == null or entity == _selected_element:
-			_set_selected_element(null)
+			_selected_element = null
 			return
 
 		if _selected_element is not Entity:
-			_set_selected_element(entity)
+			_selected_element = entity
 			return
 
 		var selected_entity: Entity = _selected_element
@@ -346,7 +342,7 @@ func _handle_mouse_click(mouse_button: MouseButton) -> void:
 		var tile_position_a := selected_entity.current_tile.position
 		var tile_position_b := entity.current_tile.position
 		if not Hexagon.is_direction_vector(tile_position_b - tile_position_a):
-			_set_selected_element(entity)
+			_selected_element = entity
 			return
 
 		var existing_link: Link = null
@@ -364,13 +360,13 @@ func _handle_mouse_click(mouse_button: MouseButton) -> void:
 				entity.links.append(existing_link)
 				_honeycomb_is_dirty = true
 
-			_set_selected_element(existing_link)
+			_selected_element = existing_link
 			return
 
 		elif mouse_button == MOUSE_BUTTON_RIGHT and existing_link != null:
 			_remove_link(existing_link)
 
-		_set_selected_element(null)
+		_selected_element = null
 		return
 
 	if tile == null:
@@ -389,7 +385,7 @@ func _handle_mouse_click(mouse_button: MouseButton) -> void:
 				_state.characters.append(character)
 				_honeycomb_is_dirty = true
 
-			_set_selected_element(character)
+			_selected_element = character
 
 		elif mouse_button == MOUSE_BUTTON_RIGHT and character != null:
 			_remove_character(character)
@@ -408,7 +404,7 @@ func _handle_mouse_click(mouse_button: MouseButton) -> void:
 				_state.entities.append(block)
 				_honeycomb_is_dirty = true
 
-			_set_selected_element(block)
+			_selected_element = block
 
 		elif mouse_button == MOUSE_BUTTON_RIGHT and block != null:
 			_remove_block(block)
@@ -428,13 +424,13 @@ func _handle_key_press(key: Key) -> void:
 			KEY_PLUS, KEY_EQUAL:
 				selected_tile.height = min(max(selected_tile.height + 1, -1), 1)
 				_honeycomb_is_dirty = true
-				_set_selected_element(selected_tile)
+				_selected_element = selected_tile
 				_refresh_selectable_indicator()
 
 			KEY_MINUS, KEY_UNDERSCORE:
 				selected_tile.height = min(max(selected_tile.height - 1, -1), 1)
 				_honeycomb_is_dirty = true
-				_set_selected_element(selected_tile)
+				_selected_element = selected_tile
 				_refresh_selectable_indicator()
 
 			KEY_DELETE, KEY_BACKSPACE:
@@ -485,7 +481,7 @@ func _handle_key_press(key: Key) -> void:
 				_honeycomb_is_dirty = true
 
 			KEY_DELETE, KEY_BACKSPACE:
-				_set_selected_element(null)
+				_selected_element = null
 				_remove_link(selected_link)
 
 
@@ -539,28 +535,26 @@ func _get_tile_position_at(world_position: Vector2) -> Vector2i:
 	return Hexagon.get_world_tile_position(world_position)
 
 
-func _set_selected_element(selected_element: Variant) -> void:
-	_selected_element = selected_element
+func _display_selection_indicator() -> void:
+	_selected_tile_indicator.visible = _selected_element is Tile
+	_selected_entity_indicator.visible = _selected_element is Entity
+	_selected_link_indicator.visible = _selected_element is Link
 
-	_selected_tile_indicator.visible = selected_element is Tile
-	_selected_entity_indicator.visible = selected_element is Entity
-	_selected_link_indicator.visible = selected_element is Link
-
-	if selected_element is Tile:
-		var selected_tile: Tile = selected_element
+	if _selected_element is Tile:
+		var selected_tile: Tile = _selected_element
 		var cell_position := selected_tile.position
 		var cell_height := selected_tile.height
 		_selected_tile_indicator.display(Cell.Type.SELECTED, cell_position, cell_height)
 
-	elif selected_element is Entity:
-		var selected_entity: Entity = selected_element
+	elif _selected_element is Entity:
+		var selected_entity: Entity = _selected_element
 		var tile_position := selected_entity.current_tile.position
 		var elevation := selected_entity.get_elevation()
 		_selected_entity_indicator.position = Hexagon.get_tile_world_position(tile_position, elevation)
 		_selected_entity_indicator.z_index = Hexagon.get_tile_z_index(tile_position) + 3
 
-	elif selected_element is Link:
-		var selected_link: Link = selected_element
+	elif _selected_element is Link:
+		var selected_link: Link = _selected_element
 
 		var tile_position_a := selected_link.entity_a.current_tile.position
 		var tile_position_b := selected_link.entity_b.current_tile.position
@@ -578,16 +572,15 @@ func _set_selected_element(selected_element: Variant) -> void:
 		_selected_link_indicator.rotation = (world_position_b - world_position_a).angle()
 		_selected_link_indicator.z_index = max(z_index_a, z_index_b) + 4
 
-
 func _on_tool_option_item_selected(index: int) -> void:
 	_selected_tool = _tool_selector_dropdown.get_item_id(index) as Tool
-	_set_selected_element(null)
+	_selected_element = null
 	_refresh_selectable_indicator()
 
 
 func _remove_tile(tile: Tile) -> void:
 	if tile == _selected_element:
-		_set_selected_element(null)
+		_selected_element = null
 
 	var entity := _get_entity_at(tile.position)
 	if entity is Character:
@@ -601,7 +594,7 @@ func _remove_tile(tile: Tile) -> void:
 
 func _remove_character(character: Character) -> void:
 	if character == _selected_element:
-		_set_selected_element(null)
+		_selected_element = null
 
 	if character == _state.active_character:
 		_state.active_character = null
@@ -616,7 +609,7 @@ func _remove_character(character: Character) -> void:
 
 func _remove_block(block: Block) -> void:
 	if block == _selected_element:
-		_set_selected_element(null)
+		_selected_element = null
 
 	for link: Link in block.links.duplicate():
 		_remove_link(link)
