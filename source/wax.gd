@@ -2,9 +2,6 @@ class_name Wax
 extends Sprite2D
 
 
-# Every link sprite is drawn on the same canvas, a tile surrounded by its six
-# neighbours with a single link left visible, so anchoring that canvas by its
-# center tile places any of them correctly
 const _SOLID_TEXTURES: Array[Texture2D] = [
 	preload("res://assets/sprites/links/solid_bottom_right_link.svg"),
 	preload("res://assets/sprites/links/solid_bottom_link.svg"),
@@ -15,6 +12,13 @@ const _SOLID_TEXTURES: Array[Texture2D] = [
 ]
 
 const _STICKY_TEXTURE := preload("res://assets/sprites/links/sticky_link.svg")
+
+# The approximate position of the center tile in the link tile grid
+# (from the top left of the link textures)
+const _CENTER_TILE_POSITION := Vector2(319.5023, 315.3215)
+
+# The approximate distance between two neighbouring tiles in the link tile grid
+const _CANVAS_TILE_DISTANCE := 222.5685
 
 var _link: Link
 
@@ -27,7 +31,7 @@ func initialize(link: Link) -> void:
 	_link = link
 
 	centered = false
-	offset = -Vector2(319.5023, 315.3215)
+	offset = -_CENTER_TILE_POSITION
 
 	_refresh()
 
@@ -52,7 +56,7 @@ func _refresh() -> void:
 
 			texture = _STICKY_TEXTURE
 			rotation = delta.angle() + PI / 2.0
-			scale = Vector2(1.0, delta.length() / 222.5685)
+			scale = Vector2(1.0, delta.length() / _CANVAS_TILE_DISTANCE)
 
 	var z_index_a := Hexagon.get_tile_z_index(tile_position_a)
 	var z_index_b := Hexagon.get_tile_z_index(tile_position_b)
