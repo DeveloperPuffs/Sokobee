@@ -22,12 +22,13 @@
 			"type": "character"
 		},
 		{
+			"identifier": 1,
 			"q": -1,
 			"r": 1,
 			"type": "block"
 		},
 		{
-			"identifier": 1,
+			"identifier": 2,
 			"q": -1,
 			"r": 0,
 			"type": "block"
@@ -35,9 +36,14 @@
 	],
 	"links": [
 		{
-			"identifier_a": 1,
+			"identifier_a": 2,
 			"identifier_b": 0,
 			"type": "STICKY"
+		},
+		{
+			"identifier_a": 2,
+			"identifier_b": 1,
+			"type": "SOLID"
 		}
 	],
 	"tiles": [

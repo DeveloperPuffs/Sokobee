@@ -19,8 +19,14 @@ func _init(state: State) -> void:
 func apply(state: State) -> void:
 	state.active_character = _active_character
 
+	var previous_tiles: Dictionary[Entity, Tile] = {}
 	for entity in state.entities:
+		previous_tiles[entity] = entity.current_tile
 		entity.current_tile = _entity_tiles[entity]
+
+	for entity in state.entities:
+		var movement := Entity.Movement.new(Entity.Movement.Kind.RESTORED)
+		entity.moved.emit(previous_tiles[entity], entity.current_tile, movement)
 
 	for character in state.characters:
 		character.facing_direction = _facing_directions[character]

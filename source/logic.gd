@@ -23,15 +23,22 @@ static func try_move_character(state: State, character: Character, direction: He
 
 	var direction_vector := Hexagon.get_direction_vector(direction)
 
-	var moving_entities: Dictionary[Entity, Tile] = {}
 	var queued_entities: Array[Entity] = []
 
+	var entity_target_tiles: Dictionary[Entity, Tile] = {}
+	var entity_movements: Dictionary[Entity, Entity.Movement] = {}
+
 	queued_entities.append(character)
+
+	var character_movement := Entity.Movement.new(Entity.Movement.Kind.WALKING)
+	entity_movements[character] = character_movement
+
 	while not queued_entities.is_empty():
-		var entity: Entity = queued_entities.pop_back()
-		if moving_entities.has(entity):
+		var entity: Entity = queued_entities.pop_front()
+		if entity_target_tiles.has(entity):
 			continue
 
+		var movement := entity_movements[entity]
 		var elevation := entity.get_elevation()
 
 		var cluster: Array[Entity] = []
@@ -59,31 +66,63 @@ static func try_move_character(state: State, character: Character, direction: He
 					if target_tile.height > elevation:
 						return false
 
-			moving_entities[connected_entity] = target_tile
+			entity_target_tiles[connected_entity] = target_tile
+			if not entity_movements.has(connected_entity):
+				entity_movements[connected_entity] = movement
 
 			for link in connected_entity.links:
 				if link.type != Link.Type.STICKY:
 					continue
 
 				var other_entity := link.other(connected_entity)
-				if moving_entities.has(other_entity):
+				if entity_target_tiles.has(other_entity):
 					continue
 
 				var new_offset := target_position - other_entity.current_tile.position
-				if not Hexagon.is_direction_vector(new_offset):
-					queued_entities.append(other_entity)
+				if Hexagon.is_direction_vector(new_offset):
+					continue
+
+				queued_entities.append(other_entity)
+
+				if not entity_movements.has(other_entity):
+					var offset := other_entity.current_tile.position - connected_entity.current_tile.position
+					var world_offset := Hexagon.get_tile_world_position(offset, 0)
+					var world_direction := Hexagon.get_tile_world_position(direction_vector, 0)
+					var blocking := world_offset.dot(world_direction) > 0.0
+
+					entity_movements[other_entity] = Entity.Movement.new(
+						Entity.Movement.Kind.CARRIED,
+						movement.dragging_delay_count + (0 if blocking else 1),
+						movement.blocking_delay_count + (1 if blocking else 0),
+					)
 
 			# Search for a potential blocker that occupying the target position
 			for other_entity in state.entities:
-				if other_entity == connected_entity or moving_entities.has(other_entity):
+				if other_entity == connected_entity or entity_target_tiles.has(other_entity):
 					continue
 
 				if other_entity.current_tile == target_tile:
 					queued_entities.append(other_entity)
+
+					if not entity_movements.has(other_entity):
+						entity_movements[other_entity] = Entity.Movement.new(
+							Entity.Movement.Kind.CARRIED,
+							movement.dragging_delay_count,
+							movement.blocking_delay_count + 1,
+						)
+
 					break
 
-	for moving_entity in moving_entities:
-		moving_entity.current_tile = moving_entities[moving_entity]
+	if entity_target_tiles.size() > 1:
+		character_movement.kind = Entity.Movement.Kind.INITIATOR
+
+	var previous_tiles: Dictionary[Entity, Tile] = {}
+	for entity in entity_target_tiles:
+		previous_tiles[entity] = entity.current_tile
+		entity.current_tile = entity_target_tiles[entity]
+
+	for entity in entity_target_tiles:
+		entity.moved.emit(previous_tiles[entity], entity.current_tile, entity_movements[entity])
 
 	return true
 
