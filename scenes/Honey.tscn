@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://vp8ad5qystq8" path="res://source/honey.gd" id="1_24mbs"]
 [ext_resource type="Texture2D" uid="uid://cgqxj4j3k1g0l" path="res://assets/sprites/blocks/honey.svg" id="1_uqqcw"]
 
-[node name="Honey" type="Sprite2D" unique_id=52704376]
+[node name="Honey" type="Sprite2D" unique_id=1709840998]
 texture = ExtResource("1_uqqcw")
 script = ExtResource("1_24mbs")
+metadata/_custom_type_script = "uid://bj47xx5uqn2pu"
