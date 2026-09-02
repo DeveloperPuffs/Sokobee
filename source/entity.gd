@@ -17,6 +17,10 @@ func get_elevation() -> int:
 
 
 class Movement:
+	# How much of the movement duration each delay type lasts
+	const _DRAGGING_DELAY_FACTOR := 0.5
+	const _BLOCKING_DELAY_FACTOR := 0.1
+
 	enum Kind {
 		# A character moving without pushing or dragging
 		WALKING,
@@ -35,7 +39,12 @@ class Movement:
 	var dragging_delay_count: int
 	var blocking_delay_count: int
 
+
 	func _init(_kind: Kind, _dragging_delay_count: int = 0, _blocking_delay_count: int = 0) -> void:
 		kind = _kind
 		dragging_delay_count = _dragging_delay_count
 		blocking_delay_count = _blocking_delay_count
+
+
+	func get_delay_factor() -> float:
+		return dragging_delay_count * _DRAGGING_DELAY_FACTOR + blocking_delay_count * _BLOCKING_DELAY_FACTOR

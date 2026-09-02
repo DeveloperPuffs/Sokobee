@@ -4,8 +4,6 @@ extends Node2D
 
 const _MOVEMENT_DURATION := 0.2
 const _MOVEMENT_RESTORE_DURATION := 0.1
-const _DRAGGING_DELAY := 0.1
-const _BLOCKING_DELAY := 0.05
 
 var _entity: Entity
 var _movement_tween: Tween = null
@@ -50,7 +48,7 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 		return
 
 	var movement_duration := _MOVEMENT_RESTORE_DURATION if movement.kind == Entity.Movement.Kind.RESTORED else _MOVEMENT_DURATION
-	var movement_delay := movement.dragging_delay_count * _DRAGGING_DELAY + movement.blocking_delay_count * _BLOCKING_DELAY
+	var movement_delay := movement_duration * movement.get_delay_factor()
 
 	_movement_tween = create_tween()
 	_movement_tween.set_parallel()

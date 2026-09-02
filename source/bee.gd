@@ -6,6 +6,7 @@ const _ROTATION_DURATION := 0.2
 const _ROTATION_RESTORE_DURATION := 0.1
 
 @export var _sleeping_indicator: Sprite2D
+@export var _animation_player: AnimationPlayer
 
 var _character: Character
 var _rotation_tween: Tween = null
@@ -18,6 +19,21 @@ func _process(_delta: float) -> void:
 func initialize(character: Character) -> void:
 	_character = character
 	_bind_entity(_character)
+
+	_character.moved.connect(func(movement: Entity.Movement) -> void:
+		if movement.kind == Entity.Movement.Kind.RESTORED:
+			return
+
+		var animation_delay := Piece._MOVEMENT_DURATION * movement.get_delay_factor()
+		get_tree().create_timer(animation_delay).timeout.connect(func() -> void:
+			match movement.kind:
+				Entity.Movement.Kind.INITIATOR:
+					_animation_player.play("flap")
+				Entity.Movement.Kind.WALKING,\
+				Entity.Movement.Kind.CARRIED:
+					_animation_player.play("flutter")
+		)
+	)
 
 	_sleeping_indicator.visible = _character.asleep
 	_character.turned.connect(_face_character_direction)
@@ -46,3 +62,4 @@ func _face_character_direction(_rotation: Character.Rotation = null) -> void:
 	if not _rotation.restoring:
 		rotation_tweener.set_trans(Tween.TRANS_BACK)
 		rotation_tweener.set_ease(Tween.EASE_OUT)
+		_animation_player.play("flutter")
