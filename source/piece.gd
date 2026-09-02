@@ -1,5 +1,5 @@
 class_name Piece
-extends Sprite2D
+extends Node2D
 
 
 const _MOVEMENT_DURATION := 0.2

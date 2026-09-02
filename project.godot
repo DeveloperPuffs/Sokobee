@@ -8,6 +8,14 @@
 
 config_version=5
 
+[addons]
+
+curved_lines_2d/close_pencil_path=false
+curved_lines_2d/add_stroke_enabled=true
+curved_lines_2d/line_begin_cap=0
+curved_lines_2d/line_end_cap=0
+curved_lines_2d/line_joint_mode=0
+
 [application]
 
 config/name="Sokobee"
@@ -20,6 +28,10 @@ run/game_scene="uid://cwxf0718jelr4"
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/curved_lines_2d/plugin.cfg")
 
 [input]
 
@@ -71,6 +83,6 @@ restart_level={
 [rendering]
 
 rendering_device/driver.windows="d3d12"
-renderer/rendering_method="gl_compatibility"
-renderer/rendering_method.mobile="gl_compatibility"
+renderer/rendering_method="mobile"
 textures/vram_compression/import_etc2_astc=true
+anti_aliasing/quality/msaa_2d=1
