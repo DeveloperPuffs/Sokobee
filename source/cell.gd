@@ -9,10 +9,12 @@ enum Type {
 	SELECTED,
 }
 
-const NORMAL_TEXTURE := preload("res://assets/sprites/tiles/cell_normal.svg")
-const GOAL_TEXTURE := preload("res://assets/sprites/tiles/cell_goal.svg")
-const SELECTABLE_TEXTURE := preload("res://assets/sprites/editor/cell_selectable.svg")
-const SELECTED_TEXTURE := preload("res://assets/sprites/editor/cell_selected.svg")
+const _TEXTURES: Dictionary[Type, Texture] = {
+	Type.NORMAL: preload("res://assets/sprites/tiles/cell_normal.svg"),
+	Type.GOAL: preload("res://assets/sprites/tiles/cell_goal.svg"),
+	Type.SELECTABLE: preload("res://assets/sprites/editor/cell_selectable.svg"),
+	Type.SELECTED: preload("res://assets/sprites/editor/cell_selected.svg"),
+}
 
 var _type: Type
 var _tile_position: Vector2i
@@ -29,17 +31,11 @@ func display(type: Type, tile_position: Vector2i, tile_height: int = 0) -> void:
 
 	z_index = Hexagon.get_tile_z_index(_tile_position)
 
-	match type:
-		Type.NORMAL:
-			texture = NORMAL_TEXTURE
-		Type.GOAL:
-			texture = GOAL_TEXTURE
-		Type.SELECTABLE:
-			texture = SELECTABLE_TEXTURE
-			z_index += 2 * Hexagon.Z_INDEX_SCALE + 2
-		Type.SELECTED:
-			texture = SELECTED_TEXTURE
-			z_index += 2 * Hexagon.Z_INDEX_SCALE + 1
+	texture = _TEXTURES[type]
+	if type == Type.SELECTABLE:
+		z_index += 2 * Hexagon.Z_INDEX_SCALE + 2
+	elif type == Type.SELECTED:
+		z_index += 2 * Hexagon.Z_INDEX_SCALE + 1
 
 
 func get_bounds() -> Rect2:
