@@ -5,7 +5,7 @@ extends Sprite2D
 const _MOVEMENT_DURATION := 0.2
 const _RESTORE_DURATION := 0.1
 const _DRAGGING_DELAY := 0.1
-const _BLOCKING_DELAY := 0.02
+const _BLOCKING_DELAY := 0.05
 
 var _entity: Entity
 var _movement_tween: Tween = null
