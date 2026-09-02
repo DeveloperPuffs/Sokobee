@@ -116,13 +116,11 @@ static func try_move_character(state: State, character: Character, direction: He
 	if entity_target_tiles.size() > 1:
 		character_movement.kind = Entity.Movement.Kind.INITIATOR
 
-	var previous_tiles: Dictionary[Entity, Tile] = {}
 	for entity in entity_target_tiles:
-		previous_tiles[entity] = entity.current_tile
 		entity.current_tile = entity_target_tiles[entity]
 
 	for entity in entity_target_tiles:
-		entity.moved.emit(previous_tiles[entity], entity.current_tile, entity_movements[entity])
+		entity.moved.emit(entity_movements[entity])
 
 	return true
 

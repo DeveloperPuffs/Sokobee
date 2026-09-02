@@ -2,7 +2,7 @@ class_name Entity
 
 
 @warning_ignore("unused_signal")
-signal moved(previous_tile: Tile, current_tile: Tile, movement: Movement)
+signal moved(movement: Movement)
 
 var current_tile: Tile = null
 var links: Array[Link] = []

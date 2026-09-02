@@ -24,11 +24,11 @@ var _elevation := 0.0:
 func _bind_entity(entity: Entity) -> void:
 	_entity = entity
 
-	_entity.moved.connect(func(_previous_tile: Tile, current_tile: Tile, movement: Entity.Movement) -> void:
-		_move_to(current_tile, movement)
+	_entity.moved.connect(func(movement: Entity.Movement) -> void:
+		_move_to_entity_tile(movement)
 	)
 
-	_move_to(_entity.current_tile)
+	_move_to_entity_tile()
 
 
 func _refresh_position() -> void:
@@ -36,8 +36,8 @@ func _refresh_position() -> void:
 	position.y -= _elevation
 
 
-func _move_to(tile: Tile, movement: Entity.Movement = null) -> void:
-	var tile_position := tile.position
+func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
+	var tile_position := _entity.current_tile.position
 
 	var target_ground_position := Hexagon.get_tile_world_position(tile_position, 0)
 	var target_elevation := _entity.get_elevation() * Hexagon.HEIGHT_OFFSET
