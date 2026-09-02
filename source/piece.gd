@@ -3,7 +3,7 @@ extends Sprite2D
 
 
 const _MOVEMENT_DURATION := 0.2
-const _RESTORE_DURATION := 0.1
+const _MOVEMENT_RESTORE_DURATION := 0.1
 const _DRAGGING_DELAY := 0.1
 const _BLOCKING_DELAY := 0.05
 
@@ -24,10 +24,7 @@ var _elevation := 0.0:
 func _bind_entity(entity: Entity) -> void:
 	_entity = entity
 
-	_entity.moved.connect(func(movement: Entity.Movement) -> void:
-		_move_to_entity_tile(movement)
-	)
-
+	_entity.moved.connect(_move_to_entity_tile)
 	_move_to_entity_tile()
 
 
@@ -52,7 +49,7 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 		z_index = target_z_index
 		return
 
-	var movement_duration := _RESTORE_DURATION if movement.kind == Entity.Movement.Kind.RESTORED else _MOVEMENT_DURATION
+	var movement_duration := _MOVEMENT_RESTORE_DURATION if movement.kind == Entity.Movement.Kind.RESTORED else _MOVEMENT_DURATION
 	var movement_delay := movement.dragging_delay_count * _DRAGGING_DELAY + movement.blocking_delay_count * _BLOCKING_DELAY
 
 	_movement_tween = create_tween()

@@ -129,14 +129,14 @@ static func rotate_character_left(character: Character) -> void:
 	if character.asleep:
 		return
 
-	character.facing_direction = Hexagon.get_direction_turned_left(character.facing_direction)
+	character.set_facing_direction(Hexagon.get_direction_turned_left(character.facing_direction))
 
 
 static func rotate_character_right(character: Character) -> void:
 	if character.asleep:
 		return
 
-	character.facing_direction = Hexagon.get_direction_turned_right(character.facing_direction)
+	character.set_facing_direction(Hexagon.get_direction_turned_right(character.facing_direction))
 
 
 static func select_character(state: State, character: Character) -> bool:

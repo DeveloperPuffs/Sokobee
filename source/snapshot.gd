@@ -26,4 +26,4 @@ func apply(state: State) -> void:
 		entity.moved.emit(Entity.Movement.new(Entity.Movement.Kind.RESTORED))
 
 	for character in state.characters:
-		character.facing_direction = _facing_directions[character]
+		character.set_facing_direction(_facing_directions[character], true)
