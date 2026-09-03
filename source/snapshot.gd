@@ -19,12 +19,15 @@ func _init(state: State) -> void:
 func apply(state: State) -> void:
 	state.active_character = _active_character
 
+	var entity_offsets: Dictionary[Entity, Vector2i] = {}
 	for entity in state.entities:
-		entity.current_tile = _entity_tiles[entity]
+		var target_tile := _entity_tiles[entity]
+		var offset := target_tile.position - entity.current_tile.position
+		entity_offsets[entity] = offset
+		entity.current_tile = target_tile
 
-	var movement := Entity.Movement.new(Entity.Movement.Kind.RESTORED)
 	for entity in state.entities:
-		entity.moved.emit(movement)
+		entity.moved.emit(Entity.Movement.new(Entity.Movement.Kind.RESTORED, entity_offsets[entity]))
 
 	for character in state.characters:
 		character.set_facing_direction(_facing_directions[character], true)

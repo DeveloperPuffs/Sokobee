@@ -7,6 +7,11 @@ const _MOVEMENT_RESTORE_DURATION := 0.1
 
 signal position_changed()
 
+signal _movement_started(movement: Entity.Movement)
+signal _movement_landed()
+
+signal _wall_hit(direction: Hexagon.Direction)
+
 var _entity: Entity
 
 var _movement_tween: Tween = null
@@ -29,10 +34,35 @@ var _bump_offset := 0.0:
 		_bump_offset = bump_effect
 		_refresh_position()
 
+var _shake_tween: Tween = null
+
 var _shake_offset := Vector2.ZERO:
 	set(shake_offset):
 		_shake_offset = shake_offset
 		_refresh_position()
+
+
+func _init() -> void:
+	_wall_hit.connect(func(_direction: Hexagon.Direction) -> void:
+		if _shake_tween != null and _shake_tween.is_valid():
+			_shake_tween.kill()
+
+		_shake_offset = Vector2.ZERO
+		_shake_tween = create_tween()
+
+		var bump_magnitude := _bump_vector.length()
+		var forward_vector := _bump_vector.normalized()
+		var lateral_vector := Vector2(-forward_vector.y, forward_vector.x)
+
+		var shake_method := func(progress: float) -> void:
+			_shake_offset = (1.0 - progress) * (
+				forward_vector * sin(progress * TAU * 2.0) * bump_magnitude * 0.3 +
+				lateral_vector * sin(progress * TAU * 4.0) * bump_magnitude * 0.1
+			)
+
+		var shake_tweener := _shake_tween.tween_method(shake_method, 0.0, 1.0, 0.4)
+		shake_tweener.set_delay(0.05)
+	)
 
 
 func _bind_entity(entity: Entity) -> void:
@@ -72,6 +102,9 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 	_movement_tween = create_tween()
 	_movement_tween.set_parallel()
 
+	var movement_started_callback := _movement_tween.tween_callback(_movement_started.emit.bind(movement))
+	movement_started_callback.set_delay(movement_delay)
+
 	var ground_position_tweener := _movement_tween.tween_property(self, ^":_ground_position", target_ground_position, movement_duration)
 	ground_position_tweener.set_delay(movement_delay)
 
@@ -95,6 +128,8 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 		# Fall off the tile late when descending, but rise early when ascending
 		if _elevation > target_elevation:
 			elevation_tweener.set_ease(Tween.EASE_IN)
+			var movement_landed := _movement_tween.chain()
+			movement_landed.tween_callback(_movement_landed.emit)
 		elif _elevation < target_elevation:
 			elevation_tweener.set_ease(Tween.EASE_OUT)
 
@@ -142,6 +177,9 @@ func _perform_bump_effect(direction: Hexagon.Direction, cause: Entity.MoveFailCa
 			back_tweener.set_ease(Tween.EASE_IN_OUT)
 
 		Entity.MoveFailCause.WALL_AHEAD:
+			var wall_hit_callback := _bump_tween.tween_callback(_wall_hit.emit.bind(direction))
+			wall_hit_callback.set_delay(0.05)
+
 			_bump_vector = world_direction * 0.2
 
 			var out_tweener := _bump_tween.tween_property(self, ^":_bump_offset", 1.0, 0.05)
@@ -151,16 +189,3 @@ func _perform_bump_effect(direction: Hexagon.Direction, cause: Entity.MoveFailCa
 			var back_tweener := _bump_tween.tween_property(self, ^":_bump_offset", 0.0, 0.15)
 			back_tweener.set_trans(Tween.TRANS_BACK)
 			back_tweener.set_ease(Tween.EASE_OUT)
-
-			var bump_magnitude := _bump_vector.length()
-			var forward_vector := _bump_vector.normalized()
-			var lateral_vector := Vector2(-forward_vector.y, forward_vector.x)
-
-			_shake_offset = Vector2.ZERO
-			var shake_method := func(progress: float) -> void:
-				_shake_offset = (1.0 - progress) * (
-					forward_vector * sin(progress * TAU * 2.0) * bump_magnitude * 0.3 +
-					lateral_vector * sin(progress * TAU * 4.0) * bump_magnitude * 0.1
-				)
-
-			_bump_tween.tween_method(shake_method, 0.0, 1.0, 0.4)

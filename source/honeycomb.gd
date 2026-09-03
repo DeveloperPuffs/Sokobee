@@ -57,14 +57,14 @@ func load(state: State) -> void:
 		if entity is Character:
 			var character: Character = entity
 			var bee: Bee = _bee_scene.instantiate()
-			bee.initialize(character)
+			bee.bind_character(character)
 			_entity_pieces[character] = bee
 			add_child(bee)
 
 		elif entity is Block:
 			var block: Block = entity
 			var honey: Honey = _honey_scene.instantiate()
-			honey.initialize(block)
+			honey.bind_block(block)
 			_entity_pieces[block] = honey
 			add_child(honey)
 	

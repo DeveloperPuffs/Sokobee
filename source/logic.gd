@@ -153,10 +153,11 @@ static func _handle_move_success(
 	direction: Hexagon.Direction,
 	moving_clusters: Dictionary[Cluster, Array]
 ) -> void:
-	var cluster_movements: Dictionary[Cluster, Entity.Movement] = {}
+	var direction_vector := Hexagon.get_direction_vector(direction)
 
+	var cluster_movements: Dictionary[Cluster, Entity.Movement] = {}
 	for moving_cluster in moving_clusters:
-		cluster_movements[moving_cluster] = Entity.Movement.new(Entity.Movement.Kind.CARRIED)
+		cluster_movements[moving_cluster] = Entity.Movement.new(Entity.Movement.Kind.CARRIED, direction_vector)
 
 	if moving_clusters.size() > 1:
 		cluster_movements[cluster].kind = Entity.Movement.Kind.INITIATOR
@@ -170,9 +171,7 @@ static func _handle_move_success(
 		change_found = false
 
 		for moving_cluster in moving_clusters:
-			var move_causes: Array[MoveCause]
-			move_causes.assign(moving_clusters[moving_cluster])
-			for move_cause in move_causes:
+			for move_cause: MoveCause in moving_clusters[moving_cluster]:
 				if not resolved_clusters.has(move_cause.cluster):
 					continue
 
@@ -185,22 +184,19 @@ static func _handle_move_success(
 				elif move_cause.kind == MoveCause.Kind.DRAGGING:
 					dragged_delay_count += 1
 
-				var comparable_movement := Entity.Movement.new(
-					Entity.Movement.Kind.CARRIED,
-					pushed_delay_count,
-					dragged_delay_count
-				)
+				var cluster_movement := cluster_movements[moving_cluster]
 
 				if resolved_clusters.has(moving_cluster):
-					var original_movement := cluster_movements[moving_cluster]
-					if comparable_movement.get_delay_factor() >= original_movement.get_delay_factor():
+					var comparable_delay_factor := Entity.Movement.calculate_delay_factor(pushed_delay_count, dragged_delay_count)
+					var original_delay_factor := cluster_movement.get_delay_factor()
+					if comparable_delay_factor >= original_delay_factor:
 						continue
 
-				cluster_movements[moving_cluster] = comparable_movement
+				cluster_movement.pushed_delay_count = pushed_delay_count
+				cluster_movement.dragged_delay_count = dragged_delay_count
 				resolved_clusters[moving_cluster] = true
 				change_found = true
 
-	var direction_vector := Hexagon.get_direction_vector(direction)
 	for moving_cluster in cluster_movements:
 		for moving_entity in moving_cluster.entities:
 			var target_position := moving_entity.current_tile.position + direction_vector
@@ -230,9 +226,7 @@ static func _handle_move_failure(
 
 			chained_clusters.append(queued_cluster)
 
-			var move_causes: Array[MoveCause]
-			move_causes.assign(moving_clusters[queued_cluster])
-			for move_cause in move_causes:
+			for move_cause: MoveCause in moving_clusters[queued_cluster]:
 				queued_clusters.append(move_cause.cluster)
 
 			if not reacting_clusters.has(queued_cluster):

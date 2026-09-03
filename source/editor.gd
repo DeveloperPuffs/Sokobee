@@ -446,10 +446,12 @@ func _handle_key_press(key: Key) -> void:
 			KEY_A, KEY_LEFT:
 				var new_direction := Hexagon.get_direction_turned_left(selected_character.facing_direction)
 				selected_character.facing_direction = new_direction
+				_honeycomb_is_dirty = true
 
 			KEY_D, KEY_RIGHT:
 				var new_direction := Hexagon.get_direction_turned_right(selected_character.facing_direction)
 				selected_character.facing_direction = new_direction
+				_honeycomb_is_dirty = true
 
 			KEY_S:
 				selected_character.asleep = not selected_character.asleep

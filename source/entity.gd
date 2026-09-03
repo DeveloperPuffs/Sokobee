@@ -45,15 +45,34 @@ class Movement:
 	}
 
 	var kind: Kind
-	var dragged_delay_count: int
+	var offset: Vector2i
 	var pushed_delay_count: int
+	var dragged_delay_count: int
 
 
-	func _init(_kind: Kind, _pushed_delay_count: int = 0, _dragged_delay_count: int = 0) -> void:
+	func _init(
+		_kind: Kind,
+		_offset: Vector2i,
+		_pushed_delay_count: int = 0,
+		_dragged_delay_count: int = 0
+	) -> void:
 		kind = _kind
+		offset = _offset
 		pushed_delay_count = _pushed_delay_count
 		dragged_delay_count = _dragged_delay_count
 
 
+	func has_direction() -> bool:
+		return Hexagon.is_direction_vector(offset)
+
+
+	func get_direction() -> Hexagon.Direction:
+		return Hexagon.get_vector_direction(offset)
+
+
 	func get_delay_factor() -> float:
-		return pushed_delay_count * _PUSHED_DELAY_FACTOR + dragged_delay_count * _DRAGGED_DELAY_FACTOR
+		return calculate_delay_factor(pushed_delay_count, dragged_delay_count)
+
+
+	static func calculate_delay_factor(_pushed_delay_count: int, _dragged_delay_count: int) -> float:
+		return _pushed_delay_count * _PUSHED_DELAY_FACTOR + _dragged_delay_count * _DRAGGED_DELAY_FACTOR
