@@ -10,9 +10,9 @@ extends Node2D
 @export var _character_indicator: Sprite2D
 
 var _state: State = null
-var _cells: Array[Cell] = []
-var _entity_nodes: Array[Node2D] = []
-var _waxes: Array[Wax] = []
+var _tile_cells: Dictionary[Tile, Cell] = {}
+var _entity_pieces: Dictionary[Entity, Piece] = {}
+var _link_waxes: Dictionary[Link, Wax] = {}
 
 
 func _ready() -> void:
@@ -34,42 +34,44 @@ func _process(_delta: float) -> void:
 
 
 func load(state: State) -> void:
-	for cell in _cells:
-		cell.queue_free()
-	_cells = []
+	for tile in _tile_cells:
+		_tile_cells[tile].queue_free()
+	_tile_cells = {}
 
-	for entity_node in _entity_nodes:
-		entity_node.queue_free()
-	_entity_nodes = []
+	for entity in _entity_pieces:
+		_entity_pieces[entity].queue_free()
+	_entity_pieces = {}
 
-	for wax in _waxes:
-		wax.queue_free()
-	_waxes = []
+	for link in _link_waxes:
+		_link_waxes[link].queue_free()
+	_link_waxes = {}
 
 	for tile: Tile in state.tiles.values():
 		var cell: Cell = _cell_scene.instantiate()
 		var cell_type := Cell.Type.GOAL if tile.goal else Cell.Type.NORMAL
 		cell.display(cell_type, tile.position, tile.height)
-		_cells.append(cell)
+		_tile_cells[tile] = cell
 		add_child(cell)
 
 	for entity in state.entities:
 		if entity is Character:
+			var character: Character = entity
 			var bee: Bee = _bee_scene.instantiate()
-			bee.initialize(entity as Character)
-			_entity_nodes.append(bee)
+			bee.initialize(character)
+			_entity_pieces[character] = bee
 			add_child(bee)
 
 		elif entity is Block:
+			var block: Block = entity
 			var honey: Honey = _honey_scene.instantiate()
-			honey.initialize(entity as Block)
-			_entity_nodes.append(honey)
+			honey.initialize(block)
+			_entity_pieces[block] = honey
 			add_child(honey)
 	
 	for link in state.links:
 		var wax: Wax = _wax_scene.instantiate()
-		wax.initialize(link)
-		_waxes.append(wax)
+		wax.initialize(link, _entity_pieces[link.entity_a], _entity_pieces[link.entity_b])
+		_link_waxes[link] = wax
 		add_child(wax)
 
 	_state = state
@@ -78,14 +80,21 @@ func load(state: State) -> void:
 
 
 func _update_camera() -> void:
-	if _cells.is_empty():
+	if _tile_cells.is_empty():
 		return
 
-	var first_cell := _cells[0]
-	var grid_bounds := first_cell.get_bounds()
+	var grid_bounds: Rect2
 
-	for cell in _cells:
+	var first_tile := true
+	for tile in _tile_cells:
+		var cell := _tile_cells[tile]
 		var cell_bounds := cell.get_bounds()
+
+		if first_tile:
+			grid_bounds = cell_bounds
+			first_tile = false
+			continue
+
 		grid_bounds = grid_bounds.merge(cell_bounds)
 
 	var screen_size := get_viewport_rect().size

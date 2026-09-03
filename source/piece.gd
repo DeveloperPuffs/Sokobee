@@ -5,6 +5,8 @@ extends Node2D
 const _MOVEMENT_DURATION := 0.2
 const _MOVEMENT_RESTORE_DURATION := 0.1
 
+signal position_changed()
+
 var _entity: Entity
 
 var _movement_tween: Tween = null
@@ -45,6 +47,7 @@ func _bind_entity(entity: Entity) -> void:
 func _refresh_position() -> void:
 	position = _ground_position + _bump_offset * _bump_vector + _shake_offset
 	position.y -= _elevation
+	position_changed.emit()
 
 
 func _move_to_entity_tile(movement: Entity.Movement = null) -> void:

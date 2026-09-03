@@ -21,43 +21,52 @@ const _CENTER_TILE_POSITION := Vector2(319.5023, 315.3215)
 const _CANVAS_TILE_DISTANCE := 222.5685
 
 var _link: Link
+var _piece_a: Piece
+var _piece_b: Piece
 
 
 func _process(_delta: float) -> void:
-	_refresh()
+	_refresh_z_index()
 
 
-func initialize(link: Link) -> void:
+func initialize(link: Link, piece_a: Piece, piece_b: Piece) -> void:
 	_link = link
+	_piece_a = piece_a
+	_piece_b = piece_b
 
 	centered = false
 	offset = -_CENTER_TILE_POSITION
 
-	_refresh()
+	match _link.type:
+		Link.Type.SOLID:
+			var position_offset := _link.entity_b.current_tile.position - _link.entity_a.current_tile.position
+			texture = _SOLID_TEXTURES[Hexagon.get_vector_direction(position_offset) as int]
+		Link.Type.STICKY:
+			texture = _STICKY_TEXTURE
+
+	piece_a.position_changed.connect(_refresh_position)
+	piece_b.position_changed.connect(_refresh_position)
+
+	_refresh_position()
+	_refresh_z_index()
 
 
-func _refresh() -> void:
-	var entity_a := _link.entity_a
-	var entity_b := _link.entity_b
-
-	var tile_position_a := entity_a.current_tile.position
-	var tile_position_b := entity_b.current_tile.position
-
-	position = Hexagon.get_tile_world_position(tile_position_a, entity_a.cluster.get_elevation())
+func _refresh_position() -> void:
+	var world_position_a := _piece_a.position
+	var world_position_b := _piece_b.position
 
 	match _link.type:
 		Link.Type.SOLID:
-			var direction := Hexagon.get_vector_direction(tile_position_b - tile_position_a)
-			texture = _SOLID_TEXTURES[direction as int]
+			position = world_position_a
+			rotation = 0.0
+			scale = Vector2.ONE
 
 		Link.Type.STICKY:
-			var world_position_b := Hexagon.get_tile_world_position(tile_position_b, entity_b.cluster.get_elevation())
-			var delta := world_position_b - position
-
-			texture = _STICKY_TEXTURE
+			var delta := world_position_b - world_position_a
+			position = world_position_a
 			rotation = delta.angle() + PI / 2.0
 			scale = Vector2(1.0, delta.length() / _CANVAS_TILE_DISTANCE)
 
-	var z_index_a := Hexagon.get_tile_z_index(tile_position_a)
-	var z_index_b := Hexagon.get_tile_z_index(tile_position_b)
-	z_index = max(z_index_a, z_index_b) + 3
+
+func _refresh_z_index() -> void:
+	z_index = max(_piece_a.z_index, _piece_b.z_index) + 1

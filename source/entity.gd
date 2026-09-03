@@ -27,7 +27,7 @@ func _init(_current_tile: Tile) -> void:
 
 class Movement:
 	# How much of the movement duration each delay type lasts
-	const _PUSHED_DELAY_FACTOR := 0.2
+	const _PUSHED_DELAY_FACTOR := 0.1
 	const _DRAGGED_DELAY_FACTOR := 0.5
 
 	enum Kind {
