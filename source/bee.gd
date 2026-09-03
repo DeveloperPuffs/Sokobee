@@ -12,21 +12,25 @@ const _WALL_HIT_SQUASH := 0.25
 const _SQUASH_BULGE_RATIO := 0.6
 
 @export var _sleeping_indicator: Sprite2D
-@export var _squash_pivot: Node2D
+@export var _scaler: Node2D
 @export var _rotator: Node2D
 @export var _animation_player: AnimationPlayer
 
 var _character: Character
 var _rotation_tween: Tween = null
+
+var _pulse_tween: Tween = null
+var _pulse := 1.0:
+	set(pulse):
+		_pulse = pulse
+		_refresh_transformation()
+
 var _squash_tween: Tween = null
-var _landing_tween: Tween = null
-
-var _squash_axis := 0.0
-
+var _squash_axis_angle := 0.0
 var _squash := 0.0:
 	set(squash):
 		_squash = squash
-		_refresh_squash()
+		_refresh_transformation()
 
 
 func _init() -> void:
@@ -36,33 +40,25 @@ func _init() -> void:
 		if not movement.has_direction():
 			return
 
+		var direction := movement.get_direction()
+		var direction_angle := Hexagon.get_direction_rotation(direction)
 		match movement.kind:
 			Entity.Movement.Kind.WALKING:
 				_animation_player.play("flutter")
 			Entity.Movement.Kind.INITIATOR:
 				_animation_player.play("flap")
-				_squash_along(movement.get_direction(), _PUSHING_SQUASH)
+				_squash_along(direction_angle, _PUSHING_SQUASH)
 			Entity.Movement.Kind.CARRIED:
 				_animation_player.play("flutter")
-				_squash_along(movement.get_direction(), _PUSHED_SQUASH)
+				_squash_along(direction_angle, _PUSHED_SQUASH)
 	)
 
 	_movement_landed.connect(func() -> void:
-		if _landing_tween != null and _landing_tween.is_valid():
-			_landing_tween.kill()
-
-		_landing_tween = create_tween()
-
-		var landed_scale := Vector2(1.0 + _LANDING_SQUASH * _SQUASH_BULGE_RATIO, 1.0 - _LANDING_SQUASH)
-		_landing_tween.tween_property(self, ^":scale", landed_scale, 0.05)
-
-		var recover_tweener := _landing_tween.tween_property(self, ^":scale", Vector2.ONE, 0.15)
-		recover_tweener.set_trans(Tween.TRANS_BACK)
-		recover_tweener.set_ease(Tween.EASE_OUT)
+		_squash_along(PI / 2.0, _LANDING_SQUASH)
 	)
 
 	_wall_hit.connect(func(direction: Hexagon.Direction) -> void:
-		_squash_along(direction, _WALL_HIT_SQUASH)
+		_squash_along(Hexagon.get_direction_rotation(direction), _WALL_HIT_SQUASH)
 	)
 
 
@@ -73,22 +69,39 @@ func bind_character(character: Character) -> void:
 	_sleeping_indicator.visible = _character.asleep
 	_character.turned.connect(_face_character_direction)
 
+	_character.clicked.connect(func() -> void:
+		if _pulse_tween != null and _pulse_tween.is_valid():
+			_pulse_tween.kill()
+
+		_pulse_tween = create_tween()
+
+		var pulsed_value := 0.9 if _character.asleep else 1.2
+		var pulsed_tweener := _pulse_tween.tween_property(self, ^":_pulse", pulsed_value, 0.1)
+		pulsed_tweener.set_trans(Tween.TRANS_QUAD)
+		pulsed_tweener.set_ease(Tween.EASE_OUT)
+
+		var settle_tweener := _pulse_tween.tween_property(self, ^":_pulse", 1.0, 0.2)
+		settle_tweener.set_trans(Tween.TRANS_BACK)
+		settle_tweener.set_ease(Tween.EASE_OUT)
+	)
+
 	_face_character_direction()
 
 
-func _refresh_squash() -> void:
-	var axis := Transform2D(_squash_axis, Vector2.ZERO)
-	var inverse_axis := Transform2D(-_squash_axis, Vector2.ZERO)
+func _refresh_transformation() -> void:
+	_scaler.transform = (
+		# Pulse Transform
+		Transform2D(Vector2(_pulse, 0.0), Vector2(0.0, _pulse), Vector2.ZERO) *
 
-	var scaling := Transform2D(
-		Vector2(1.0 - _squash, 0.0),
-		Vector2(0.0, 1.0 + _squash * _SQUASH_BULGE_RATIO),
-		Vector2.ZERO
+		# Squash Transform
+		Transform2D(_squash_axis_angle, Vector2.ZERO) *
+		Transform2D(
+			Vector2(1.0 - _squash, 0.0),
+			Vector2(0.0, 1.0 + _squash * _SQUASH_BULGE_RATIO),
+			Vector2.ZERO
+		) *
+		Transform2D(-_squash_axis_angle, Vector2.ZERO)
 	)
-
-	# Rotate into the squash axis, scale along it, rotate back — otherwise the
-	# art turns with the axis instead of deforming along it
-	_squash_pivot.transform = axis * scaling * inverse_axis
 
 
 func _face_character_direction(_rotation: Character.Rotation = null) -> void:
@@ -114,18 +127,18 @@ func _face_character_direction(_rotation: Character.Rotation = null) -> void:
 		_animation_player.play("flutter")
 
 
-func _squash_along(direction: Hexagon.Direction, squash: float) -> void:
+func _squash_along(axis_angle: float, squash: float) -> void:
+	_squash_axis_angle = axis_angle
+
 	if _squash_tween != null and _squash_tween.is_valid():
 		_squash_tween.kill()
 
 	_squash_tween = create_tween()
 
-	_squash_axis = Hexagon.get_direction_rotation(direction)
-
-	var compress_tweener := _squash_tween.tween_property(self, ^":_squash", squash, _MOVEMENT_DURATION * 0.3)
+	var compress_tweener := _squash_tween.tween_property(self, ^":_squash", squash, 0.05)
 	compress_tweener.set_trans(Tween.TRANS_QUAD)
 	compress_tweener.set_ease(Tween.EASE_OUT)
 
-	var release_tweener := _squash_tween.tween_property(self, ^":_squash", 0.0, _MOVEMENT_DURATION * 0.7)
+	var release_tweener := _squash_tween.tween_property(self, ^":_squash", 0.0, 0.15)
 	release_tweener.set_trans(Tween.TRANS_BACK)
 	release_tweener.set_ease(Tween.EASE_OUT)

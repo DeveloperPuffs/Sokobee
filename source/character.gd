@@ -4,6 +4,9 @@ extends Entity
 
 signal turned(rotation: Rotation)
 
+@warning_ignore("unused_signal")
+signal clicked()
+
 var facing_direction: Hexagon.Direction
 var asleep: bool
 

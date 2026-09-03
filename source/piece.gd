@@ -121,15 +121,17 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 		# RESTORED movements will have linear transitions
 
 	if _elevation != target_elevation:
+		# Fall off the tile late when descending, but rise early when ascending
 		var elevation_tweener := _movement_tween.tween_property(self, ^":_elevation", target_elevation, movement_duration)
 		elevation_tweener.set_delay(movement_delay)
 		elevation_tweener.set_trans(Tween.TRANS_EXPO)
 
-		# Fall off the tile late when descending, but rise early when ascending
 		if _elevation > target_elevation:
 			elevation_tweener.set_ease(Tween.EASE_IN)
-			var movement_landed := _movement_tween.chain()
-			movement_landed.tween_callback(_movement_landed.emit)
+			if movement.kind != Entity.Movement.Kind.RESTORED:
+				var movement_landed := _movement_tween.chain()
+				movement_landed.tween_callback(_movement_landed.emit)
+
 		elif _elevation < target_elevation:
 			elevation_tweener.set_ease(Tween.EASE_OUT)
 

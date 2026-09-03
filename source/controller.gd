@@ -78,13 +78,11 @@ func _on_clicked_tile() -> void:
 		return
 
 	for character in _state.characters:
-		if character.current_tile != clicked_tile:
-			continue
+		if character.current_tile == clicked_tile:
+			character.clicked.emit()
 
-		if character == _state.active_character:
-			return
+			var snapshot := Snapshot.new(_state)
+			if Logic.select_character(_state, character):
+				_history.save_snapshot(snapshot)
 
-		var snapshot := Snapshot.new(_state)
-		if Logic.select_character(_state, character):
-			_history.save_snapshot(snapshot)
-			return
+			break
