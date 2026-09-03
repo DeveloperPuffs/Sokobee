@@ -2,7 +2,7 @@ class_name Game
 extends Node2D
 
 
-signal exited_game
+signal exited_game()
 
 @export var _controller: Controller
 @export var _honeycomb: Honeycomb

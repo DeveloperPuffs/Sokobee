@@ -2,14 +2,14 @@ class_name Inputs
 extends Node
 
 
-signal moved_forward
-signal moved_backward
-signal turned_left
-signal turned_right
-signal undid_step
-signal redid_step
-signal restarted_level
-signal clicked_tile
+signal moved_forward()
+signal moved_backward()
+signal turned_left()
+signal turned_right()
+signal undid_step()
+signal redid_step()
+signal restarted_level()
+signal clicked_tile()
 
 
 func _unhandled_input(event: InputEvent) -> void:

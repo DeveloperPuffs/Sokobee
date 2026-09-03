@@ -2,8 +2,8 @@ class_name Controller
 extends Node2D
 
 
-signal level_completed
-signal restart_requested
+signal level_completed()
+signal restart_requested()
 
 @export var _inputs: Inputs
 

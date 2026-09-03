@@ -28,7 +28,7 @@ Right Click to Select/Unlink Entities
 
 """
 
-signal exited_editor
+signal exited_editor()
 
 enum Tool {
 	TILE,

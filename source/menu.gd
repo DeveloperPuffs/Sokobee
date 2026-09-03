@@ -6,9 +6,9 @@ extends Node2D
 @export var _edit_button: Button
 @export var _quit_button: Button
 
-signal play_button_pressed
-signal edit_button_pressed
-signal quit_button_pressed
+signal play_button_pressed()
+signal edit_button_pressed()
+signal quit_button_pressed()
 
 
 func _ready() -> void:
