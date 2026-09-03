@@ -57,7 +57,7 @@ static func get_direction_rotation(direction: Direction) -> float:
 	return PI / 3.0 * (direction as int) + PI / 6.0
 
 
-static func get_tile_world_position(tile_position: Vector2i, tile_height: int) -> Vector2:
+static func get_tile_world_position(tile_position: Vector2i, tile_height: int = 0) -> Vector2:
 	var x := 1.5 * tile_position.x * TILE_SIZE
 	var y := (sqrt(3.0) / 2.0 * tile_position.x + sqrt(3.0) * tile_position.y) * TILE_SIZE
 	y -= tile_height * HEIGHT_OFFSET

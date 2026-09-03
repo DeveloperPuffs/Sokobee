@@ -21,7 +21,7 @@ func _draw() -> void:
 
 func _draw_axis(canvas_transform: Transform2D, center: Vector2, direction: Hexagon.Direction, color: Color) -> void:
 	var direction_vector := Hexagon.get_direction_vector(direction)
-	var world_direction := Hexagon.get_tile_world_position(direction_vector, 0)
+	var world_direction := Hexagon.get_tile_world_position(direction_vector)
 	var screen_direction := canvas_transform.basis_xform(world_direction).normalized()
 
 	var distance := get_viewport_rect().size.length() + center.length()

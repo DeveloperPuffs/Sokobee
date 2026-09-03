@@ -127,7 +127,7 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if _clusters_are_dirty:
-		_state.assign_block_clusters()
+		_state.assign_clusters()
 		_clusters_are_dirty = false
 
 	if _honeycomb_is_dirty:
@@ -520,7 +520,7 @@ func _refresh_selectable_indicator() -> void:
 
 			_selectable_entity_indicator.visible = true
 
-			var elevation := entity.get_elevation()
+			var elevation := entity.cluster.get_elevation()
 			var character_position := Hexagon.get_tile_world_position(tile_position, elevation)
 			_selectable_entity_indicator.position = character_position
 
@@ -549,7 +549,7 @@ func _display_selection_indicator() -> void:
 	elif _selected_element is Entity:
 		var selected_entity: Entity = _selected_element
 		var tile_position := selected_entity.current_tile.position
-		var elevation := selected_entity.get_elevation()
+		var elevation := selected_entity.cluster.get_elevation()
 		_selected_entity_indicator.position = Hexagon.get_tile_world_position(tile_position, elevation)
 		_selected_entity_indicator.z_index = Hexagon.get_tile_z_index(tile_position) + 3
 
@@ -559,8 +559,8 @@ func _display_selection_indicator() -> void:
 		var tile_position_a := selected_link.entity_a.current_tile.position
 		var tile_position_b := selected_link.entity_b.current_tile.position
 
-		var elevation_a := selected_link.entity_a.get_elevation()
-		var elevation_b := selected_link.entity_b.get_elevation()
+		var elevation_a := selected_link.entity_a.cluster.get_elevation()
+		var elevation_b := selected_link.entity_b.cluster.get_elevation()
 
 		var world_position_a := Hexagon.get_tile_world_position(tile_position_a, elevation_a)
 		var world_position_b := Hexagon.get_tile_world_position(tile_position_b, elevation_b)
@@ -571,6 +571,7 @@ func _display_selection_indicator() -> void:
 		_selected_link_indicator.position = (world_position_a + world_position_b) / 2.0
 		_selected_link_indicator.rotation = (world_position_b - world_position_a).angle()
 		_selected_link_indicator.z_index = max(z_index_a, z_index_b) + 4
+
 
 func _on_tool_option_item_selected(index: int) -> void:
 	_selected_tool = _tool_selector_dropdown.get_item_id(index) as Tool
@@ -604,6 +605,7 @@ func _remove_character(character: Character) -> void:
 
 	_state.entities.erase(character)
 	_state.characters.erase(character)
+	_clusters_are_dirty = true
 	_honeycomb_is_dirty = true
 
 
@@ -615,6 +617,7 @@ func _remove_block(block: Block) -> void:
 		_remove_link(link)
 
 	_state.entities.erase(block)
+	_clusters_are_dirty = true
 	_honeycomb_is_dirty = true
 
 

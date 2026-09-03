@@ -22,8 +22,9 @@ func apply(state: State) -> void:
 	for entity in state.entities:
 		entity.current_tile = _entity_tiles[entity]
 
+	var movement := Entity.Movement.new(Entity.Movement.Kind.RESTORED)
 	for entity in state.entities:
-		entity.moved.emit(Entity.Movement.new(Entity.Movement.Kind.RESTORED))
+		entity.moved.emit(movement)
 
 	for character in state.characters:
 		character.set_facing_direction(_facing_directions[character], true)

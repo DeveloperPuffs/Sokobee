@@ -6,6 +6,7 @@ const _MOVEMENT_DURATION := 0.2
 const _MOVEMENT_RESTORE_DURATION := 0.1
 
 var _entity: Entity
+
 var _movement_tween: Tween = null
 
 var _ground_position := Vector2.ZERO:
@@ -18,24 +19,39 @@ var _elevation := 0.0:
 		_elevation = elevation_offset
 		_refresh_position()
 
+var _bump_tween: Tween = null
+var _bump_vector := Vector2.ZERO
+
+var _bump_offset := 0.0:
+	set(bump_effect):
+		_bump_offset = bump_effect
+		_refresh_position()
+
+var _shake_offset := Vector2.ZERO:
+	set(shake_offset):
+		_shake_offset = shake_offset
+		_refresh_position()
+
 
 func _bind_entity(entity: Entity) -> void:
 	_entity = entity
 
 	_entity.moved.connect(_move_to_entity_tile)
+	_entity.move_failed.connect(_perform_bump_effect)
+
 	_move_to_entity_tile()
 
 
 func _refresh_position() -> void:
-	position = _ground_position
+	position = _ground_position + _bump_offset * _bump_vector + _shake_offset
 	position.y -= _elevation
 
 
 func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 	var tile_position := _entity.current_tile.position
 
-	var target_ground_position := Hexagon.get_tile_world_position(tile_position, 0)
-	var target_elevation := _entity.get_elevation() * Hexagon.HEIGHT_OFFSET
+	var target_ground_position := Hexagon.get_tile_world_position(tile_position)
+	var target_elevation := _entity.cluster.get_elevation() * Hexagon.HEIGHT_OFFSET
 	var target_z_index := Hexagon.get_tile_z_index(tile_position) + 2
 
 	if _movement_tween != null and _movement_tween.is_valid():
@@ -58,8 +74,8 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 
 	match movement.kind:
 		Entity.Movement.Kind.WALKING:
-			ground_position_tweener.set_trans(Tween.TRANS_CUBIC)
-			ground_position_tweener.set_ease(Tween.EASE_IN_OUT)
+			ground_position_tweener.set_trans(Tween.TRANS_BACK)
+			ground_position_tweener.set_ease(Tween.EASE_OUT)
 		Entity.Movement.Kind.INITIATOR:
 			ground_position_tweener.set_trans(Tween.TRANS_QUAD)
 			ground_position_tweener.set_ease(Tween.EASE_OUT)
@@ -88,3 +104,60 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 		movement_ended.tween_callback(func() -> void:
 			z_index = target_z_index
 		)
+
+
+func _perform_bump_effect(direction: Hexagon.Direction, cause: Entity.MoveFailCause) -> void:
+	if _bump_tween != null and _bump_tween.is_valid():
+		_bump_tween.kill()
+
+	var direction_vector := Hexagon.get_direction_vector(direction)
+	var world_direction := Hexagon.get_tile_world_position(direction_vector)
+
+	_bump_tween = create_tween()
+
+	match cause:
+		Entity.MoveFailCause.NONE:
+			_bump_vector = world_direction * 0.1
+
+			var out_tweener := _bump_tween.tween_property(self, ^":_bump_offset", 1.0, 0.1)
+			out_tweener.set_trans(Tween.TRANS_QUAD)
+			out_tweener.set_ease(Tween.EASE_OUT)
+
+			var back_tweener := _bump_tween.tween_property(self, ^":_bump_offset", 0.0, 0.1)
+			back_tweener.set_trans(Tween.TRANS_CUBIC)
+			back_tweener.set_ease(Tween.EASE_IN_OUT)
+
+		Entity.MoveFailCause.NO_GROUND_AHEAD:
+			_bump_vector = world_direction * 0.25
+
+			var out_tweener := _bump_tween.tween_property(self, ^":_bump_offset", 1.0, 0.15)
+			out_tweener.set_trans(Tween.TRANS_SINE)
+			out_tweener.set_ease(Tween.EASE_OUT)
+
+			var back_tweener := _bump_tween.tween_property(self, ^":_bump_offset", 0.0, 0.05)
+			back_tweener.set_trans(Tween.TRANS_SINE)
+			back_tweener.set_ease(Tween.EASE_IN_OUT)
+
+		Entity.MoveFailCause.WALL_AHEAD:
+			_bump_vector = world_direction * 0.2
+
+			var out_tweener := _bump_tween.tween_property(self, ^":_bump_offset", 1.0, 0.05)
+			out_tweener.set_trans(Tween.TRANS_QUAD)
+			out_tweener.set_ease(Tween.EASE_OUT)
+
+			var back_tweener := _bump_tween.tween_property(self, ^":_bump_offset", 0.0, 0.15)
+			back_tweener.set_trans(Tween.TRANS_BACK)
+			back_tweener.set_ease(Tween.EASE_OUT)
+
+			var bump_magnitude := _bump_vector.length()
+			var forward_vector := _bump_vector.normalized()
+			var lateral_vector := Vector2(-forward_vector.y, forward_vector.x)
+
+			_shake_offset = Vector2.ZERO
+			var shake_method := func(progress: float) -> void:
+				_shake_offset = (1.0 - progress) * (
+					forward_vector * sin(progress * TAU * 2.0) * bump_magnitude * 0.3 +
+					lateral_vector * sin(progress * TAU * 4.0) * bump_magnitude * 0.1
+				)
+
+			_bump_tween.tween_method(shake_method, 0.0, 1.0, 0.4)

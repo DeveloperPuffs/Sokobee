@@ -9,36 +9,38 @@ var characters: Array[Character] = []
 var active_character: Character = null
 
 
-func assign_block_clusters() -> void:
+func assign_clusters() -> void:
 	for entity in entities:
+		entity.cluster = Cluster.new()
+
+	for entity in entities:
+		if entity is Character:
+			entity.cluster.entities.append(entity)
+			continue
+
 		if entity is Block:
-			var block := entity as Block
-			block.cluster = []
-
-	for entity in entities:
-		if not (entity is Block):
-			continue
-
-		var block := entity as Block
-		if not block.cluster.is_empty():
-			continue
-
-		var cluster: Array[Block] = []
-		var queue: Array[Block] = [block]
-
-		while not queue.is_empty():
-			var current: Block = queue.pop_back()
-			if cluster.has(current):
+			var block: Block = entity
+			if not block.cluster.entities.is_empty():
 				continue
 
-			cluster.append(current)
+			var queue: Array[Block] = [block]
 
-			for link in current.links:
-				if link.type == Link.Type.SOLID:
-					queue.push_back(link.other(current) as Block)
+			while not queue.is_empty():
+				var current_block: Block = queue.pop_back()
+				if block.cluster.entities.has(current_block):
+					continue
 
-		for member in cluster:
-			member.cluster = cluster
+				block.cluster.entities.append(current_block)
+
+				for link in current_block.links:
+					if link.type == Link.Type.SOLID:
+						var connected_block: Block = link.other(current_block)
+						queue.push_back(connected_block)
+
+			for connected_block in block.cluster.entities:
+				connected_block.cluster = block.cluster
+
+			continue
 
 
 func get_tile_at(world_position: Vector2) -> Tile:

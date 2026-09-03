@@ -46,7 +46,7 @@ static func load_level_state(level_data_value: Variant, result: Level.LoadResult
 	_check_unreferenced_identifiers(context)
 
 	if context.entities_are_loaded and context.links_are_loaded:
-		context.state.assign_block_clusters()
+		context.state.assign_clusters()
 
 
 static func save_level_state(state: State) -> Dictionary:

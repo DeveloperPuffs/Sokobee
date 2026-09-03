@@ -43,7 +43,7 @@ func _refresh() -> void:
 	var tile_position_a := entity_a.current_tile.position
 	var tile_position_b := entity_b.current_tile.position
 
-	position = Hexagon.get_tile_world_position(tile_position_a, entity_a.get_elevation())
+	position = Hexagon.get_tile_world_position(tile_position_a, entity_a.cluster.get_elevation())
 
 	match _link.type:
 		Link.Type.SOLID:
@@ -51,7 +51,7 @@ func _refresh() -> void:
 			texture = _SOLID_TEXTURES[direction as int]
 
 		Link.Type.STICKY:
-			var world_position_b := Hexagon.get_tile_world_position(tile_position_b, entity_b.get_elevation())
+			var world_position_b := Hexagon.get_tile_world_position(tile_position_b, entity_b.cluster.get_elevation())
 			var delta := world_position_b - position
 
 			texture = _STICKY_TEXTURE
