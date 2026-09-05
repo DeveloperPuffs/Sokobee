@@ -16,6 +16,7 @@ signal _wall_hit(direction: Hexagon.Direction)
 
 var _entity: Entity
 
+var _movement_delay := 0.0
 var _movement_tween: Tween = null
 
 var _ground_position := Vector2.ZERO:
@@ -89,17 +90,23 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 	var target_elevation := _entity.cluster.get_elevation() * Hexagon.HEIGHT_OFFSET
 	var target_z_index := Hexagon.get_tile_z_index(tile_position) + 2
 
+	var interrupted := false
+	var remaining_delay := 0.0
+
 	if _movement_tween != null and _movement_tween.is_valid():
+		interrupted = true
+		remaining_delay = maxf(_movement_delay - _movement_tween.get_total_elapsed_time(), 0.0)
 		_movement_tween.kill()
 
 	if movement == null:
+		_movement_delay = 0.0
 		_ground_position = target_ground_position
 		_elevation = target_elevation
 		z_index = target_z_index
 		return
 
 	var movement_duration := _MOVEMENT_RESTORE_DURATION if movement.kind == Entity.Movement.Kind.RESTORED else _MOVEMENT_DURATION
-	var movement_delay := movement_duration * movement.get_delay_factor()
+	var movement_delay = remaining_delay if interrupted else movement_duration * movement.get_delay_factor()
 
 	_movement_tween = create_tween()
 	_movement_tween.set_parallel()
@@ -110,17 +117,18 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 	var ground_position_tweener := _movement_tween.tween_property(self, ^":_ground_position", target_ground_position, movement_duration)
 	ground_position_tweener.set_delay(movement_delay)
 
-	match movement.kind:
-		Entity.Movement.Kind.WALKING:
-			ground_position_tweener.set_trans(Tween.TRANS_BACK)
-			ground_position_tweener.set_ease(Tween.EASE_OUT)
-		Entity.Movement.Kind.INITIATOR:
-			ground_position_tweener.set_trans(Tween.TRANS_QUAD)
-			ground_position_tweener.set_ease(Tween.EASE_OUT)
-		Entity.Movement.Kind.CARRIED:
-			ground_position_tweener.set_trans(Tween.TRANS_BACK)
-			ground_position_tweener.set_ease(Tween.EASE_OUT)
-		# RESTORED movements will have linear transitions
+	if not interrupted:
+		match movement.kind:
+			Entity.Movement.Kind.WALKING:
+				ground_position_tweener.set_trans(Tween.TRANS_BACK)
+				ground_position_tweener.set_ease(Tween.EASE_OUT)
+			Entity.Movement.Kind.INITIATOR:
+				ground_position_tweener.set_trans(Tween.TRANS_QUAD)
+				ground_position_tweener.set_ease(Tween.EASE_OUT)
+			Entity.Movement.Kind.CARRIED:
+				ground_position_tweener.set_trans(Tween.TRANS_BACK)
+				ground_position_tweener.set_ease(Tween.EASE_OUT)
+			# RESTORED movements will have linear transitions
 
 	if _elevation != target_elevation:
 		# Fall off the tile late when descending, but rise early when ascending
