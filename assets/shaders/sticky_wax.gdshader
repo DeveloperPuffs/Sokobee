@@ -7,7 +7,7 @@ shader_type canvas_item;
 const vec2 TRANSPARENT_COLOR_POSITION = vec2(0.0, 0.0);
 
 // How much more long than thick the sprite can be before a waist appears
-const float WAIST_LENGTH_THICKNESS_RATIO = 3.0;
+const float WAIST_LENGTH_THICKNESS_RATIO = 2.0;
 
 // How thin the waist can be compared to the thickness
 const float WAIST_MINIMUM_RATIO = 0.5;

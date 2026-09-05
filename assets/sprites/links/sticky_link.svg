@@ -14,7 +14,6 @@
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
@@ -29,7 +28,7 @@
      inkscape:document-units="px"
      inkscape:zoom="4.8421988"
      inkscape:cx="161.39362"
-     inkscape:cy="145.69827"
+     inkscape:cy="112.65543"
      inkscape:window-width="3840"
      inkscape:window-height="1514"
      inkscape:window-x="2869"
@@ -40,31 +39,7 @@
      showguides="true"
      inkscape:lockguides="true" />
   <defs
-     id="defs1">
-    <linearGradient
-       id="linearGradient2"
-       inkscape:collect="always">
-      <stop
-         style="stop-color:#ee6622;stop-opacity:0.87;"
-         offset="0.13101161"
-         id="stop2" />
-      <stop
-         style="stop-color:#ee6622;stop-opacity:0.60000002;"
-         offset="1"
-         id="stop3" />
-    </linearGradient>
-    <radialGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient2"
-       id="radialGradient3"
-       cx="-3211.0293"
-       cy="2246.5996"
-       fx="-3211.0293"
-       fy="2246.5996"
-       r="1149.2656"
-       gradientTransform="matrix(1,0,0,0.89494661,0,236.01291)"
-       gradientUnits="userSpaceOnUse" />
-  </defs>
+     id="defs1" />
   <g
      inkscape:groupmode="layer"
      id="layer4"
@@ -72,7 +47,7 @@
      transform="matrix(0,0.9955943,-0.89100377,0,3885.0393,-1212.7017)"
      style="display:inline;stroke-width:1.06174">
     <ellipse
-       style="fill:url(#radialGradient3);stroke-width:815.418"
+       style="fill:#ee6622;stroke-width:815.418;fill-opacity:0.60000002"
        id="path1"
        cx="-3211.0293"
        cy="2246.5996"

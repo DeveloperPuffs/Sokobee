@@ -7,6 +7,50 @@
 [ext_resource type="Script" uid="uid://b7hu1lfwbj786" path="res://source/link_attachment_marker.gd" id="5_dfh60"]
 [ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="5_f131d"]
 
+[sub_resource type="Curve2D" id="Curve2D_mwfub"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector2Array(0, 0, 279.74115, 197.34737, -289.68256, 195.91423, 153.87048, 278.9776, 0, 0, 224.01855, -166.30942)
+}
+point_count = 2
+
+[sub_resource type="Resource" id="Resource_emq76"]
+resource_local_to_scene = true
+script = ExtResource("5_f131d")
+
+[sub_resource type="Curve2D" id="Curve2D_wfwi3"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector2Array(0, 0, 0, 53.0208, 121.20125, 0, 66.93945, 0, -66.93945, 0, 0, 96, 0, 53.0208, 0, -53.0208, -121.20125, 0, -66.93945, 0, 66.93945, 0, 0, -96, 0, -53.0208, 0, 0, 121.20125, 0)
+}
+point_count = 5
+
+[sub_resource type="Resource" id="Resource_jsbps"]
+resource_local_to_scene = true
+script = ExtResource("5_f131d")
+
+[sub_resource type="Curve2D" id="Curve2D_c8xc2"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector2Array(0, 0, 337.11792, -195.76917, -259.549, -174.76306, 269.92798, -242.10516, 0, 0, 172.84717, 234.93079)
+}
+point_count = 2
+
+[sub_resource type="Resource" id="Resource_cdch5"]
+resource_local_to_scene = true
+script = ExtResource("5_f131d")
+
+[sub_resource type="Curve2D" id="Curve2D_2ltla"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector2Array(0, 0, 0, 53.0208, 121.20125, 0, 66.93945, 0, -66.93945, 0, 0, 96, 0, 53.0208, 0, -53.0208, -121.20125, 0, -66.93945, 0, 66.93945, 0, 0, -96, 0, -53.0208, 0, 0, 121.20125, 0)
+}
+point_count = 5
+
+[sub_resource type="Resource" id="Resource_bu4bv"]
+resource_local_to_scene = true
+script = ExtResource("5_f131d")
+
 [sub_resource type="Curve2D" id="Curve2D_pjeov"]
 resource_local_to_scene = true
 _data = {
@@ -37,50 +81,6 @@ _data = {
 point_count = 5
 
 [sub_resource type="Resource" id="Resource_hu557"]
-resource_local_to_scene = true
-script = ExtResource("5_f131d")
-
-[sub_resource type="Curve2D" id="Curve2D_mwfub"]
-resource_local_to_scene = true
-_data = {
-"points": PackedVector2Array(0, 0, 419.3003, 34.20964, -232.432, 214.65302, 126.32324, 252.8132, 0, 0, 185.47302, -218.20676)
-}
-point_count = 2
-
-[sub_resource type="Resource" id="Resource_emq76"]
-resource_local_to_scene = true
-script = ExtResource("5_f131d")
-
-[sub_resource type="Curve2D" id="Curve2D_wfwi3"]
-resource_local_to_scene = true
-_data = {
-"points": PackedVector2Array(0, 0, 0, 53.0208, 121.20125, 0, 66.93945, 0, -66.93945, 0, 0, 96, 0, 53.0208, 0, -53.0208, -121.20125, 0, -66.93945, 0, 66.93945, 0, 0, -96, 0, -53.0208, 0, 0, 121.20125, 0)
-}
-point_count = 5
-
-[sub_resource type="Resource" id="Resource_jsbps"]
-resource_local_to_scene = true
-script = ExtResource("5_f131d")
-
-[sub_resource type="Curve2D" id="Curve2D_c8xc2"]
-resource_local_to_scene = true
-_data = {
-"points": PackedVector2Array(0, 0, 419.3003, -34.2097, -232.432, -214.65295, 126.32324, -252.81311, 0, 0, 185.47302, 218.20679)
-}
-point_count = 2
-
-[sub_resource type="Resource" id="Resource_cdch5"]
-resource_local_to_scene = true
-script = ExtResource("5_f131d")
-
-[sub_resource type="Curve2D" id="Curve2D_2ltla"]
-resource_local_to_scene = true
-_data = {
-"points": PackedVector2Array(0, 0, 0, 53.0208, 121.20125, 0, 66.93945, 0, -66.93945, 0, 0, 96, 0, 53.0208, 0, -53.0208, -121.20125, 0, -66.93945, 0, 66.93945, 0, 0, -96, 0, -53.0208, 0, 0, 121.20125, 0)
-}
-point_count = 5
-
-[sub_resource type="Resource" id="Resource_bu4bv"]
 resource_local_to_scene = true
 script = ExtResource("5_f131d")
 
@@ -135,7 +135,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_dfh60"]
 resource_name = "flap"
-length = 0.19999999999999998
+length = 0.2
 step = 0.3
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -144,10 +144,10 @@ tracks/0/path = NodePath("Scaler/Rotator/Skeleton/Root/Body/LeftWing:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.100468345, 0.19725902),
+"times": PackedFloat32Array(0, 0.1, 0.2),
 "transitions": PackedFloat32Array(0.5, 2, 1),
 "update": 0,
-"values": [-2.7493641, -2.0366511, -2.7493641]
+"values": [-2.7493641, -1.9962931, -2.7493641]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -156,15 +156,15 @@ tracks/1/path = NodePath("Scaler/Rotator/Skeleton/Root/Body/RightWing:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.09659781, 0.19603308),
+"times": PackedFloat32Array(0, 0.1, 0.2),
 "transitions": PackedFloat32Array(0.5, 2, 1),
 "update": 0,
-"values": [2.668262, 2.0582647, 2.668262]
+"values": [2.668262, 2.026244, 2.668262]
 }
 
 [sub_resource type="Animation" id="Animation_f131d"]
 resource_name = "flutter"
-length = 0.19999999999999998
+length = 0.1
 step = 0.3
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -173,10 +173,10 @@ tracks/0/path = NodePath("Scaler/Rotator/Skeleton/Root/Body/LeftWing:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2),
+"times": PackedFloat32Array(0, 0.05, 0.1),
 "transitions": PackedFloat32Array(0.5, 2, 1),
 "update": 0,
-"values": [-2.7493641, -2.508582, -2.7493641]
+"values": [-2.6553118, -2.3518095, -2.6553118]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -185,10 +185,10 @@ tracks/1/path = NodePath("Scaler/Rotator/Skeleton/Root/Body/RightWing:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.2),
+"times": PackedFloat32Array(0, 0.05, 0.1),
 "transitions": PackedFloat32Array(0.5, 2, 1),
 "update": 0,
-"values": [2.668262, 2.4475474, 2.668262]
+"values": [2.5188286, 2.3556397, 2.5188286]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_f131d"]
@@ -215,8 +215,92 @@ position = Vector2(13, 0)
 scale = Vector2(0.125, 0.125)
 metadata/svg_root = true
 
+[node name="Left Antenna" type="Node2D" parent="Scaler/Rotator/SVG" unique_id=1497815461]
+position = Vector2(-792, -808)
+scale = Vector2(0.6487582, 0.81338114)
+metadata/svg_style = {
+"stroke-width": "1.37662"
+}
+
+[node name="LeftPath" type="Node2D" parent="Scaler/Rotator/SVG/Left Antenna" unique_id=2043403245 node_paths=PackedStringArray("line")]
+position = Vector2(1953.806, 551.9779)
+script = ExtResource("3_pjeov")
+stroke_color = Color(0.13333334, 0.06666667, 0, 1)
+stroke_width = 132.155
+line = NodePath("Stroke")
+curve = SubResource("Curve2D_mwfub")
+update_curve_at_runtime = true
+arc_list = SubResource("Resource_emq76")
+
+[node name="Stroke" type="Line2D" parent="Scaler/Rotator/SVG/Left Antenna/LeftPath" unique_id=532264596]
+points = PackedVector2Array(-289.68256, 195.91423, -263.15997, 213.02995, -236.12306, 227.43306, -208.69077, 239.21135, -180.98206, 248.45264, -153.11595, 255.24477, -125.211395, 259.67545, -97.387405, 261.83258, -69.762924, 261.80396, -42.456947, 259.6773, -15.588469, 255.54057, 10.723555, 249.48148, 36.360115, 241.58788, 61.20227, 231.94754, 85.131035, 220.64828, 108.027374, 207.77791, 129.77237, 193.42426, 150.24701, 177.67514, 169.3323, 160.61832, 186.90933, 142.34167, 202.85905, 122.93294, 217.0625, 102.479965, 229.40071, 81.07057, 239.7547, 58.79253, 248.00546, 35.733673, 254.03404, 11.981819, 257.72147, -12.3752365, 258.94873, -37.24968, 257.59686, -62.55371, 253.5469, -88.19951, 246.67986, -114.099266, 236.87674, -140.16518, 224.01855, -166.30942)
+width = 132.155
+default_color = Color(0.13333334, 0.06666667, 0, 1)
+sharp_limit = 4.0
+metadata/_edit_lock_ = true
+
+[node name="LeftCircle" type="Node2D" parent="Scaler/Rotator/SVG/Left Antenna" unique_id=1397345225 node_paths=PackedStringArray("polygon")]
+position = Vector2(2126.049, 325.60703)
+script = ExtResource("3_pjeov")
+fill_color = Color(0.13333334, 0.06666667, 0, 1)
+polygon = NodePath("Fill")
+curve = SubResource("Curve2D_wfwi3")
+update_curve_at_runtime = true
+arc_list = SubResource("Resource_jsbps")
+shape_type = 2
+size = Vector2(242.4025, 192)
+rx = 121.20125
+ry = 96.0
+
+[node name="Fill" type="Polygon2D" parent="Scaler/Rotator/SVG/Left Antenna/LeftCircle" unique_id=483701076]
+color = Color(0.13333334, 0.06666667, 0, 1)
+polygon = PackedVector2Array(121.20125, 0, 120.57552, 9.815684, 118.73894, 19.347769, 115.75244, 28.548008, 111.67691, 37.36815, 106.57329, 45.75995, 100.50247, 53.675156, 93.525375, 61.06552, 85.70292, 67.8828, 77.09602, 74.07874, 67.76559, 79.605095, 57.77253, 84.41361, 47.17778, 88.456055, 36.042233, 91.68416, 24.426811, 94.04968, 12.392429, 95.50438, 0, 96, -12.392429, 95.50438, -24.426811, 94.04968, -36.042233, 91.68416, -47.177776, 88.45605, -57.77253, 84.41361, -67.76558, 79.605095, -77.09602, 74.07874, -85.70292, 67.8828, -93.525375, 61.06552, -100.50247, 53.675156, -106.57329, 45.75995, -111.67691, 37.36815, -115.75244, 28.548008, -118.738945, 19.347769, -120.57552, 9.815684, -121.20125, 0, -120.57552, -9.815684, -118.73894, -19.347769, -115.75244, -28.548008, -111.67691, -37.36815, -106.57329, -45.75995, -100.50247, -53.675156, -93.525375, -61.06552, -85.70292, -67.8828, -77.09602, -74.07874, -67.76559, -79.605095, -57.77253, -84.41361, -47.17778, -88.456055, -36.042233, -91.68416, -24.426811, -94.04968, -12.392429, -95.50438, 0, -96, 12.392429, -95.50438, 24.426811, -94.04968, 36.042233, -91.68416, 47.177776, -88.45605, 57.77253, -84.41361, 67.76558, -79.605095, 77.09602, -74.07874, 85.70292, -67.8828, 93.525375, -61.06552, 100.50247, -53.675156, 106.57329, -45.75995, 111.67691, -37.36815, 115.75244, -28.548008, 118.738945, -19.347769, 120.57552, -9.815684)
+metadata/_edit_lock_ = true
+
+[node name="Right Antenna" type="Node2D" parent="Scaler/Rotator/SVG" unique_id=1867084031]
+position = Vector2(-792, -760)
+scale = Vector2(0.6487582, 0.81338114)
+metadata/svg_style = {
+"stroke-width": "1.37662"
+}
+
+[node name="RightPath" type="Node2D" parent="Scaler/Rotator/SVG/Right Antenna" unique_id=458118369 node_paths=PackedStringArray("line")]
+position = Vector2(1948.3376, 1406.4747)
+script = ExtResource("3_pjeov")
+stroke_color = Color(0.13333334, 0.06666667, 0, 1)
+stroke_width = 132.155
+line = NodePath("Stroke")
+curve = SubResource("Curve2D_c8xc2")
+update_curve_at_runtime = true
+arc_list = SubResource("Resource_cdch5")
+
+[node name="Stroke" type="Line2D" parent="Scaler/Rotator/SVG/Right Antenna/RightPath" unique_id=866517273]
+points = PackedVector2Array(-259.549, -174.76306, -227.88216, -191.49911, -196.17216, -205.08362, -164.54047, -215.64116, -133.10852, -223.2963, -101.99773, -228.1736, -71.32957, -230.3977, -41.225468, -230.09315, -11.806866, -227.38455, 16.804804, -222.39645, 44.488087, -215.25345, 71.12157, -206.08012, 96.58377, -195.00105, 120.7533, -182.14085, 143.50868, -167.62402, 164.7285, -151.57524, 184.29129, -134.119, 202.07562, -115.37996, 217.96007, -95.48265, 231.82318, -74.551674, 243.54352, -52.711594, 252.99965, -30.08702, 260.07013, -6.8025055, 264.63348, 17.017342, 266.56833, 41.247967, 265.75323, 65.76478, 262.06668, 90.443184, 255.38727, 115.158615, 245.5936, 139.7865, 232.5642, 164.20224, 216.17761, 188.28123, 196.31241, 211.89896, 172.84717, 234.93079)
+width = 132.155
+default_color = Color(0.13333334, 0.06666667, 0, 1)
+sharp_limit = 4.0
+metadata/_edit_lock_ = true
+
+[node name="RightCircle" type="Node2D" parent="Scaler/Rotator/SVG/Right Antenna" unique_id=826684938 node_paths=PackedStringArray("polygon")]
+position = Vector2(2096.3127, 1662.1974)
+script = ExtResource("3_pjeov")
+fill_color = Color(0.13333334, 0.06666667, 0, 1)
+polygon = NodePath("Fill")
+curve = SubResource("Curve2D_2ltla")
+update_curve_at_runtime = true
+arc_list = SubResource("Resource_bu4bv")
+shape_type = 2
+size = Vector2(242.4025, 192)
+rx = 121.20125
+ry = 96.0
+
+[node name="Fill" type="Polygon2D" parent="Scaler/Rotator/SVG/Right Antenna/RightCircle" unique_id=1576603271]
+color = Color(0.13333334, 0.06666667, 0, 1)
+polygon = PackedVector2Array(121.20125, 0, 120.57552, 9.815684, 118.73894, 19.347769, 115.75244, 28.548008, 111.67691, 37.36815, 106.57329, 45.75995, 100.50247, 53.675156, 93.525375, 61.06552, 85.70292, 67.8828, 77.09602, 74.07874, 67.76559, 79.605095, 57.77253, 84.41361, 47.17778, 88.456055, 36.042233, 91.68416, 24.426811, 94.04968, 12.392429, 95.50438, 0, 96, -12.392429, 95.50438, -24.426811, 94.04968, -36.042233, 91.68416, -47.177776, 88.45605, -57.77253, 84.41361, -67.76558, 79.605095, -77.09602, 74.07874, -85.70292, 67.8828, -93.525375, 61.06552, -100.50247, 53.675156, -106.57329, 45.75995, -111.67691, 37.36815, -115.75244, 28.548008, -118.738945, 19.347769, -120.57552, 9.815684, -121.20125, 0, -120.57552, -9.815684, -118.73894, -19.347769, -115.75244, -28.548008, -111.67691, -37.36815, -106.57329, -45.75995, -100.50247, -53.675156, -93.525375, -61.06552, -85.70292, -67.8828, -77.09602, -74.07874, -67.76559, -79.605095, -57.77253, -84.41361, -47.17778, -88.456055, -36.042233, -91.68416, -24.426811, -94.04968, -12.392429, -95.50438, 0, -96, 12.392429, -95.50438, 24.426811, -94.04968, 36.042233, -91.68416, 47.177776, -88.45605, 57.77253, -84.41361, 67.76558, -79.605095, 77.09602, -74.07874, 85.70292, -67.8828, 93.525375, -61.06552, 100.50247, -53.675156, 106.57329, -45.75995, 111.67691, -37.36815, 115.75244, -28.548008, 118.738945, -19.347769, 120.57552, -9.815684)
+metadata/_edit_lock_ = true
+
 [node name="Body" type="Node2D" parent="Scaler/Rotator/SVG" unique_id=2146964122]
-position = Vector2(-836.0418, -791.64984)
+position = Vector2(-840.00006, -791.99994)
 scale = Vector2(0.6893965, 0.81338114)
 metadata/svg_style = {
 "stroke-width": "1.33543"
@@ -282,94 +366,10 @@ color = Color(0.13333334, 0.06666667, 0, 1)
 polygon = PackedVector2Array(-411.72964, -367.21832, 411.72964, -367.21832, 411.72964, 367.21832, -411.72964, 367.21832)
 metadata/_edit_lock_ = true
 
-[node name="Left Antenna" type="Node2D" parent="Scaler/Rotator/SVG" unique_id=1497815461]
-position = Vector2(-792, -808)
-scale = Vector2(0.6487582, 0.81338114)
-metadata/svg_style = {
-"stroke-width": "1.37662"
-}
-
-[node name="path4" type="Node2D" parent="Scaler/Rotator/SVG/Left Antenna" unique_id=2043403245 node_paths=PackedStringArray("line")]
-position = Vector2(1953.806, 551.9779)
-script = ExtResource("3_pjeov")
-stroke_color = Color(0.13333334, 0.06666667, 0, 1)
-stroke_width = 132.155
-line = NodePath("Stroke")
-curve = SubResource("Curve2D_mwfub")
-update_curve_at_runtime = true
-arc_list = SubResource("Resource_emq76")
-
-[node name="Stroke" type="Line2D" parent="Scaler/Rotator/SVG/Left Antenna/path4" unique_id=532264596]
-points = PackedVector2Array(-232.432, 214.65302, -157.25233, 218.20688, -88.90888, 216.24478, -27.338428, 209.07423, 27.522177, 197.00273, 75.73608, 180.33774, 97.37027, 170.37878, 117.36647, 159.38673, 135.73257, 147.40009, 152.4765, 134.45723, 167.60612, 120.59663, 181.12933, 105.85669, 193.05405, 90.27588, 203.38812, 73.89262, 212.13953, 56.745327, 219.3161, 38.87245, 224.92574, 20.312439, 228.97635, 1.1037216, 231.47586, -18.715279, 232.4321, -39.106117, 231.853, -60.030354, 229.74646, -81.44956, 220.9826, -125.61914, 206.20375, -171.30737, 185.47302, -218.20676)
-width = 132.155
-default_color = Color(0.13333334, 0.06666667, 0, 1)
-sharp_limit = 4.0
-metadata/_edit_lock_ = true
-
-[node name="path5" type="Node2D" parent="Scaler/Rotator/SVG/Left Antenna" unique_id=1397345225 node_paths=PackedStringArray("polygon")]
-position = Vector2(2126.049, 325.60703)
-script = ExtResource("3_pjeov")
-fill_color = Color(0.13333334, 0.06666667, 0, 1)
-polygon = NodePath("Fill")
-curve = SubResource("Curve2D_wfwi3")
-update_curve_at_runtime = true
-arc_list = SubResource("Resource_jsbps")
-shape_type = 2
-size = Vector2(242.4025, 192)
-rx = 121.20125
-ry = 96.0
-
-[node name="Fill" type="Polygon2D" parent="Scaler/Rotator/SVG/Left Antenna/path5" unique_id=483701076]
-color = Color(0.13333334, 0.06666667, 0, 1)
-polygon = PackedVector2Array(121.20125, 0, 120.57552, 9.815684, 118.73894, 19.347769, 115.75244, 28.548008, 111.67691, 37.36815, 106.57329, 45.75995, 100.50247, 53.675156, 93.525375, 61.06552, 85.70292, 67.8828, 77.09602, 74.07874, 67.76559, 79.605095, 57.77253, 84.41361, 47.17778, 88.456055, 36.042233, 91.68416, 24.426811, 94.04968, 12.392429, 95.50438, 0, 96, -12.392429, 95.50438, -24.426811, 94.04968, -36.042233, 91.68416, -47.177776, 88.45605, -57.77253, 84.41361, -67.76558, 79.605095, -77.09602, 74.07874, -85.70292, 67.8828, -93.525375, 61.06552, -100.50247, 53.675156, -106.57329, 45.75995, -111.67691, 37.36815, -115.75244, 28.548008, -118.738945, 19.347769, -120.57552, 9.815684, -121.20125, 0, -120.57552, -9.815684, -118.73894, -19.347769, -115.75244, -28.548008, -111.67691, -37.36815, -106.57329, -45.75995, -100.50247, -53.675156, -93.525375, -61.06552, -85.70292, -67.8828, -77.09602, -74.07874, -67.76559, -79.605095, -57.77253, -84.41361, -47.17778, -88.456055, -36.042233, -91.68416, -24.426811, -94.04968, -12.392429, -95.50438, 0, -96, 12.392429, -95.50438, 24.426811, -94.04968, 36.042233, -91.68416, 47.177776, -88.45605, 57.77253, -84.41361, 67.76558, -79.605095, 77.09602, -74.07874, 85.70292, -67.8828, 93.525375, -61.06552, 100.50247, -53.675156, 106.57329, -45.75995, 111.67691, -37.36815, 115.75244, -28.548008, 118.738945, -19.347769, 120.57552, -9.815684)
-metadata/_edit_lock_ = true
-
-[node name="Right Antenna" type="Node2D" parent="Scaler/Rotator/SVG" unique_id=1867084031]
-position = Vector2(-792, -760)
-scale = Vector2(0.6487582, 0.81338114)
-metadata/svg_style = {
-"stroke-width": "1.37662"
-}
-
-[node name="path4-2" type="Node2D" parent="Scaler/Rotator/SVG/Right Antenna" unique_id=458118369 node_paths=PackedStringArray("line")]
-position = Vector2(1965.1954, 1424.7434)
-script = ExtResource("3_pjeov")
-stroke_color = Color(0.13333334, 0.06666667, 0, 1)
-stroke_width = 132.155
-line = NodePath("Stroke")
-curve = SubResource("Curve2D_c8xc2")
-update_curve_at_runtime = true
-arc_list = SubResource("Resource_cdch5")
-
-[node name="Stroke" type="Line2D" parent="Scaler/Rotator/SVG/Right Antenna/path4-2" unique_id=866517273]
-points = PackedVector2Array(-232.432, -214.65295, -157.25233, -218.20683, -88.90888, -216.24474, -27.338428, -209.07419, 27.522177, -197.00269, 75.73608, -180.33768, 97.37027, -170.37872, 117.36647, -159.38669, 135.73257, -147.40002, 152.4765, -134.45718, 167.60612, -120.59657, 181.12933, -105.85663, 193.05405, -90.27582, 203.38812, -73.89255, 212.13953, -56.74526, 219.3161, -38.872383, 224.92574, -20.31237, 228.97635, -1.1036606, 231.47586, 18.715347, 232.4321, 39.10618, 231.853, 60.03042, 229.74646, 81.44962, 220.9826, 125.6192, 206.20375, 171.30742, 185.47302, 218.20679)
-width = 132.155
-default_color = Color(0.13333334, 0.06666667, 0, 1)
-sharp_limit = 4.0
-metadata/_edit_lock_ = true
-
-[node name="path5-2" type="Node2D" parent="Scaler/Rotator/SVG/Right Antenna" unique_id=826684938 node_paths=PackedStringArray("polygon")]
-position = Vector2(2136.1802, 1649.5752)
-script = ExtResource("3_pjeov")
-fill_color = Color(0.13333334, 0.06666667, 0, 1)
-polygon = NodePath("Fill")
-curve = SubResource("Curve2D_2ltla")
-update_curve_at_runtime = true
-arc_list = SubResource("Resource_bu4bv")
-shape_type = 2
-size = Vector2(242.4025, 192)
-rx = 121.20125
-ry = 96.0
-
-[node name="Fill" type="Polygon2D" parent="Scaler/Rotator/SVG/Right Antenna/path5-2" unique_id=1576603271]
-color = Color(0.13333334, 0.06666667, 0, 1)
-polygon = PackedVector2Array(121.20125, 0, 120.57552, 9.815684, 118.73894, 19.347769, 115.75244, 28.548008, 111.67691, 37.36815, 106.57329, 45.75995, 100.50247, 53.675156, 93.525375, 61.06552, 85.70292, 67.8828, 77.09602, 74.07874, 67.76559, 79.605095, 57.77253, 84.41361, 47.17778, 88.456055, 36.042233, 91.68416, 24.426811, 94.04968, 12.392429, 95.50438, 0, 96, -12.392429, 95.50438, -24.426811, 94.04968, -36.042233, 91.68416, -47.177776, 88.45605, -57.77253, 84.41361, -67.76558, 79.605095, -77.09602, 74.07874, -85.70292, 67.8828, -93.525375, 61.06552, -100.50247, 53.675156, -106.57329, 45.75995, -111.67691, 37.36815, -115.75244, 28.548008, -118.738945, 19.347769, -120.57552, 9.815684, -121.20125, 0, -120.57552, -9.815684, -118.73894, -19.347769, -115.75244, -28.548008, -111.67691, -37.36815, -106.57329, -45.75995, -100.50247, -53.675156, -93.525375, -61.06552, -85.70292, -67.8828, -77.09602, -74.07874, -67.76559, -79.605095, -57.77253, -84.41361, -47.17778, -88.456055, -36.042233, -91.68416, -24.426811, -94.04968, -12.392429, -95.50438, 0, -96, 12.392429, -95.50438, 24.426811, -94.04968, 36.042233, -91.68416, 47.177776, -88.45605, 57.77253, -84.41361, 67.76558, -79.605095, 77.09602, -74.07874, 85.70292, -67.8828, 93.525375, -61.06552, 100.50247, -53.675156, 106.57329, -45.75995, 111.67691, -37.36815, 115.75244, -28.548008, 118.738945, -19.347769, 120.57552, -9.815684)
-metadata/_edit_lock_ = true
-
 [node name="Right Wing" type="Node2D" parent="Scaler/Rotator/SVG" unique_id=183259117 node_paths=PackedStringArray("polygon", "line", "skeleton", "bone")]
-position = Vector2(128, -8)
-rotation = 2.668262
-scale = Vector2(0.824641, 0.93925065)
+position = Vector2(120, -8)
+rotation = 2.5188286
+scale = Vector2(0.6842053, 0.82810926)
 skew = -0.020692348
 script = ExtResource("3_pjeov")
 fill_color = Color(1, 0.8666667, 0.46666667, 1)
@@ -403,9 +403,9 @@ sharp_limit = 4.0
 metadata/_edit_lock_ = true
 
 [node name="Left Wing" type="Node2D" parent="Scaler/Rotator/SVG" unique_id=1796866566 node_paths=PackedStringArray("polygon", "line", "skeleton", "bone")]
-position = Vector2(128, -40)
-rotation = -2.7493641
-scale = Vector2(0.8145559, -0.9514704)
+position = Vector2(120, -40)
+rotation = -2.6553118
+scale = Vector2(0.6751198, -0.8027717)
 skew = 0.04086399
 script = ExtResource("3_pjeov")
 fill_color = Color(1, 0.8666667, 0.46666667, 1)
@@ -439,7 +439,7 @@ sharp_limit = 4.0
 metadata/_edit_lock_ = true
 
 [node name="Skeleton" type="Skeleton2D" parent="Scaler/Rotator" unique_id=1903168811]
-position = Vector2(12, 3)
+position = Vector2(11, 3)
 
 [node name="Root" type="Bone2D" parent="Scaler/Rotator/Skeleton" unique_id=1764690991]
 position = Vector2(-92, -3)
@@ -458,17 +458,18 @@ bone_angle = 0.0
 [node name="LeftWing" type="Bone2D" parent="Scaler/Rotator/Skeleton/Root/Body" unique_id=1419538626]
 position = Vector2(-3, -6)
 rotation = -2.7493641
-rest = Transform2D(-0.9240595, -0.38224864, 0.38224864, -0.9240595, -3, -6)
+scale = Vector2(0.99999994, 0.99999994)
+rest = Transform2D(-0.884077, -0.46734107, 0.46734107, -0.884077, -3, -6)
 auto_calculate_length_and_angle = false
-length = 132.118
+length = 100.0
 bone_angle = 0.0
 
 [node name="RightWing" type="Bone2D" parent="Scaler/Rotator/Skeleton/Root/Body" unique_id=48742631]
 position = Vector2(-3, -2)
 rotation = 2.668262
-rest = Transform2D(-0.89005494, 0.45585328, -0.45585328, -0.89005494, -3, -2)
+rest = Transform2D(-0.81226933, 0.58328253, -0.58328253, -0.81226933, -3, -2)
 auto_calculate_length_and_angle = false
-length = 131.268
+length = 100.0
 bone_angle = 0.0
 
 [node name="LinkAttachmentMarker" type="Node2D" parent="Scaler/Rotator" unique_id=467282182]
