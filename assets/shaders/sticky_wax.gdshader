@@ -22,7 +22,7 @@ float remap(float value, float from_start, float from_end, float to_start, float
 }
 
 
-float get_waist_thickness_at(float x) {
+float waist_thickness_ratio_at(float x) {
 	float waist = max(WAIST_LENGTH_THICKNESS_RATIO / (length / thickness), WAIST_MINIMUM_RATIO);
 	if (waist > 0.999) {
 		return 1.0;
@@ -53,7 +53,7 @@ void fragment() {
 	} else {
 		// Stretchable Rectangle
 		source_uv.x = 0.5;
-		source_uv.y = 0.5 + (UV.y - 0.5) / get_waist_thickness_at(UV.x);
+		source_uv.y = 0.5 + (UV.y - 0.5) / waist_thickness_ratio_at(UV.x);
 		if (source_uv.y < 0.0 || source_uv.y > 1.0) {
 			source_uv = TRANSPARENT_COLOR_POSITION;
 		}
