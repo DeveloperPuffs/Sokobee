@@ -8,12 +8,14 @@ const _TEXTURE_SIZE := 256.0
 const _STICKY_TEXTURE := preload("res://assets/sprites/links/sticky_link.svg")
 const _SHADER := preload("res://assets/shaders/sticky_wax.gdshader")
 
+# This offset makes the sticky wax appear in front of solid links where they overlap
+const _Z_INDEX_OFFSET := 2 * Hexagon.Z_INDEX_SCALE + 2
+
 
 func _init(link: Link, piece_a: Piece, piece_b: Piece) -> void:
 	super(link, piece_a, piece_b)
 
 	texture = _STICKY_TEXTURE
-	centered = true
 	texture_repeat = CanvasItem.TEXTURE_REPEAT_DISABLED
 
 	material = ShaderMaterial.new()
@@ -45,4 +47,4 @@ func _process(_delta: float) -> void:
 
 func _refresh_z_index() -> void:
 	super()
-	z_index = max(_piece_a.z_index, _piece_b.z_index) + 2
+	z_index = maxi(_piece_a.z_index, _piece_b.z_index) + _Z_INDEX_OFFSET

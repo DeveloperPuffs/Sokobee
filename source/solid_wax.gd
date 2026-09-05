@@ -36,4 +36,4 @@ func _refresh_sprite() -> void:
 
 func _refresh_z_index() -> void:
 	super()
-	z_index = max(_piece_a.z_index, _piece_b.z_index) + 1
+	z_index = maxi(_piece_a.z_index, _piece_b.z_index) + 1
