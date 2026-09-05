@@ -27,4 +27,4 @@ func _draw() -> void:
 	if not Engine.is_editor_hint():
 		return
 
-	draw_arc(Vector2.ZERO, radius, 0.0, TAU, 16, Color(0.0, 0.84, 1.0, 0.87), 2.0)
+	draw_arc(Vector2.ZERO, radius, 0.0, TAU, 64, Color(0.0, 0.84, 1.0, 0.87), 2.0)

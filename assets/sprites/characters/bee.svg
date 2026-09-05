@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="true"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="1.7280423"
-     inkscape:cx="220.48071"
-     inkscape:cy="85.935396"
+     inkscape:zoom="6.9121692"
+     inkscape:cx="200.15424"
+     inkscape:cy="102.64506"
      inkscape:window-width="3840"
      inkscape:window-height="1514"
      inkscape:window-x="2869"
@@ -41,7 +41,7 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Bee"
-     transform="matrix(0.79207104,0,0,1,90.927777,7.6210039)"
+     transform="matrix(0.79207104,0,0,1,78.713203,8.2305706)"
      style="stroke-width:1.12362">
     <g
        id="g3"
@@ -49,10 +49,23 @@
        transform="matrix(0.87037206,0,0,0.81338113,237.29967,184.35018)"
        style="stroke-width:1.33543">
       <path
-         style="opacity:1;fill:#221100;fill-opacity:1;stroke:none;stroke-width:128.201;stroke-dasharray:none;stroke-opacity:1"
-         d="M 318.68316,734.43666 C 194.0971,842.50383 192.34176,959.82762 -54.494151,975.77142 184.8507,1000.4228 183.21979,1125.43 316.04897,1262.313"
-         id="path3"
-         sodipodi:nodetypes="ccc"
+         sodipodi:type="star"
+         style="fill:#221100;fill-opacity:1;stroke:none;stroke-width:658.141;stroke-linecap:round"
+         id="path1"
+         inkscape:flatsided="true"
+         sodipodi:sides="3"
+         sodipodi:cx="-51.770546"
+         sodipodi:cy="959.71667"
+         sodipodi:r1="373.05304"
+         sodipodi:r2="186.52652"
+         sodipodi:arg1="-3.1240416"
+         sodipodi:arg2="-2.0768441"
+         inkscape:rounded="0.062"
+         inkscape:randomized="0"
+         d="m -424.76613,953.16954 c 0.70308,-40.05494 530.82631,-333.8393 565.16336,-313.20295 34.33705,20.63635 23.70016,626.62871 -11.33997,646.04731 -35.04013,19.4186 -554.52647,-292.78943 -553.82339,-332.84436 z"
+         inkscape:transform-center-x="19.459271"
+         inkscape:transform-center-y="1.1148162"
+         transform="matrix(0.35318647,0,0,0.42972976,196.80525,576.9289)"
          inkscape:label="Stinger" />
       <rect
          style="opacity:1;fill:#eeaa22;fill-opacity:1;stroke:#221100;stroke-width:128.201;stroke-dasharray:none;stroke-opacity:1"
@@ -76,58 +89,62 @@
          inkscape:label="Stripe" />
     </g>
     <g
-       id="g6"
-       inkscape:label="Left Antenna"
-       transform="matrix(0.81906562,0,0,0.81338113,340.50358,189.67549)"
-       style="stroke-width:1.37662">
-      <path
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#221100;stroke-width:132.155;stroke-dasharray:none;stroke-opacity:1"
-         d="m 1721.374,766.63091 c 419.3003,34.20964 544.2283,-180.0466 417.905,-432.85977"
-         id="path4"
-         sodipodi:nodetypes="cc" />
-      <ellipse
-         style="opacity:1;fill:#221100;fill-opacity:1;stroke:none;stroke-width:132.155;stroke-dasharray:none;stroke-opacity:1"
-         id="path5"
-         cx="2126.0491"
-         cy="325.60703"
-         rx="121.20125"
-         ry="96" />
-    </g>
-    <g
        id="g7"
        inkscape:label="Right Antenna"
-       transform="matrix(0.81906562,0,0,0.81338113,340.50358,189.67549)"
+       transform="matrix(0.81906562,0,0,0.81338113,301.24089,197.8594)"
        style="stroke-width:1.37662">
       <path
          style="fill:none;fill-opacity:1;stroke:#221100;stroke-width:132.155;stroke-dasharray:none;stroke-opacity:1"
-         d="m 1732.7634,1210.0905 c 419.3003,-34.2097 544.2283,180.0466 417.905,432.8598"
+         d="m 1723.7875,1218.6156 c 259.8726,-140.4075 481.4018,97.8874 389.5722,296.0869"
          id="path4-2"
-         sodipodi:nodetypes="cc" />
+         sodipodi:nodetypes="cc"
+         inkscape:label="Curve" />
       <ellipse
          style="fill:#221100;fill-opacity:1;stroke:none;stroke-width:132.155;stroke-dasharray:none;stroke-opacity:1"
          id="path5-2"
-         cx="2136.1802"
-         cy="1649.5752"
+         cx="2085.7212"
+         cy="1546.947"
          rx="121.20125"
-         ry="96" />
+         ry="96"
+         inkscape:label="Circle" />
+    </g>
+    <g
+       id="g7-8"
+       inkscape:label="Left Antenna"
+       transform="matrix(0.81906562,0,0,-0.81338113,277.18661,1780.2706)"
+       style="stroke-width:1.37662">
+      <path
+         style="fill:none;fill-opacity:1;stroke:#221100;stroke-width:132.155;stroke-dasharray:none;stroke-opacity:1"
+         d="m 1723.7875,1218.6156 c 259.8726,-140.4075 481.4018,97.8874 389.5722,296.0869"
+         id="path4-2-2"
+         sodipodi:nodetypes="cc"
+         inkscape:label="Curve" />
+      <ellipse
+         style="fill:#221100;fill-opacity:1;stroke:none;stroke-width:132.155;stroke-dasharray:none;stroke-opacity:1"
+         id="path5-2-4"
+         cx="2085.7212"
+         cy="1546.947"
+         rx="121.20125"
+         ry="96"
+         inkscape:label="Circle" />
     </g>
     <ellipse
-       style="fill:#ffdd77;fill-opacity:1;stroke:#221100;stroke-width:109.092;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#ffdd77;fill-opacity:1;stroke:#221100;stroke-width:108.077;stroke-dasharray:none;stroke-opacity:1"
        id="path6-6"
-       cx="-117.36262"
-       cy="1535.8948"
-       rx="642.33691"
-       ry="289.8761"
-       transform="matrix(0.90249594,-0.43069836,0.61076218,0.7918141,0,0)"
+       cx="110.2595"
+       cy="1549.3627"
+       rx="522.47034"
+       ry="251.20958"
+       transform="matrix(0.87649724,-0.48140689,0.55674001,0.8306868,0,0)"
        inkscape:label="Right Wing" />
     <ellipse
-       style="fill:#ffdd77;fill-opacity:1;stroke:#221100;stroke-width:109.092;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#ffdd77;fill-opacity:1;stroke:#221100;stroke-width:108.175;stroke-dasharray:none;stroke-opacity:1"
        id="path6-6-1"
-       cx="1149.3215"
-       cy="-342.32285"
-       rx="642.33691"
-       ry="289.8761"
-       transform="matrix(0.90249594,0.43069836,0.61076218,-0.7918141,0,0)"
+       cx="1236.6791"
+       cy="-257.16159"
+       rx="532.33801"
+       ry="253.5062"
+       transform="matrix(0.88070583,0.47366363,0.56481494,-0.8252176,0,0)"
        inkscape:label="Left Wing" />
   </g>
 </svg>
