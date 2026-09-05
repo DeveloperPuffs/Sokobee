@@ -6,7 +6,6 @@ extends Node2D
 @export var _cell_scene: PackedScene
 @export var _bee_scene: PackedScene
 @export var _honey_scene: PackedScene
-@export var _wax_scene: PackedScene
 @export var _character_indicator: Sprite2D
 
 var _state: State = null
@@ -99,8 +98,13 @@ func load(state: State) -> void:
 		add_child(piece)
 	
 	for link in state.links:
-		var wax: Wax = _wax_scene.instantiate()
-		wax.initialize(link, _entity_pieces[link.entity_a], _entity_pieces[link.entity_b])
+		var wax: Wax
+		match link.type:
+			Link.Type.SOLID:
+				wax = SolidWax.new(link, _entity_pieces[link.entity_a], _entity_pieces[link.entity_b])
+			Link.Type.STICKY:
+				wax = StickyWax.new(link, _entity_pieces[link.entity_a], _entity_pieces[link.entity_b])
+
 		_link_waxes[link] = wax
 		add_child(wax)
 

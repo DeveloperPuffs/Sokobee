@@ -12,7 +12,7 @@ static func win_check(state: State) -> bool:
 			continue
 
 		if not block_positions.has(tile.position):
-			return false	
+			return false
 
 	return true
 

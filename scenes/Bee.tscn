@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://etinujhfeptf" path="res://assets/sprites/characters/sleeping_indicator_placeholder.svg" id="3_ghu41"]
 [ext_resource type="Script" uid="uid://de3jpss66xjfh" path="res://addons/curved_lines_2d/scalable_vector_shape_2d.gd" id="3_pjeov"]
 [ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="4_dfh60"]
+[ext_resource type="Script" uid="uid://b7hu1lfwbj786" path="res://source/link_attachment_marker.gd" id="5_dfh60"]
 [ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="5_f131d"]
 
 [sub_resource type="Curve2D" id="Curve2D_pjeov"]
@@ -197,12 +198,13 @@ _data = {
 &"flutter": SubResource("Animation_f131d")
 }
 
-[node name="Bee" type="Node2D" unique_id=1413269199 node_paths=PackedStringArray("_sleeping_indicator", "_scaler", "_rotator", "_animation_player")]
+[node name="Bee" type="Node2D" unique_id=1413269199 node_paths=PackedStringArray("_sleeping_indicator", "_scaler", "_rotator", "_animation_player", "link_attachment_marker")]
 script = ExtResource("1_cncwb")
 _sleeping_indicator = NodePath("SleepingIndicator")
 _scaler = NodePath("Scaler")
 _rotator = NodePath("Scaler/Rotator")
 _animation_player = NodePath("AnimationPlayer")
+link_attachment_marker = NodePath("Scaler/Rotator/LinkAttachmentMarker")
 
 [node name="Scaler" type="Node2D" parent="." unique_id=1238201229]
 
@@ -468,6 +470,11 @@ rest = Transform2D(-0.89005494, 0.45585328, -0.45585328, -0.89005494, -3, -2)
 auto_calculate_length_and_angle = false
 length = 131.268
 bone_angle = 0.0
+
+[node name="LinkAttachmentMarker" type="Node2D" parent="Scaler/Rotator" unique_id=467282182]
+position = Vector2(-8, 1)
+script = ExtResource("5_dfh60")
+radius = 40.0
 
 [node name="SleepingIndicator" type="Sprite2D" parent="." unique_id=39220428]
 visible = false

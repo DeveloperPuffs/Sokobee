@@ -15,6 +15,10 @@
 		{
 			"filepath": "testing_3.json",
 			"title": "Testing 3"
+		},
+		{
+			"filepath": "sticky_drag_test.json",
+			"title": "Sticky Drag Test"
 		}
 	]
 }

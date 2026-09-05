@@ -12,6 +12,8 @@ signal _movement_landed()
 
 signal _wall_hit(direction: Hexagon.Direction)
 
+@export var link_attachment_marker: LinkAttachmentMarker
+
 var _entity: Entity
 
 var _movement_tween: Tween = null
@@ -116,8 +118,8 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 			ground_position_tweener.set_trans(Tween.TRANS_QUAD)
 			ground_position_tweener.set_ease(Tween.EASE_OUT)
 		Entity.Movement.Kind.CARRIED:
-			ground_position_tweener.set_trans(Tween.TRANS_QUAD)
-			ground_position_tweener.set_ease(Tween.EASE_IN)
+			ground_position_tweener.set_trans(Tween.TRANS_BACK)
+			ground_position_tweener.set_ease(Tween.EASE_OUT)
 		# RESTORED movements will have linear transitions
 
 	if _elevation != target_elevation:

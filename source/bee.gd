@@ -5,9 +5,9 @@ extends Piece
 const _ROTATION_DURATION := 0.2
 const _ROTATION_RESTORE_DURATION := 0.1
 
-const _PUSHING_SQUASH := 0.2
+const _PUSHING_SQUASH := 0.15
 const _PUSHED_SQUASH := 0.1
-const _LANDING_SQUASH := 0.25
+const _LANDING_SQUASH := 0.2
 const _WALL_HIT_SQUASH := 0.25
 const _SQUASH_BULGE_RATIO := 0.6
 
