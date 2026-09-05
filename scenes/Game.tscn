@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://tjcm5lekc0od"]
 
-[ext_resource type="Script" uid="uid://bbkp0k38byhvc" path="res://source/game.gd" id="1_78awf"]
+[ext_resource type="Script" uid="uid://bxosdtvcd1sxg" path="res://source/game.gd" id="1_78awf"]
 [ext_resource type="PackedScene" uid="uid://cl821nsxaarwo" path="res://scenes/Controller.tscn" id="3_cpr0p"]
 [ext_resource type="PackedScene" uid="uid://dqj3nmogbiner" path="res://scenes/Honeycomb.tscn" id="4_78awf"]
 
 [node name="Game" type="Node2D" unique_id=1780889916 node_paths=PackedStringArray("_controller", "_honeycomb")]
-position = Vector2(-3, 15)
 script = ExtResource("1_78awf")
 _controller = NodePath("Controller")
 _honeycomb = NodePath("Honeycomb")
