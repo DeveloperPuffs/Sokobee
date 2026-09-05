@@ -68,8 +68,7 @@ func _move_character(direction: Hexagon.Direction) -> void:
 	if Logic.try_move_character(_state, _state.active_character, direction):
 		_history.save_snapshot(snapshot)
 		if Logic.win_check(_state):
-			get_tree().create_timer(1.0).timeout.connect(level_completed.emit)
-			active = false
+			level_completed.emit()
 
 
 func _on_clicked_tile() -> void:

@@ -19,8 +19,11 @@ func _ready() -> void:
 
 	_controller.restart_requested.connect(_load_level)
 	_controller.level_completed.connect(func() -> void:
-		_level_number += 1
-		_load_level()
+		_controller.active = false
+		get_tree().create_timer(0.5).timeout.connect(func() -> void:
+			_level_number += 1
+			_load_level()
+		)
 	)
 
 	_load_level()
