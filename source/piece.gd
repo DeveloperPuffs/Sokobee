@@ -120,7 +120,7 @@ func _move_to_entity_tile(movement: Entity.Movement = null) -> void:
 	if not interrupted:
 		match movement.kind:
 			Entity.Movement.Kind.WALKING:
-				ground_position_tweener.set_trans(Tween.TRANS_BACK)
+				ground_position_tweener.set_trans(Tween.TRANS_QUAD)
 				ground_position_tweener.set_ease(Tween.EASE_OUT)
 			Entity.Movement.Kind.INITIATOR:
 				ground_position_tweener.set_trans(Tween.TRANS_QUAD)

@@ -2,8 +2,8 @@ class_name Bee
 extends Piece
 
 
-const _ROTATION_DURATION := 0.2
-const _ROTATION_RESTORE_DURATION := 0.1
+const _ROTATION_DURATION := 0.1
+const _ROTATION_RESTORE_DURATION := 0.05
 
 const _PUSHING_SQUASH := 0.15
 const _PUSHED_SQUASH := 0.1
@@ -122,7 +122,7 @@ func _face_character_direction(_rotation: Character.Rotation = null) -> void:
 
 	var rotation_tweener := _rotation_tween.tween_property(_rotator, ^":rotation", target_rotation, rotation_duration)
 	if not _rotation.restoring:
-		rotation_tweener.set_trans(Tween.TRANS_BACK)
+		rotation_tweener.set_trans(Tween.TRANS_QUAD)
 		rotation_tweener.set_ease(Tween.EASE_OUT)
 		_animation_player.play("flutter")
 
