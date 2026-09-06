@@ -5,6 +5,26 @@
 	},
 	"levels": [
 		{
+			"filepath": "level_1.json",
+			"title": "Level 1"
+		},
+		{
+			"filepath": "level_2.json",
+			"title": "Level 2"
+		},
+		{
+			"filepath": "level_3.json",
+			"title": "Level 3"
+		},
+		{
+			"filepath": "level_4.json",
+			"title": "Level 4"
+		},
+		{
+			"filepath": "level_5.json",
+			"title": "Level 5"
+		},
+		{
 			"filepath": "testing1.json",
 			"title": "Testing"
 		},
