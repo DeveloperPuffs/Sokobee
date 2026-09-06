@@ -39,9 +39,9 @@ enum Tool {
 
 @export var _selectable_tile_indicator: Cell
 @export var _selected_tile_indicator: Cell
-@export var _selected_entity_indicator: Sprite2D
-@export var _selectable_entity_indicator: Sprite2D
-@export var _selected_link_indicator: Sprite2D
+@export var _selected_entity_indicator: Node2D
+@export var _selectable_entity_indicator: Node2D
+@export var _selected_link_indicator: Node2D
 
 @export var _controller: Controller
 @export var _honeycomb: Honeycomb

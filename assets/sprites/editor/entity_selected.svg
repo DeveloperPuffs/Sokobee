@@ -4,7 +4,7 @@
 <svg
    width="256"
    height="256"
-   viewBox="0 0 2048 2048"
+   viewBox="-1024 -1024 2048 2048"
    version="1.1"
    id="svg1"
    inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
@@ -27,8 +27,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      inkscape:zoom="2.8756734"
-     inkscape:cx="82.58935"
-     inkscape:cy="145.18338"
+     inkscape:cx="82.763223"
+     inkscape:cy="145.18339"
      inkscape:window-width="3840"
      inkscape:window-height="1514"
      inkscape:window-x="2869"
@@ -38,15 +38,16 @@
   <defs
      id="defs1" />
   <g
-     inkscape:label="Layer 1"
+     inkscape:label="Indicator"
      inkscape:groupmode="layer"
      id="layer1">
     <ellipse
        style="fill:#ff3fcf;fill-opacity:0.33;stroke:#ff3fcf;stroke-width:63.9999;stroke-opacity:0.87"
        id="path2"
-       cx="1024"
-       cy="1024"
+       cx="0"
+       cy="0"
        rx="645.84863"
-       ry="645.84857" />
+       ry="645.84857"
+       inkscape:label="Overlay" />
   </g>
 </svg>
