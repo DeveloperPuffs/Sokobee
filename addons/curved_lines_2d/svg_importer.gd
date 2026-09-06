@@ -414,22 +414,26 @@ func process_svg_path(element:SVGXMLElement, current_node : Node2D, scene_root :
 							cursor_start_is_set = true
 							cursor_start = cursor
 				"v":
-					while string_array[i+1].is_valid_float():
+					# while string_array[i+1].is_valid_float():
+					while string_array.size() > i + 1 and string_array[i+1].is_valid_float():
 						cursor.y += float(string_array[i+1])
 						curve.add_point(cursor)
 						i += 1
 				"V":
-					while string_array[i+1].is_valid_float():
+					# while string_array[i+1].is_valid_float():
+					while string_array.size() > i + 1 and string_array[i+1].is_valid_float():
 						cursor.y = float(string_array[i+1])
 						curve.add_point(cursor)
 						i += 1
 				"h":
-					while string_array[i+1].is_valid_float():
+					# while string_array[i+1].is_valid_float():
+					while string_array.size() > i + 1 and string_array[i+1].is_valid_float():
 						cursor.x += float(string_array[i+1])
 						curve.add_point(cursor)
 						i += 1
 				"H":
-					while string_array[i+1].is_valid_float():
+					# while string_array[i+1].is_valid_float():
+					while string_array.size() > i + 1 and string_array[i+1].is_valid_float():
 						cursor.x = float(string_array[i+1])
 						curve.add_point(cursor)
 						i += 1
