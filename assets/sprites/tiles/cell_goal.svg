@@ -4,7 +4,7 @@
 <svg
    width="256"
    height="384"
-   viewBox="0 0 2048 3072"
+   viewBox="-1024 -933.49 2048 3072"
    version="1.1"
    id="svg1"
    inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
@@ -27,27 +27,20 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      inkscape:zoom="2.0334082"
-     inkscape:cx="253.02348"
-     inkscape:cy="256.46597"
-     inkscape:window-width="3840"
-     inkscape:window-height="1514"
-     inkscape:window-x="2869"
-     inkscape:window-y="-11"
-     inkscape:window-maximized="1"
+     inkscape:cx="101.30775"
+     inkscape:cy="217.61494"
+     inkscape:window-width="1898"
+     inkscape:window-height="1072"
+     inkscape:window-x="4090"
+     inkscape:window-y="341"
+     inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
   <defs
      id="defs1" />
   <g
-     inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
-    <rect
-       style="display:inline;fill:#bb8822;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
-       id="rect2"
-       width="2047.9999"
-       height="1222.1595"
-       x="5.5639129"
-       y="940.87421" />
+     id="layer1"
+     inkscape:label="Cell">
     <path
        sodipodi:type="star"
        style="fill:#bb8822;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
@@ -63,7 +56,16 @@
        inkscape:rounded="0.062"
        inkscape:randomized="0"
        d="m 436.76728,136.31593 c 25.35475,14.31595 238.42845,375.32539 238.70785,404.44123 0.2794,29.11584 -205.8271,394.14779 -230.90246,408.94768 -25.07535,14.79989 -444.25554612,18.8224 -469.610302,4.50645 C -50.392388,939.89534 -263.46608,578.8859 -263.74548,549.77006 -264.02488,520.65422 -57.918385,155.62227 -32.843029,140.82238 -7.7676725,126.02249 411.41252,121.99998 436.76728,136.31593 Z"
-       transform="matrix(2.18053,0,0,2.2093395,581.38199,945.50474)" />
+       transform="matrix(2.18053,0,0,2.2093395,-446.59953,11.34624)"
+       inkscape:label="Bottom" />
+    <rect
+       style="display:inline;fill:#bb8822;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2"
+       width="2047.9999"
+       height="1222.1595"
+       x="-1022.4175"
+       y="6.7156787"
+       inkscape:label="Wall" />
     <path
        sodipodi:type="star"
        style="fill:#bb8822;fill-opacity:1;stroke:#ffdd77;stroke-width:61.9216;stroke-dasharray:none;stroke-opacity:1"
@@ -79,6 +81,7 @@
        inkscape:rounded="0.062"
        inkscape:randomized="0"
        d="m 436.76728,136.31593 c 25.35475,14.31595 238.42845,375.32539 238.70785,404.44123 0.2794,29.11584 -205.8271,394.14779 -230.90246,408.94768 -25.07535,14.79989 -444.25554612,18.8224 -469.610302,4.50645 C -50.392388,939.89534 -263.46608,578.8859 -263.74548,549.77006 -264.02488,520.65422 -57.918385,155.62227 -32.843029,140.82238 -7.7676725,126.02249 411.41252,121.99998 436.76728,136.31593 Z"
-       transform="matrix(2.0536078,0,0,2.0807403,605.21591,-200.70335)" />
+       transform="matrix(2.0536078,0,0,2.0807403,-422.76561,-1134.8618)"
+       inkscape:label="Surface" />
   </g>
 </svg>

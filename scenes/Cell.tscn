@@ -1,6 +1,16 @@
 [gd_scene format=3 uid="uid://b1uvikogqsnhd"]
 
 [ext_resource type="Script" uid="uid://ondeeyy5puol" path="res://source/cell.gd" id="1_rd428"]
+[ext_resource type="PackedScene" uid="uid://bl4o01f846d4s" path="res://scenes/cells/CellNormal.tscn" id="2_74kmm"]
+[ext_resource type="PackedScene" uid="uid://bejkgvxsptxcd" path="res://scenes/cells/CellGoal.tscn" id="3_rud6e"]
+[ext_resource type="PackedScene" uid="uid://28cnnn0jm0gm" path="res://scenes/cells/CellSelectable.tscn" id="4_d8h7g"]
+[ext_resource type="PackedScene" uid="uid://bi1afalava7ry" path="res://scenes/cells/CellSelected.tscn" id="5_yo6he"]
 
-[node name="Cell" type="Sprite2D" unique_id=2068236679]
+[node name="Cell" type="Node2D" unique_id=573265318]
 script = ExtResource("1_rd428")
+_type_scenes = Dictionary[int, PackedScene]({
+0: ExtResource("2_74kmm"),
+1: ExtResource("3_rud6e"),
+2: ExtResource("4_d8h7g"),
+3: ExtResource("5_yo6he")
+})
