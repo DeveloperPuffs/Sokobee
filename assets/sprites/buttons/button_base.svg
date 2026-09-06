@@ -4,7 +4,7 @@
 <svg
    width="256"
    height="320"
-   viewBox="0 0 2048 2560"
+   viewBox="-1024 -1024 2048 2560"
    version="1.1"
    id="svg1"
    inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
@@ -26,24 +26,25 @@
      inkscape:pagecheckerboard="true"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="3.0370554"
-     inkscape:cx="260.12038"
-     inkscape:cy="158.54172"
+     inkscape:zoom="2.1475225"
+     inkscape:cx="362.04511"
+     inkscape:cy="114.31778"
      inkscape:window-width="3840"
      inkscape:window-height="1514"
      inkscape:window-x="2869"
      inkscape:window-y="-11"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer3" />
   <defs
      id="defs1" />
   <g
      inkscape:label="Button"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     transform="translate(-1027.1855,-1033.7489)">
     <path
        sodipodi:type="star"
-       style="fill:#bb8822;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none;stroke-opacity:1;opacity:1"
+       style="opacity:1;fill:#bb8822;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
        id="path1-8"
        inkscape:flatsided="true"
        sodipodi:sides="6"
@@ -62,26 +63,46 @@
        style="display:inline;opacity:1;fill:#bb8822;fill-opacity:1;stroke:none;stroke-width:0;stroke-dasharray:none;stroke-opacity:1"
        id="rect2"
        width="2047.9999"
-       height="575.17883"
+       height="604.1543"
        x="0"
-       y="1070.2338"
+       y="1041.2583"
        inkscape:label="Rectangle" />
-    <path
-       sodipodi:type="star"
-       style="fill:#eeaa22;fill-opacity:1;stroke:#ffdd77;stroke-width:61.9216;stroke-dasharray:none;stroke-opacity:1"
-       id="path1"
-       inkscape:flatsided="true"
-       sodipodi:sides="6"
-       sodipodi:cx="205.86482"
-       sodipodi:cy="545.26361"
-       sodipodi:r1="469.63193"
-       sodipodi:r2="406.71317"
-       sodipodi:arg1="-1.0567934"
-       sodipodi:arg2="-0.53319467"
-       inkscape:rounded="0.062"
-       inkscape:randomized="0"
-       d="m 436.76728,136.31593 c 25.35475,14.31595 238.42845,375.32539 238.70785,404.44123 0.2794,29.11584 -205.8271,394.14779 -230.90246,408.94768 -25.07535,14.79989 -444.25554612,18.8224 -469.610302,4.50645 C -50.392388,939.89534 -263.46608,578.8859 -263.74548,549.77006 -264.02488,520.65422 -57.918385,155.62227 -32.843029,140.82238 -7.7676725,126.02249 411.41252,121.99998 436.76728,136.31593 Z"
-       transform="matrix(2.0536078,0,0,2.0807403,605.21591,-72.70335)"
-       inkscape:label="Surface" />
+    <g
+       inkscape:groupmode="layer"
+       id="layer2"
+       inkscape:label="Surface"
+       transform="translate(1027.1855,1033.7489)">
+      <path
+         sodipodi:type="star"
+         style="fill:#eeaa22;fill-opacity:1;stroke:#ffdd77;stroke-width:61.9216;stroke-dasharray:none;stroke-opacity:1"
+         id="path1"
+         inkscape:flatsided="true"
+         sodipodi:sides="6"
+         sodipodi:cx="205.86482"
+         sodipodi:cy="545.26361"
+         sodipodi:r1="469.63193"
+         sodipodi:r2="406.71317"
+         sodipodi:arg1="-1.0567934"
+         sodipodi:arg2="-0.53319467"
+         inkscape:rounded="0.062"
+         inkscape:randomized="0"
+         d="m 436.76728,136.31593 c 25.35475,14.31595 238.42845,375.32539 238.70785,404.44123 0.2794,29.11584 -205.8271,394.14779 -230.90246,408.94768 -25.07535,14.79989 -444.25554612,18.8224 -469.610302,4.50645 C -50.392388,939.89534 -263.46608,578.8859 -263.74548,549.77006 -264.02488,520.65422 -57.918385,155.62227 -32.843029,140.82238 -7.7676725,126.02249 411.41252,121.99998 436.76728,136.31593 Z"
+         transform="matrix(2.0536078,0,0,2.0807403,-421.96959,-1128.7034)"
+         inkscape:label="Face" />
+      <g
+         inkscape:groupmode="layer"
+         id="layer3"
+         inkscape:label="Icon"
+         transform="translate(-1027.1855,-1033.7489)">
+        <rect
+           style="fill:#ff3fcf;fill-opacity:0.329412;stroke:#ff3fcf;stroke-width:58.4242;stroke-linecap:round;stroke-opacity:0.87"
+           id="rect1"
+           width="965.57562"
+           height="965.57581"
+           x="545.19373"
+           y="556.80957"
+           inkscape:label="Content" />
+      </g>
+    </g>
   </g>
 </svg>

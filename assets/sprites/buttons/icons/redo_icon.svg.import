@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bn20u4rtcmide"
-path="res://.godot/imported/redo_button.svg-b3260c1aef0ba5226645b07bb4c30c1f.ctex"
+uid="uid://ww1s2wbbgnx0"
+path="res://.godot/imported/redo_icon.svg-047e5d7fda45fd8f1149cf28289a36f7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/buttons/redo_button.svg"
-dest_files=["res://.godot/imported/redo_button.svg-b3260c1aef0ba5226645b07bb4c30c1f.ctex"]
+source_file="res://assets/sprites/buttons/icons/redo_icon.svg"
+dest_files=["res://.godot/imported/redo_icon.svg-047e5d7fda45fd8f1149cf28289a36f7.ctex"]
 
 [params]
 

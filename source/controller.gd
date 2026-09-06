@@ -42,13 +42,8 @@ func _ready() -> void:
 			Logic.rotate_character_right(_state.active_character)
 	)
 
-	_inputs.undid_step.connect(func() -> void:
-		_history.undo_snapshot(_state)
-	)
-
-	_inputs.redid_step.connect(func() -> void:
-		_history.redo_snapshot(_state)
-	)
+	_inputs.undid_step.connect(undo_step)
+	_inputs.redid_step.connect(redo_step)
 
 	_inputs.restarted_level.connect(restart_requested.emit)
 	_inputs.clicked_tile.connect(_on_clicked_tile)
@@ -57,6 +52,14 @@ func _ready() -> void:
 func load(state: State) -> void:
 	_state = state
 	_history = History.new()
+
+
+func undo_step() -> void:
+	_history.undo_snapshot(_state)
+
+
+func redo_step() -> void:
+	_history.redo_snapshot(_state)
 
 
 func _can_control_character() -> bool:

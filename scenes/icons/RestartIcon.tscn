@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://cn6kyq71t5jsb"]
+
+[ext_resource type="Script" uid="uid://de3jpss66xjfh" path="res://addons/curved_lines_2d/scalable_vector_shape_2d.gd" id="1_mowyj"]
+[ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="2_v6xs7"]
+[ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="3_4jrd3"]
+
+[sub_resource type="Curve2D" id="Curve2D_f1bqm"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 313.95117, -371.5869, 0, 0, 0, 0, 410.20984, 102.84363, 0, 0, 0, 0, -0.042236328, 371.5869, 0, 0, 0, 0, -410.2943, 102.84363, 0, 0, 0, 0, -314.03558, -371.5869)
+}
+point_count = 5
+
+[sub_resource type="Resource" id="Resource_h63iv"]
+script = ExtResource("2_v6xs7")
+radius = Vector2(444.05368, 435.34113)
+
+[sub_resource type="Resource" id="Resource_u4q32"]
+script = ExtResource("2_v6xs7")
+start_point = 1
+radius = Vector2(444.05368, 435.34113)
+
+[sub_resource type="Resource" id="Resource_kivf8"]
+script = ExtResource("2_v6xs7")
+start_point = 2
+radius = Vector2(444.05368, 435.34113)
+
+[sub_resource type="Resource" id="Resource_qn016"]
+script = ExtResource("2_v6xs7")
+start_point = 3
+radius = Vector2(444.05368, 435.34113)
+
+[sub_resource type="Resource" id="Resource_ortkd"]
+resource_local_to_scene = true
+script = ExtResource("3_4jrd3")
+arcs = Array[ExtResource("2_v6xs7")]([SubResource("Resource_h63iv"), SubResource("Resource_u4q32"), SubResource("Resource_kivf8"), SubResource("Resource_qn016")])
+
+[sub_resource type="Curve2D" id="Curve2D_8un5i"]
+resource_local_to_scene = true
+_data = {
+"points": PackedVector2Array(0, 0, 15.0695, 34.85284, 254.14368, -150.8728, 43.068726, 6.3409424, -43.0684, -6.34092, -203.29639, 244.62183, -27.998901, 28.511932, 27.9991, -28.51196, -242.8374, -238.81137, -15.06958, -34.852905, 0, 0, 254.14368, -150.8728)
+}
+point_count = 4
+
+[sub_resource type="Resource" id="Resource_3xn04"]
+resource_local_to_scene = true
+script = ExtResource("3_4jrd3")
+
+[node name="RestartIcon" type="Node2D" unique_id=558967566]
+
+[node name="RestartIcon" type="Node2D" parent="." unique_id=277250445]
+scale = Vector2(0.125, 0.125)
+metadata/svg_root = true
+
+[node name="Icon" type="Node2D" parent="RestartIcon" unique_id=266023379]
+position = Vector2(-930.96735, -943.621)
+scale = Vector2(0.92536914, 0.91958785)
+metadata/svg_style = {
+"stroke-width": "1.08404"
+}
+
+[node name="path3" type="Node2D" parent="RestartIcon/Icon" unique_id=1710934941 node_paths=PackedStringArray("line")]
+position = Vector2(1000.7345, 1105.0332)
+script = ExtResource("1_mowyj")
+stroke_color = Color(0.2, 0.13333334, 0.06666667, 1)
+stroke_width = 208.135
+begin_cap_mode = 2
+end_cap_mode = 2
+line = NodePath("Stroke")
+curve = SubResource("Curve2D_f1bqm")
+update_curve_at_runtime = true
+arc_list = SubResource("Resource_ortkd")
+
+[node name="Stroke" type="Line2D" parent="RestartIcon/Icon/path3" unique_id=513750745]
+points = PackedVector2Array(313.95117, -371.5869, 335.08936, -349.36374, 354.59482, -325.74908, 372.37253, -300.85803, 388.33588, -274.81183, 402.4071, -247.73737, 414.5176, -219.76656, 424.60843, -191.03568, 432.6304, -161.6847, 438.5444, -131.8566, 442.3217, -101.696724, 443.94382, -71.352, 443.4029, -40.970253, 440.70154, -10.699509, 435.8529, 19.312757, 428.88068, 48.920326, 419.81876, 77.97896, 410.20984, 102.84363, 397.35663, 130.49405, 382.56732, 157.19812, 365.914, 182.82571, 347.47775, 207.25201, 327.34845, 230.35799, 305.6241, 252.03108, 282.4106, 272.1657, 257.821, 290.66376, 231.97514, 307.43512, 204.9989, 322.39807, 177.02373, 335.47977, 148.1859, 346.6164, 118.625916, 355.75375, 88.48779, 362.84732, 57.918365, 367.86252, 27.066557, 370.7749, -0.042236328, 371.5869, -31.017843, 370.52646, -61.842552, 367.3502, -92.36617, 362.07367, -122.44001, 354.72253, -151.91753, 345.3326, -180.65512, 333.94968, -208.5128, 320.62918, -235.35483, 305.436, -261.0504, 288.44415, -285.47443, 269.73642, -308.5078, 249.40398, -330.03842, 227.54585, -349.9613, 204.26854, -368.1794, 179.68544, -384.60397, 153.91634, -399.15503, 127.08676, -410.2943, 102.84363, -421.14883, 74.381546, -429.95175, 45.246494, -436.6602, 15.5804, -441.2415, -14.472203, -443.67328, -44.764904, -443.94376, -75.15012, -442.05157, -105.47981, -438.00598, -135.60623, -431.8267, -165.38258, -423.54376, -194.66382, -413.1976, -223.30728, -400.83856, -251.1734, -386.52692, -278.12643, -370.33234, -304.0351, -352.33374, -328.7731, -332.6188, -352.21997, -314.03558, -371.5869)
+width = 208.135
+default_color = Color(0.2, 0.13333334, 0.06666667, 1)
+begin_cap_mode = 2
+end_cap_mode = 2
+sharp_limit = 4.0
+metadata/_edit_lock_ = true
+
+[node name="path2" type="Node2D" parent="RestartIcon/Icon" unique_id=1744696039 node_paths=PackedStringArray("polygon")]
+position = Vector2(1304.8026, 716.329)
+script = ExtResource("1_mowyj")
+fill_color = Color(0.2, 0.13333334, 0.06666667, 1)
+polygon = NodePath("Fill")
+curve = SubResource("Curve2D_8un5i")
+update_curve_at_runtime = true
+arc_list = SubResource("Resource_3xn04")
+
+[node name="Fill" type="Polygon2D" parent="RestartIcon/Icon/path2" unique_id=1328378454]
+color = Color(0.2, 0.13333334, 0.06666667, 1)
+polygon = PackedVector2Array(254.14368, -150.8728, 254.52765, -148.9985, 254.27953, -146.65384, 253.41827, -143.85495, 251.96295, -140.61798, 247.3461, -132.89438, 240.58113, -123.612236, 195.08264, -73.48152, 47.22548, 62.32218, -111.532616, 190.40205, -170.65724, 230.87798, -190.89606, 241.6081, -194.77853, 243.1253, -198.1521, 244.1441, -200.99773, 244.64832, -203.29639, 244.62183, -205.30147, 244.00397, -207.27853, 242.75806, -209.2268, 240.9038, -211.14551, 238.46094, -213.03387, 235.4492, -214.89111, 231.88834, -218.50916, 223.1982, -225.33769, 200.09676, -231.58151, 170.41978, -249.71713, 11.219357, -254.52765, -152.13815, -250.9436, -210.11288, -247.48059, -228.75323, -246.43236, -232.12169, -245.30962, -234.93402, -244.11154, -237.1705, -242.8374, -238.81137, -241.2163, -240.06784, -238.99109, -241.16656, -236.18156, -242.1112, -232.80754, -242.90532, -224.44507, -244.05632, -214.06203, -244.64833, -155.49115, -242.00064, 10.501709, -218.60391, 174.07028, -183.32626, 229.61081, -165.82745, 239.04684, -161.77847, 246.38657, -157.91722, 249.22081, -156.06598, 251.47163, -154.27242, 253.11917, -152.54018)
+metadata/_edit_lock_ = true

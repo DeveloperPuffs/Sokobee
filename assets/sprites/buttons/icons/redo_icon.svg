@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="128"
+   height="128"
+   viewBox="-512 -512 1024 1024"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   sodipodi:docname="redo_icon.svg"
+   inkscape:export-filename="Normal Tile.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="1.7822201"
+     inkscape:cx="253.05516"
+     inkscape:cy="23.285564"
+     inkscape:window-width="3840"
+     inkscape:window-height="1514"
+     inkscape:window-x="2869"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Icon"
+     transform="matrix(0.92800296,0,0,0.92664769,-979.66181,-937.44796)"
+     style="stroke-width:1.07837">
+    <path
+       style="fill:none;fill-opacity:1;stroke:#332211;stroke-width:207.047;stroke-linecap:round;stroke-dasharray:none;stroke-opacity:1"
+       id="path3"
+       sodipodi:type="arc"
+       sodipodi:cx="-1051.0804"
+       sodipodi:cy="1155.2633"
+       sodipodi:rx="444.05368"
+       sodipodi:ry="435.34113"
+       sodipodi:start="4.1887902"
+       sodipodi:end="0.52359878"
+       sodipodi:arc-type="arc"
+       d="m -1273.1073,778.24683 a 444.05368,435.34113 0 0 1 536.02022,69.18381 444.05368,435.34113 0 0 1 70.5684,525.50326"
+       sodipodi:open="true"
+       transform="scale(-1,1)" />
+    <path
+       id="path2"
+       style="fill:#332211;fill-opacity:1;stroke-width:828.183"
+       d="m 1448.6193,547.01104 c -36.6067,-10.08772 -340.452,466.12006 -328.1964,507.89226 12.2555,41.772 459.8922,3.7636 484.2433,-27.9206 24.3511,-31.68451 -119.4402,-469.88387 -156.0469,-479.97166 z"
+       sodipodi:nodetypes="ssss" />
+  </g>
+</svg>

@@ -3,11 +3,52 @@
 [ext_resource type="Script" uid="uid://bxosdtvcd1sxg" path="res://source/game.gd" id="1_78awf"]
 [ext_resource type="PackedScene" uid="uid://cl821nsxaarwo" path="res://scenes/Controller.tscn" id="3_cpr0p"]
 [ext_resource type="PackedScene" uid="uid://dqj3nmogbiner" path="res://scenes/Honeycomb.tscn" id="4_78awf"]
+[ext_resource type="PackedScene" uid="uid://cdl1do0da8ebo" path="res://scenes/icons/QuitIcon.tscn" id="4_400sg"]
+[ext_resource type="PackedScene" uid="uid://bgtfyduom2sws" path="res://scenes/GameButton.tscn" id="4_s0nni"]
+[ext_resource type="PackedScene" uid="uid://cn6kyq71t5jsb" path="res://scenes/icons/RestartIcon.tscn" id="5_aug50"]
+[ext_resource type="PackedScene" uid="uid://bju3j3bvpr0yy" path="res://scenes/icons/UndoIcon.tscn" id="5_g4kob"]
+[ext_resource type="PackedScene" uid="uid://b1kyhcqmgtes5" path="res://scenes/icons/RedoIcon.tscn" id="6_qy1jj"]
 
-[node name="Game" type="Node2D" unique_id=1780889916 node_paths=PackedStringArray("_controller", "_honeycomb")]
+[node name="Game" type="Node2D" unique_id=1780889916 node_paths=PackedStringArray("_controller", "_honeycomb", "_undo_button", "_redo_button", "_restart_button", "_quit_button")]
 script = ExtResource("1_78awf")
 _controller = NodePath("Controller")
 _honeycomb = NodePath("Honeycomb")
+_undo_button = NodePath("CanvasLayer/UndoButton")
+_redo_button = NodePath("CanvasLayer/RedoButton")
+_restart_button = NodePath("CanvasLayer/RestartButton")
+_quit_button = NodePath("CanvasLayer/QuitButton")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=360904227]
+scale = Vector2(0.25, 0.25)
+transform = Transform2D(0.25, 0, 0, 0.25, 0, 0)
+
+[node name="RestartButton" parent="CanvasLayer" unique_id=718229476 instance=ExtResource("4_s0nni")]
+offset_left = 4096.0
+offset_top = 300.0
+offset_right = 4104.0
+offset_bottom = 308.0
+_icon_scene = ExtResource("5_aug50")
+
+[node name="QuitButton" parent="CanvasLayer" unique_id=1136407383 instance=ExtResource("4_s0nni")]
+offset_left = 4292.0
+offset_top = 416.0
+offset_right = 4300.0
+offset_bottom = 424.0
+_icon_scene = ExtResource("4_400sg")
+
+[node name="UndoButton" parent="CanvasLayer" unique_id=1524071657 instance=ExtResource("4_s0nni")]
+offset_left = 3712.0
+offset_top = 292.0
+offset_right = 3720.0
+offset_bottom = 300.0
+_icon_scene = ExtResource("5_g4kob")
+
+[node name="RedoButton" parent="CanvasLayer" unique_id=639117946 instance=ExtResource("4_s0nni")]
+offset_left = 3900.0
+offset_top = 412.0
+offset_right = 3908.0
+offset_bottom = 420.0
+_icon_scene = ExtResource("6_qy1jj")
 
 [node name="Controller" parent="." unique_id=1951775412 instance=ExtResource("3_cpr0p")]
 

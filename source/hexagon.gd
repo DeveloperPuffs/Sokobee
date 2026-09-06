@@ -89,10 +89,14 @@ static func get_tile_z_index(tile_position: Vector2i) -> int:
 	return (tile_position.x + 2 * tile_position.y) * Z_INDEX_SCALE
 
 
-static func check_point_tile_interesection(point: Vector2, tile_position: Vector2i, tile_height: int) -> bool:
-	var tile_center := get_tile_world_position(tile_position, tile_height)
-	var offset := (point - tile_center).abs()
-	if offset.y > TILE_HEIGHT / 2.0:
+static func check_point_hexagon_intersection(offset: Vector2) -> bool:
+	var absolute_offset := offset.abs()
+	if absolute_offset.y > TILE_HEIGHT / 2.0:
 		return false
 
-	return sqrt(3.0) * offset.x + offset.y <= TILE_HEIGHT
+	return sqrt(3.0) * absolute_offset.x + absolute_offset.y <= TILE_HEIGHT
+
+
+static func check_point_tile_interesection(point: Vector2, tile_position: Vector2i, tile_height: int) -> bool:
+	var tile_center := get_tile_world_position(tile_position, tile_height)
+	return check_point_hexagon_intersection(point - tile_center)

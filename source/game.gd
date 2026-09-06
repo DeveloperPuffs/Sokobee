@@ -7,6 +7,11 @@ signal exited_game()
 @export var _controller: Controller
 @export var _honeycomb: Honeycomb
 
+@export var _undo_button: GameButton
+@export var _redo_button: GameButton
+@export var _restart_button: GameButton
+@export var _quit_button: GameButton
+
 var _manifest: Manifest
 var _level_number := 1
 
@@ -25,6 +30,12 @@ func _ready() -> void:
 			_load_level()
 		)
 	)
+
+	_undo_button.pressed.connect(_controller.undo_step)
+	_redo_button.pressed.connect(_controller.redo_step)
+
+	_restart_button.pressed.connect(_load_level)
+	_quit_button.pressed.connect(exited_game.emit)
 
 	_load_level()
 
