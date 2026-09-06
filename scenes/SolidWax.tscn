@@ -117,7 +117,14 @@ script = ExtResource("3_rvfp3")
 
 [node name="SolidWax" type="Node2D" unique_id=1383528041 node_paths=PackedStringArray("_direction_shapes")]
 script = ExtResource("1_neopi")
-_direction_shapes = [NodePath("Bottom Right Link"), NodePath("Bottom Link"), NodePath("Bottom Left Link"), NodePath("Top Left Link"), NodePath("Top Link"), NodePath("Top Right Link")]
+_direction_shapes = {
+0: NodePath("Bottom Right Link"),
+1: NodePath("Bottom Link"),
+2: NodePath("Bottom Left Link"),
+3: NodePath("Top Left Link"),
+4: NodePath("Top Link"),
+5: NodePath("Top Right Link")
+}
 
 [node name="Top Link" type="Node2D" parent="." unique_id=698402294]
 position = Vector2(0.24138641, -19.707275)

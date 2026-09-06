@@ -2,16 +2,16 @@ class_name SolidWax
 extends Wax
 
 
-@export var _direction_shapes: Array[Node2D]
+@export var _direction_shapes: Dictionary[Hexagon.Direction, Node2D]
 
 
 func bind_link(link: Link, piece_a: Piece, piece_b: Piece) -> void:
 	var position_offset := link.entity_b.current_tile.position - link.entity_a.current_tile.position
 	var direction := Hexagon.get_vector_direction(position_offset)
 
-	for index in _direction_shapes.size():
-		if index != direction as int:
-			_direction_shapes[index].free()
+	for shape_direction in _direction_shapes:
+		if shape_direction != direction:
+			_direction_shapes[shape_direction].free()
 	_direction_shapes.clear()
 
 	piece_a.position_changed.connect(_refresh_sprite)
