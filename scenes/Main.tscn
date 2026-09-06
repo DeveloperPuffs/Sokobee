@@ -1,6 +1,12 @@
 [gd_scene format=3 uid="uid://drai4rbni5lie"]
 
 [ext_resource type="Script" uid="uid://b0ausvqps25t0" path="res://source/main.gd" id="1_rvslj"]
+[ext_resource type="PackedScene" uid="uid://bmcu7h13gyer2" path="res://scenes/Menu.tscn" id="2_rarhs"]
+[ext_resource type="PackedScene" uid="uid://boc2xc2hwd5s0" path="res://scenes/Editor.tscn" id="3_vcsgt"]
+[ext_resource type="PackedScene" uid="uid://tjcm5lekc0od" path="res://scenes/Game.tscn" id="4_c01mt"]
 
 [node name="Main" type="Node2D" unique_id=110388656]
 script = ExtResource("1_rvslj")
+_menu_scene = ExtResource("2_rarhs")
+_editor_scene = ExtResource("3_vcsgt")
+_game_scene = ExtResource("4_c01mt")
