@@ -1,5 +1,5 @@
 class_name Wax
-extends Sprite2D
+extends Node2D
 
 
 var _link: Link
@@ -7,7 +7,7 @@ var _piece_a: Piece
 var _piece_b: Piece
 
 
-func _init(link: Link, piece_a: Piece, piece_b: Piece) -> void:
+func bind_link(link: Link, piece_a: Piece, piece_b: Piece) -> void:
 	_link = link
 	_piece_a = piece_a
 	_piece_b = piece_b

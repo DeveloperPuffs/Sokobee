@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://oynrnydot7i7"]
+
+[ext_resource type="Shader" uid="uid://c38r8kxculjk5" path="res://assets/shaders/sticky_wax.gdshader" id="1_162jl"]
+[ext_resource type="Script" uid="uid://k6xffddq7rp3" path="res://source/sticky_wax.gd" id="1_bmeaf"]
+[ext_resource type="Texture2D" uid="uid://cfckjjxqxylmy" path="res://assets/sprites/links/sticky_link.svg" id="1_dc04o"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_162jl"]
+resource_local_to_scene = true
+shader = ExtResource("1_162jl")
+shader_parameter/length = 64.0
+shader_parameter/thickness = 64.0
+
+[node name="StickyWax" type="Sprite2D" unique_id=603152259]
+material = SubResource("ShaderMaterial_162jl")
+texture = ExtResource("1_dc04o")
+script = ExtResource("1_bmeaf")

@@ -5,23 +5,8 @@ extends Wax
 const _THICKNESS := 64.0
 const _TEXTURE_SIZE := 256.0
 
-const _STICKY_TEXTURE := preload("res://assets/sprites/links/sticky_link.svg")
-const _SHADER := preload("res://assets/shaders/sticky_wax.gdshader")
-
 # This offset makes the sticky wax appear in front of solid links where they overlap
 const _Z_INDEX_OFFSET := 2 * Hexagon.Z_INDEX_SCALE + 2
-
-
-func _init(link: Link, piece_a: Piece, piece_b: Piece) -> void:
-	super(link, piece_a, piece_b)
-
-	texture = _STICKY_TEXTURE
-	texture_repeat = CanvasItem.TEXTURE_REPEAT_DISABLED
-
-	material = ShaderMaterial.new()
-	material.shader = _SHADER
-
-	material.set_shader_parameter("thickness", _THICKNESS)
 
 
 func _process(_delta: float) -> void:
@@ -33,7 +18,7 @@ func _process(_delta: float) -> void:
 	var delta := marker_b.global_position - marker_a.global_position
 	var distance := delta.length()
 	if is_zero_approx(distance):
-		return
+			return
 
 	var unit := delta / distance
 	var length := maxf(distance - (marker_a.radius + marker_b.radius), 0.0) + _THICKNESS
