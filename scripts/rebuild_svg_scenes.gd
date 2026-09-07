@@ -4,14 +4,14 @@ extends EditorScript
 
 
 const _SCENE_SVG_PATHS: Dictionary[String, String] = {
-	"res://scenes/cells/CellNormal.tscn": "res://assets/sprites/tiles/cell_normal.svg",
-	"res://scenes/cells/CellGoal.tscn": "res://assets/sprites/tiles/cell_goal.svg",
-	"res://scenes/cells/CellSelectable.tscn": "res://assets/sprites/editor/cell_selectable.svg",
-	"res://scenes/cells/CellSelected.tscn": "res://assets/sprites/editor/cell_selected.svg",
-	"res://scenes/icons/UndoIcon.tscn": "res://assets/sprites/buttons/icons/undo_icon.svg",
-	"res://scenes/icons/RedoIcon.tscn": "res://assets/sprites/buttons/icons/redo_icon.svg",
-	"res://scenes/icons/RestartIcon.tscn": "res://assets/sprites/buttons/icons/restart_icon.svg",
-	"res://scenes/icons/QuitIcon.tscn": "res://assets/sprites/buttons/icons/quit_icon.svg",
+	"res://scenes/svg_scenes/cells/CellNormal.tscn": "res://assets/sprites/tiles/cell_normal.svg",
+	"res://scenes/svg_scenes/cells/CellGoal.tscn": "res://assets/sprites/tiles/cell_goal.svg",
+	"res://scenes/svg_scenes/cells/CellSelectable.tscn": "res://assets/sprites/editor/cell_selectable.svg",
+	"res://scenes/svg_scenes/cells/CellSelected.tscn": "res://assets/sprites/editor/cell_selected.svg",
+	"res://scenes/svg_scenes/icons/UndoIcon.tscn": "res://assets/sprites/buttons/icons/undo_icon.svg",
+	"res://scenes/svg_scenes/icons/RedoIcon.tscn": "res://assets/sprites/buttons/icons/redo_icon.svg",
+	"res://scenes/svg_scenes/icons/RestartIcon.tscn": "res://assets/sprites/buttons/icons/restart_icon.svg",
+	"res://scenes/svg_scenes/icons/QuitIcon.tscn": "res://assets/sprites/buttons/icons/quit_icon.svg",
 }
 
 # If the import settings changed, this should be set to true to force rebuild every scene

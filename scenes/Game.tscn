@@ -3,11 +3,11 @@
 [ext_resource type="Script" uid="uid://bxosdtvcd1sxg" path="res://source/game.gd" id="1_78awf"]
 [ext_resource type="PackedScene" uid="uid://cl821nsxaarwo" path="res://scenes/Controller.tscn" id="3_cpr0p"]
 [ext_resource type="PackedScene" uid="uid://dqj3nmogbiner" path="res://scenes/Honeycomb.tscn" id="4_78awf"]
-[ext_resource type="PackedScene" uid="uid://cdl1do0da8ebo" path="res://scenes/icons/QuitIcon.tscn" id="4_400sg"]
+[ext_resource type="PackedScene" uid="uid://cdl1do0da8ebo" path="res://scenes/svg_scenes/icons/QuitIcon.tscn" id="4_400sg"]
 [ext_resource type="PackedScene" uid="uid://bgtfyduom2sws" path="res://scenes/GameButton.tscn" id="4_s0nni"]
-[ext_resource type="PackedScene" uid="uid://cn6kyq71t5jsb" path="res://scenes/icons/RestartIcon.tscn" id="5_aug50"]
-[ext_resource type="PackedScene" uid="uid://bju3j3bvpr0yy" path="res://scenes/icons/UndoIcon.tscn" id="5_g4kob"]
-[ext_resource type="PackedScene" uid="uid://b1kyhcqmgtes5" path="res://scenes/icons/RedoIcon.tscn" id="6_qy1jj"]
+[ext_resource type="PackedScene" uid="uid://cn6kyq71t5jsb" path="res://scenes/svg_scenes/icons/RestartIcon.tscn" id="5_aug50"]
+[ext_resource type="PackedScene" uid="uid://bju3j3bvpr0yy" path="res://scenes/svg_scenes/icons/UndoIcon.tscn" id="5_g4kob"]
+[ext_resource type="PackedScene" uid="uid://b1kyhcqmgtes5" path="res://scenes/svg_scenes/icons/RedoIcon.tscn" id="6_qy1jj"]
 
 [node name="Game" type="Node2D" unique_id=1780889916 node_paths=PackedStringArray("_controller", "_honeycomb", "_undo_button", "_redo_button", "_restart_button", "_quit_button")]
 script = ExtResource("1_78awf")
