@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c5ijggcyyudrk"]
 
 [ext_resource type="Script" uid="uid://de3jpss66xjfh" path="res://addons/curved_lines_2d/scalable_vector_shape_2d.gd" id="1_7o8m6"]
-[ext_resource type="Script" uid="uid://cxkyexr1lh8ak" path="res://source/solid_wax.gd" id="1_neopi"]
+[ext_resource type="Script" uid="uid://cxkyexr1lh8ak" path="res://source/level_nodes/solid_wax.gd" id="1_neopi"]
 [ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="2_neopi"]
 [ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="3_rvfp3"]
 

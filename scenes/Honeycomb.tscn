@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dqj3nmogbiner"]
 
-[ext_resource type="Script" uid="uid://bywmv4jan3kfq" path="res://source/honeycomb.gd" id="1_db0fd"]
+[ext_resource type="Script" uid="uid://bywmv4jan3kfq" path="res://source/level_nodes/honeycomb.gd" id="1_db0fd"]
 [ext_resource type="PackedScene" uid="uid://b1uvikogqsnhd" path="res://scenes/Cell.tscn" id="2_8gk6n"]
 [ext_resource type="PackedScene" uid="uid://b68jrnaws4an1" path="res://scenes/Bee.tscn" id="3_y5jdm"]
 [ext_resource type="PackedScene" uid="uid://cmv0kkthsgbs" path="res://scenes/Honey.tscn" id="4_slnha"]

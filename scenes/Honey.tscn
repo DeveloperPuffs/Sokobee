@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://cmv0kkthsgbs"]
 
-[ext_resource type="Script" uid="uid://vp8ad5qystq8" path="res://source/honey.gd" id="1_24mbs"]
+[ext_resource type="Script" uid="uid://vp8ad5qystq8" path="res://source/level_nodes/honey.gd" id="1_24mbs"]
 [ext_resource type="Script" uid="uid://de3jpss66xjfh" path="res://addons/curved_lines_2d/scalable_vector_shape_2d.gd" id="2_x2r5l"]
 [ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="3_c1u3n"]
 [ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="4_2haic"]
-[ext_resource type="Script" uid="uid://b7hu1lfwbj786" path="res://source/link_attachment_marker.gd" id="5_c1u3n"]
+[ext_resource type="Script" uid="uid://b7hu1lfwbj786" path="res://source/level_nodes/link_attachment_marker.gd" id="5_c1u3n"]
 
 [sub_resource type="Curve2D" id="Curve2D_cxu6k"]
 resource_local_to_scene = true

@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://b68jrnaws4an1"]
 
-[ext_resource type="Script" uid="uid://bg0sgpjuhbi8" path="res://source/bee.gd" id="1_cncwb"]
+[ext_resource type="Script" uid="uid://bg0sgpjuhbi8" path="res://source/level_nodes/bee.gd" id="1_cncwb"]
 [ext_resource type="Texture2D" uid="uid://etinujhfeptf" path="res://assets/sprites/characters/sleeping_indicator_placeholder.svg" id="3_ghu41"]
 [ext_resource type="Script" uid="uid://de3jpss66xjfh" path="res://addons/curved_lines_2d/scalable_vector_shape_2d.gd" id="3_pjeov"]
 [ext_resource type="Script" uid="uid://dlbv4pit17dnu" path="res://addons/curved_lines_2d/scalable_arc.gd" id="4_dfh60"]
-[ext_resource type="Script" uid="uid://b7hu1lfwbj786" path="res://source/link_attachment_marker.gd" id="5_dfh60"]
+[ext_resource type="Script" uid="uid://b7hu1lfwbj786" path="res://source/level_nodes/link_attachment_marker.gd" id="5_dfh60"]
 [ext_resource type="Script" uid="uid://dl1t88tthmwts" path="res://addons/curved_lines_2d/scalable_arc_list.gd" id="5_f131d"]
 
 [sub_resource type="Curve2D" id="Curve2D_dfh60"]
