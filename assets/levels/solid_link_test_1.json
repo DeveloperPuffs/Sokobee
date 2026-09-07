@@ -1,0 +1,144 @@
+{
+	"active": 3,
+	"entities": [
+		{
+			"identifier": 0,
+			"q": 1,
+			"r": 1,
+			"type": "block"
+		},
+		{
+			"identifier": 1,
+			"q": 0,
+			"r": 1,
+			"type": "block"
+		},
+		{
+			"identifier": 2,
+			"q": 1,
+			"r": 0,
+			"type": "block"
+		},
+		{
+			"facing": "TOP_CENTER",
+			"identifier": 3,
+			"q": 0,
+			"r": 2,
+			"type": "character"
+		},
+		{
+			"q": -1,
+			"r": 0,
+			"type": "block"
+		}
+	],
+	"links": [
+		{
+			"identifier_a": 2,
+			"identifier_b": 0,
+			"type": "SOLID"
+		},
+		{
+			"identifier_a": 2,
+			"identifier_b": 1,
+			"type": "SOLID"
+		}
+	],
+	"tiles": [
+		{
+			"q": 0,
+			"r": 0
+		},
+		{
+			"q": 1,
+			"r": 0
+		},
+		{
+			"height": 1,
+			"q": -1,
+			"r": 0
+		},
+		{
+			"q": 0,
+			"r": 1
+		},
+		{
+			"goal": true,
+			"q": 0,
+			"r": -1
+		},
+		{
+			"q": 1,
+			"r": -1
+		},
+		{
+			"height": 1,
+			"q": -1,
+			"r": 1
+		},
+		{
+			"height": 1,
+			"q": 2,
+			"r": 0
+		},
+		{
+			"q": 2,
+			"r": -1
+		},
+		{
+			"q": 1,
+			"r": 1
+		},
+		{
+			"q": 0,
+			"r": 2
+		},
+		{
+			"goal": true,
+			"q": 0,
+			"r": -2
+		},
+		{
+			"q": -1,
+			"r": 2
+		},
+		{
+			"q": -2,
+			"r": 2
+		},
+		{
+			"q": -2,
+			"r": 1
+		},
+		{
+			"goal": true,
+			"q": -1,
+			"r": -1
+		},
+		{
+			"q": 1,
+			"r": -2
+		},
+		{
+			"goal": true,
+			"q": 3,
+			"r": -2
+		},
+		{
+			"q": 3,
+			"r": -1
+		},
+		{
+			"q": 3,
+			"r": 0
+		},
+		{
+			"q": 2,
+			"r": 1
+		},
+		{
+			"q": 1,
+			"r": 2
+		}
+	]
+}

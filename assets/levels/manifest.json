@@ -45,20 +45,44 @@
 			"title": "Organize the Beeroom"
 		},
 		{
-			"filepath": "testing1.json",
-			"title": "Testing"
+			"filepath": "mutli_block_test.json",
+			"title": "Multi Block Test"
 		},
 		{
-			"filepath": "testing2.json",
-			"title": "Testing 2"
+			"filepath": "tile_height_test_1.json",
+			"title": "Tile Height Test 1"
 		},
 		{
-			"filepath": "testing_3.json",
-			"title": "Testing 3"
+			"filepath": "tile_height_test_2.json",
+			"title": "Tile Height Test 2"
+		},
+		{
+			"filepath": "solid_link_test_1.json",
+			"title": "Solid Link Test 1"
+		},
+		{
+			"filepath": "character_switching_test_1.json",
+			"title": "Character Switching Test 1"
+		},
+		{
+			"filepath": "sticky_link_test_1.json",
+			"title": "Sticky Link Test 1"
 		},
 		{
 			"filepath": "sticky_drag_test.json",
 			"title": "Sticky Drag Test"
+		},
+		{
+			"filepath": "sticky_link_test_2.json",
+			"title": "Sticky Link Test 2"
+		},
+		{
+			"filepath": "sleeping_bee_test.json",
+			"title": "Sleeping Bee Test"
+		},
+		{
+			"filepath": "testing_1.json",
+			"title": "Testing"
 		}
 	]
 }
