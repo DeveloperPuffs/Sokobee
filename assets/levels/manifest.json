@@ -5,24 +5,44 @@
 	},
 	"levels": [
 		{
-			"filepath": "level_1.json",
-			"title": "Level 1"
+			"filepath": "original_level_1.json",
+			"title": "Just a Beehive"
 		},
 		{
-			"filepath": "level_2.json",
-			"title": "Level 2"
+			"filepath": "original_level_2.json",
+			"title": "Also Just a Beehive"
 		},
 		{
-			"filepath": "level_3.json",
-			"title": "Level 3"
+			"filepath": "original_level_3.json",
+			"title": "Two Too Many"
 		},
 		{
-			"filepath": "level_4.json",
-			"title": "Level 4"
+			"filepath": "original_level_4.json",
+			"title": "Double Push"
 		},
 		{
-			"filepath": "level_5.json",
-			"title": "Level 5"
+			"filepath": "original_level_5.json",
+			"title": "Hexscape"
+		},
+		{
+			"filepath": "original_level_6.json",
+			"title": "Swiss Cheese"
+		},
+		{
+			"filepath": "original_level_7.json",
+			"title": "Roundabout"
+		},
+		{
+			"filepath": "original_level_8.json",
+			"title": "Open Space"
+		},
+		{
+			"filepath": "original_level_9.json",
+			"title": "Procedural Honeycomb"
+		},
+		{
+			"filepath": "original_level_10.json",
+			"title": "Organize the Beeroom"
 		},
 		{
 			"filepath": "testing1.json",
